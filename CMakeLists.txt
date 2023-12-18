@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(proj_name "AgileVision")
 
+message(status "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+
 project (${proj_name})
 
 set(trd_incl "${CMAKE_SOURCE_DIR}/third_party/include")
@@ -33,6 +35,8 @@ set(CMAKE_ISNTALL_INCLUDE "${CMAKE_INSTALL_PREFIX}/include/${proj_name}")
 set(license_file "${CMAKE_CURRENT_SOURCE_DIR}/doc/license_template.txt" )
 
 add_subdirectory(source/agile_vision/basic)
+
+add_subdirectory(source/agile_vision/core)
 
 add_subdirectory(source/agile_vision/test)
 

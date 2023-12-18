@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: data_spec.h  
+ *   File: core_base_def.h  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -25,36 +25,44 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+#ifndef __core_base_def_h__
+#define __core_base_def_h__
 
-#ifndef __data_spec_h__
-#define __data_spec_h__
-
-#include <cassert>
-#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/basic/base_type_def.h"
 
 AGV_NAMESPACE_BEGIN
 
-struct DataSpec
+enum class DataType
 {
-    static DataSpec Single(DataType type){ return {type}; }
-    static DataSpec SingleInt(){ return StaticArray(DataType::kInt); }
-    static DataSpec SingleFloat(){ return StaticArray(DataType::kFloat); }
-    static DataSpec SingleString(){ return StaticArray(DataType::kString); }
-    static DataSpec SingleBytes(){ return StaticArray(DataType::kBytes); }
-    static DataSpec StaticArray(DataType type, unsigned int fixed_size = 1)
-    { 
-        assert(fixed_size);
-        return {type, 0, fixed_size}; 
-    }
-    static DataSpec DynamicArray(DataType type){ return {type, 0, 0}; }
-    bool isStaticArray()const{ return arry_size > 0; }
-    bool isDynamicArray()const{ return arry_size == 0; }
-    DataType major_type = DataType::kUnk;
-    unsigned int subtype = 0;
-    unsigned int arry_size = 1; // 0 means: size dynamic, other value means fix size
+    kUnk,
+    kInt,
+    kFloat,
+    kString,
+    kBytes,
+    kImage
+};
+
+inline bool IsFundamentalType(DataType t)
+{
+    return t == DataType::kInt || t == DataType::kFloat;
+}
+
+inline unsigned int GetFundamentalTypeSize(DataType t)
+{
+    if(t == DataType::kInt)
+        return sizeof(int);
+    if(t == DataType::kFloat)
+        return sizeof(float);
+    return 0;
+}
+
+enum class PinKind
+{
+    kNone,
+    kIn,
+    kOut
 };
 
 AGV_NAMESPACE_END
 
 #endif
-
