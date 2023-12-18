@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: test.cpp  
+ *   File: relationship_mapping.h  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -26,11 +26,36 @@
  *   SOFTWARE.
  */
 
-#include <iostream>
+#ifndef __relationship_network_h__
+#define __relationship_network_h__
 
-int main()
+#include "ratel/basic/directed_graph.hpp"
+#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/core_export.h"
+
+AGV_NAMESPACE_BEGIN
+
+class AGV_CORE_API RelationshipNetwork
 {
-    std::cout << "Enter test main..." << std::endl;
-    std::cout << "Leave test main..." << std::endl;
-    return 0; 
-}
+public:
+    bool checkCycle()const;
+    void addToolVertex(Tool* t);
+    void makeRelationship(Tool* producer, const AgvString& produce_pin_key, Tool* consumer, const AgvString& consume_pin_key);
+    RelationshipNetwork();
+    ~RelationshipNetwork();
+
+private:
+    struct VertexData{
+        Tool* t = nullptr;
+    };
+    struct ArcData{
+        AgvString produce_pin_key;
+        AgvString consume_pin_key;
+    };
+    ratel::DirectedGraph<VertexData, ArcData, std::string> dg_;
+};
+
+AGV_NAMESPACE_END
+
+#endif
+

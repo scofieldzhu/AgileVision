@@ -29,17 +29,30 @@
 #ifndef __pin_h__
 #define __pin_h__
 
-#include "agile_vision/basic/base_type_def.h"
+#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/core_export.h"
 
 AGV_NAMESPACE_BEGIN
 
-class Pin
+class AGV_CORE_API Pin
 {
 public:
+    const auto& dataSpec()const{ return ds_; }
+    PinDirection direction()const{ return direction_; }
+    DataBuffer* mutableDataBuffer(){ return data_buffer_.get(); }
+    const DataBuffer* dataBuffer()const{ return data_buffer_.get(); }
+    void setName(const AgvString& str){ name_ = str; }
+    const auto& name()const{ return name_; }
+    Pin(PinDirection dir, const DataSpec& ds);
+    ~Pin();
 
+private:
+    AgvString name_ = "unnamed";
+    PinDirection direction_;
+    const DataSpec& ds_;
+    DataBufferPtr data_buffer_;
 };
 
 AGV_NAMESPACE_END
 
 #endif
-

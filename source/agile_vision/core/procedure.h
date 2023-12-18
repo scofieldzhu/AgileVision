@@ -25,4 +25,26 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+#ifndef __procedure_h__
+#define __procedure_h__
 
+#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/core_export.h"
+
+AGV_NAMESPACE_BEGIN
+
+class RelationshipNetwork;
+class AGV_CORE_API Procedure
+{
+public:
+    Procedure();
+    ~Procedure();
+
+private:
+    friend class Tool;
+    RelationshipNetwork* tool_relationships_;
+};
+
+AGV_NAMESPACE_END
+
+#endif

@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: relationship_mapping.h  
+ *   File: image_data.h  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -26,22 +26,32 @@
  *   SOFTWARE.
  */
 
-#ifndef __relationship_mapping_h__
-#define __relationship_mapping_h__
+#ifndef __image_data_h__
+#define __image_data_h__
 
-#include "ratel/basic/directed_graph.hpp"
 #include "agile_vision/basic/base_type_def.h"
 
 AGV_NAMESPACE_BEGIN
 
-class RelationshipMapping
+struct ImageData
 {
-public:
-    RelationshipMapping();
-    ~RelationshipMapping();
+    enum DataType
+    {
+        DT_UNK,
+        DT_UCHAR,
+        DT_SHORT,
+        DT_INT,
+        DT_FLOAT
+    };
+    uint8_t type = DT_UNK; 
+    uint8_t channel = 1;
+    uint8_t bits = 8;
+    uint32_t width = 0;
+    uint32_t height = 0;
+    uint32_t size = 0;
+    void* data = nullptr;
 };
 
 AGV_NAMESPACE_END
 
 #endif
-

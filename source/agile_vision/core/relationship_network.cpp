@@ -25,17 +25,41 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
-
-#include "relationship_mapping.h"
+#include "relationship_network.h"
+#include "tool.h"
 
 AGV_NAMESPACE_BEGIN
 
-RelationshipMapping::RelationshipMapping()
+RelationshipNetwork::RelationshipNetwork()
 {
 }
 
-RelationshipMapping::~RelationshipMapping()
+RelationshipNetwork::~RelationshipNetwork()
 {
+}
+
+bool RelationshipNetwork::checkCycle() const
+{
+    return dg_.checkCycle();
+}
+
+void RelationshipNetwork::addToolVertex(Tool *t)
+{
+    if(t == nullptr)
+        return;    
+    VertexData vd;
+    vd.t = t;
+    dg_.addVertex(t->iid(), vd);
+}
+
+void RelationshipNetwork::makeRelationship(Tool* producer, const AgvString& produce_pin_key, Tool* consumer, const AgvString& consume_pin_key)
+{
+    if(producer == nullptr || consumer == nullptr)
+        return;
+    ArcData ad;
+    ad.produce_pin_key = produce_pin_key;
+    ad.consume_pin_key = consume_pin_key;
+    dg_.addArc(producer->iid(), consumer->iid(), ad);
 }
 
 AGV_NAMESPACE_END

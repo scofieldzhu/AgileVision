@@ -26,3 +26,22 @@
  *   SOFTWARE.
  */
 
+#include "pin.h"
+#include "data_buffer.h"
+
+AGV_NAMESPACE_BEGIN
+
+Pin::Pin(PinDirection dir, const DataSpec& ds)
+    :direction_(dir),
+    ds_(ds)
+{
+    if(direction_ != PinDirection::kIn){
+        data_buffer_ = std::make_shared<DataBuffer>(ds_);
+    }
+}
+
+Pin::~Pin()
+{
+}
+
+AGV_NAMESPACE_END

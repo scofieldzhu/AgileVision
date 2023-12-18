@@ -29,12 +29,30 @@
 #ifndef __tool_h__
 #define __tool_h__
 
-#include "agile_vision/basic/base_type_def.h"
+#include <map>
+#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/core_export.h"
 
 AGV_NAMESPACE_BEGIN
 
-class Tool{
+class AGV_CORE_API Tool
+{
+public:
+    void setInputConnection(const PinKey& consume_key, Tool* producer, const PinKey& produce_key);
+    void run();
+    const std::string& iid()const{ return iid_; }
+    Procedure* belongedProcedure();
+    Tool(const std::string& iid);
+    ~Tool();
 
+protected:
+    using PinMap = std::map<AgvString, PinPtr>;
+    PinMap input_pin_dict_;
+    PinMap output_pin_dict_;
+
+private:
+    const std::string iid_;
+    AgvString name_ = "unnamed";
 };
 
 AGV_NAMESPACE_END

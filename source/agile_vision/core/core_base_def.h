@@ -25,10 +25,12 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+
 #ifndef __core_base_def_h__
 #define __core_base_def_h__
 
 #include "agile_vision/basic/base_type_def.h"
+#include <memory>
 
 AGV_NAMESPACE_BEGIN
 
@@ -56,12 +58,31 @@ inline unsigned int GetFundamentalTypeSize(DataType t)
     return 0;
 }
 
-enum class PinKind
+enum class PinDirection
 {
-    kNone,
+    kNoDir,
     kIn,
     kOut
 };
+
+class DataBuffer;
+using DataBufferPtr = std::shared_ptr<DataBuffer>;
+
+struct DataSpec;
+
+class Pin;
+using PinPtr = std::shared_ptr<Pin>;
+using PinKey = AgvString;
+
+class Tool;
+using ToolPtr = std::shared_ptr<Tool>;
+using ToolList = std::vector<ToolPtr>;
+
+class Process;
+using ProcessPtr = std::shared_ptr<Process>;
+
+class Procedure;
+using ProcedurePtr = std::shared_ptr<Procedure>;
 
 AGV_NAMESPACE_END
 
