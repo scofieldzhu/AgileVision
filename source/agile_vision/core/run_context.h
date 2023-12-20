@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: testx.cpp  
+ *   File: run_context.h  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -26,3 +26,21 @@
  *   SOFTWARE.
  */
 
+#ifndef __run_context_h__
+#define __run_context_h__
+
+#include "agile_vision/core/core_base_def.h"
+
+AGV_NAMESPACE_BEGIN
+
+struct RunContext
+{
+    bool is_running = false;
+    int run_result = 0;
+    uint64_t occur_time = 0;
+    uint64_t elapsed_time = 0;
+};
+
+AGV_NAMESPACE_END
+
+#endif

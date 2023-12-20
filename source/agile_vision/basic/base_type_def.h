@@ -43,6 +43,8 @@ using AgvMultiBytes = std::vector<AgvBytes>;
 using AgvString = std::string;
 using AgvMultiString = std::vector<AgvString>;
 
+using agv_time_t = uint64_t;
+
 AGV_NAMESPACE_END
 
 #endif

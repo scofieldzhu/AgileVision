@@ -26,3 +26,27 @@
  *   SOFTWARE.
  */
 
+#ifndef __process_h__
+#define __process_h__
+
+#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/core_export.h"
+
+AGV_NAMESPACE_BEGIN
+
+class AGV_CORE_API Process
+{
+public:
+    void insertTool(ToolPtr t);
+    void removeTool(Tool* t);
+    Process();
+    ~Process();
+
+private:
+    ToolList tools_;
+};
+
+AGV_NAMESPACE_END
+
+#endif
+

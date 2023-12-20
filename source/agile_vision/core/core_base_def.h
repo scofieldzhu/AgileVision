@@ -84,6 +84,15 @@ using ProcessPtr = std::shared_ptr<Process>;
 class Procedure;
 using ProcedurePtr = std::shared_ptr<Procedure>;
 
+class DataPin;
+using DataPinPtr = std::shared_ptr<DataPin>;
+
+class OutputPin;
+using OutputPinPtr = std::shared_ptr<OutputPin>;
+
+class InputPin;
+using InputPinPtr = std::shared_ptr<InputPin>;
+
 AGV_NAMESPACE_END
 
 #endif

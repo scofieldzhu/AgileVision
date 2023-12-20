@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: pin.cpp  
+ *   File: output_pin.h  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -26,22 +26,26 @@
  *   SOFTWARE.
  */
 
-#include "pin.h"
-#include "data_buffer.h"
+#ifndef __output_pin_h__
+#define __output_pin_h__
+
+#include "agile_vision/core/tool_pin.h"
+#include "agile_vision/core/data_buffer.h"
 
 AGV_NAMESPACE_BEGIN
 
-Pin::Pin(PinDirection dir, const DataSpec& ds)
-    :direction_(dir),
-    ds_(ds)
+class AGV_CORE_API OutputPin : public ToolPin
 {
-    if(direction_ != PinDirection::kIn){
-        data_buffer_ = std::make_shared<DataBuffer>(ds_);
-    }
-}
+public:
+    DataBuffer& mutableDataBuffer(){ return data_buffer_; }
+    const DataBuffer& dataBuffer()const{ return data_buffer_; }
+    OutputPin(const DataSpec& ds);
+    ~OutputPin();
 
-Pin::~Pin()
-{
-}
+private:
+    DataBuffer data_buffer_;
+};
 
 AGV_NAMESPACE_END
+
+#endif

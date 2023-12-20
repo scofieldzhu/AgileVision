@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: relationship_mapping.cpp  
+ *   File: relationship_network.cpp  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -25,6 +25,7 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+
 #include "relationship_network.h"
 #include "tool.h"
 
@@ -43,7 +44,7 @@ bool RelationshipNetwork::checkCycle() const
     return dg_.checkCycle();
 }
 
-void RelationshipNetwork::addToolVertex(Tool *t)
+void RelationshipNetwork::addTool(const Tool *t)
 {
     if(t == nullptr)
         return;    
@@ -52,16 +53,55 @@ void RelationshipNetwork::addToolVertex(Tool *t)
     dg_.addVertex(t->iid(), vd);
 }
 
-void RelationshipNetwork::makeRelationship(Tool* producer, const AgvString& produce_pin_key, Tool* consumer, const AgvString& consume_pin_key)
+bool RelationshipNetwork::existTool(const Tool *t) const
 {
-    if(producer == nullptr || consumer == nullptr)
+    return dg_.existVertex(t->iid());
+}
+
+void RelationshipNetwork::makeRelationship(const ToolLinkage& linkage)
+{
+    if(!linkage.isValid())
         return;
     ArcData ad;
-    ad.produce_pin_key = produce_pin_key;
-    ad.consume_pin_key = consume_pin_key;
-    dg_.addArc(producer->iid(), consumer->iid(), ad);
+    ad.produce_pin_key = linkage.produce_pin_key;
+    ad.data_location = linkage.data_location;
+    ad.consume_pin_key = linkage.consum_pin_key;
+    dg_.addArc(linkage.producer->iid(), linkage.consumer->iid(), ad);
+}
+
+bool RelationshipNetwork::getToolRelationships(const Tool* t, ToolLinkageList* produce_linkages, ToolLinkageList* consume_linkages) const
+{
+    if(t == nullptr || !dg_.existVertex(t->iid()))
+        return false;
+    DGType::ArcInfoList out_arc_infos, in_arc_infos;
+    dg_.getVertexArcs(t->iid(), out_arc_infos, in_arc_infos);
+    if(produce_linkages){
+        for(const auto& out_arc_info : out_arc_infos){
+            ToolLinkage tl;
+            tl.producer = t;
+            tl.produce_pin_key = out_arc_info.data.produce_pin_key;
+            tl.data_location = out_arc_info.data.data_location;
+            VertexData vd;
+            dg_.getVertexData(out_arc_info.target_vertex, vd);
+            tl.consumer = vd.t;
+            tl.consum_pin_key = out_arc_info.data.consume_pin_key;
+            produce_linkages->push_back(std::move(tl));
+        }
+    }
+    if(consume_linkages){
+        for(const auto& in_arc_info : in_arc_infos){
+            ToolLinkage tl;
+            VertexData vd;
+            dg_.getVertexData(in_arc_info.source_vertex, vd);
+            tl.producer = vd.t;
+            tl.produce_pin_key = in_arc_info.data.produce_pin_key;
+            tl.data_location = in_arc_info.data.data_location;
+            tl.consumer = t;
+            tl.consum_pin_key = in_arc_info.data.consume_pin_key;
+            produce_linkages->push_back(std::move(tl));
+        }
+    }
+    return true;
 }
 
 AGV_NAMESPACE_END
-
-

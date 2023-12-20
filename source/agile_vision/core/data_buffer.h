@@ -60,6 +60,8 @@ public:
     void setBytesValue(const agv_byte* bytes, size_t byte_size, size_t idx = 0);
     std::optional<AgvBytes> getBytesValue(size_t idx = 0)const;
     const AgvMultiBytes& getAllBytesValues()const;
+    void updateModifyTime(agv_time_t t);
+    agv_time_t lastModifyTime()const{ return last_modify_time_; }
     explicit DataBuffer(const DataSpec& data_spec);
     ~DataBuffer();
 
@@ -69,6 +71,7 @@ private:
     AgvBytes fundamental_bytes_;
     AgvMultiBytes bytes_table_;
     size_t value_size_ = 0;
+    agv_time_t last_modify_time_ = 0;
 };
 
 AGV_NAMESPACE_END

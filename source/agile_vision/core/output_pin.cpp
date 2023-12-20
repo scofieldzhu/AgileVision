@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: data_spec.h  
+ *   File: output_pin.cpp  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -25,40 +25,18 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
-
-#ifndef __data_spec_h__
-#define __data_spec_h__
-
-#include <cassert>
-#include "agile_vision/core/core_base_def.h"
+#include "output_pin.h"
 
 AGV_NAMESPACE_BEGIN
 
-struct DataSpec
+OutputPin::OutputPin(const DataSpec& ds)
+    :ToolPin(ds),
+    data_buffer_(ds)
 {
-    static DataSpec Single(DataType type){ return {type}; }
-    static DataSpec SingleInt(){ return StaticArray(DataType::kInt); }
-    static DataSpec SingleFloat(){ return StaticArray(DataType::kFloat); }
-    static DataSpec SingleString(){ return StaticArray(DataType::kString); }
-    static DataSpec SingleBytes(){ return StaticArray(DataType::kBytes); }
-    static DataSpec StaticArray(DataType type, unsigned int fixed_size = 1)
-    { 
-        assert(fixed_size);
-        return {type, 0, fixed_size}; 
-    }
-    static DataSpec DynamicArray(DataType type){ return {type, 0, 0}; }
-    bool isStaticArray()const{ return arry_size > 0; }
-    bool isDynamicArray()const{ return arry_size == 0; }    
-    bool compatibleWith(const DataSpec& ds)const
-    {        
-        return ds.major_type == major_type && ds.subtype == subtype && ds.arry_size == arry_size;
-    }
-    DataType major_type = DataType::kUnk;
-    unsigned int subtype = 0;
-    unsigned int arry_size = 1; // 0 means: size dynamic, other value means fix size
-};
+}
 
+OutputPin::~OutputPin()
+{
+
+}
 AGV_NAMESPACE_END
-
-#endif
-
