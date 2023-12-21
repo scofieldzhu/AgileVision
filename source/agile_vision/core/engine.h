@@ -1,4 +1,3 @@
- 
 /* 
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
@@ -31,6 +30,7 @@
 #define __engine_h__
 
 #include <thread>
+#include <condition_variable>
 #include "ratel/basic/notifier.hpp"
 #include "ratel/basic/id_seed.hpp"
 #include "agile_vision/core/core_base_def.h"
@@ -52,10 +52,9 @@ public:
     void destroyWork(wkid_t w);
     bool existsWork(wkid_t w)const;
     using wtid_t = uint32_t;
-    wtid_t createWait(wkid_list works);
+    using finish_callback = std::function<void(wtid_t)>;
+    wtid_t createWait(wkid_list works, finish_callback cb);
     void destroyWait(wtid_t wait);
-    using wait_notifier = ratel::Notifier<wtid_t>;
-    wait_notifier& waitNotifier(){ return wait_notifier_; }
     Engine();
     ~Engine();
 
@@ -64,6 +63,7 @@ private:
     int locateWorkPos(wkid_t w)const;
     void makeActiveWork(wkid_t w)const;
     void runThreadProc(wkid_t);
+    void updateWaitThreadProc();
     enum Status
     {
         STATUS_IDLE,
@@ -79,15 +79,17 @@ private:
     std::map<wkid_t, WorkPtr> work_table_;
     struct Wait 
     {
-        std::vector<wkid_t> target_wids;
+        std::map<wkid_t, bool> status_dict;
+        std::function<void(wtid_t)> cb;
     };
     using WaitPtr = std::shared_ptr<Wait>;
     std::map<wtid_t, WaitPtr> wait_table_;
-    wkid_list active_work_ids_;
     ratel::IdSeed<wkid_t> work_id_seed_{1};
     ratel::IdSeed<wtid_t> wait_id_seed_{1};
-    wait_notifier wait_notifier_;
-    std::mutex active_works_mutex_;
+    bool stop_update_wait_ = false;
+    wtid_t finish_work_id_ = null_id;
+    std::condition_variable check_wait_cv_;
+    std::mutex access_wait_mutex_;
 };
 
 AGV_NAMESPACE_END
