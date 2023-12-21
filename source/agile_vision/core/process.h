@@ -37,12 +37,22 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API Process
 {
 public:
+    using iterator = ToolList::iterator;
+    using const_iterator = ToolList::const_iterator;
+    iterator begin(){ return tools_.begin(); }
+    const_iterator begin()const{ return tools_.begin(); }
+    iterator end(){ return tools_.end(); }
+    const_iterator end()const{ return tools_.end(); }
     RunContext& runContext(){ return run_context_; }
     const RunContext& runContext()const{ return run_context_; }
     bool run();
-    void insertTool(ToolPtr t, uint32_t pos);
+    void insertTool(const_iterator pos, ToolPtr t);
     Tool* findTool(const AgvString& name, bool recursive)const;
+    const_iterator findTool(Tool* t)const;
+    bool existsTool(Tool* t)const;
     void removeTool(Tool* t);
+    void removeTool(const_iterator pos);
+    void removeTool(iterator pos);
     void setAlias(const AgvString& s);
     const AgvString& alias()const{ return alias_; }
     const std::string& iid()const{ return iid_; }

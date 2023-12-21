@@ -48,6 +48,49 @@ bool Process::run()
     return s;
 }
 
+void Process::insertTool(const_iterator pos, ToolPtr t)
+{
+    if(!existsTool(t.get()))
+        tools_.insert(pos, t);
+}
+
+Tool* Process::findTool(const AgvString& name, bool recursive) const
+{
+    if(!tools_.empty()){
+        auto it = std::find_if(tools_.begin(), tools_.end(), [name](const auto& item){ return item->name() == name; });
+        if(it != tools_.end())
+            return (*it).get();
+    }
+    return nullptr;
+}
+
+Process::const_iterator Process::findTool(Tool *t) const
+{
+    if(t && !tools_.empty())
+        return std::find_if(tools_.begin(), tools_.end(), [t](const auto& item){ return item.get() == t; });
+    return end();
+}
+
+bool Process::existsTool(Tool *t) const
+{
+    return t && !tools_.empty() && std::find_if(tools_.begin(), tools_.end(), [t](const auto& item){ return item.get() == t; }) != tools_.end();
+}
+
+void Process::removeTool(Tool* t)
+{
+    auto it = findTool(t);
+    if(it != end())
+        tools_.erase(it);
+}
+
+void Process::removeTool(const_iterator pos)
+{
+    tools_.erase(pos);
+}
+
+void Process::removeTool(iterator pos)
+{
+    tools_.erase(pos);
+}
+
 AGV_NAMESPACE_END
-
-
