@@ -29,7 +29,7 @@
 #ifndef __process_h__
 #define __process_h__
 
-#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/run_context.h"
 #include "agile_vision/core/core_export.h"
 
 AGV_NAMESPACE_BEGIN
@@ -37,13 +37,23 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API Process
 {
 public:
-    void insertTool(ToolPtr t);
+    RunContext& runContext(){ return run_context_; }
+    const RunContext& runContext()const{ return run_context_; }
+    bool run();
+    void insertTool(ToolPtr t, uint32_t pos);
+    Tool* findTool(const AgvString& name, bool recursive)const;
     void removeTool(Tool* t);
-    Process();
+    void setAlias(const AgvString& s);
+    const AgvString& alias()const{ return alias_; }
+    const std::string& iid()const{ return iid_; }
+    Process(const std::string& iid);
     ~Process();
 
 private:
+    const std::string iid_;
+    AgvString alias_{"null"};
     ToolList tools_;
+    RunContext run_context_;
 };
 
 AGV_NAMESPACE_END

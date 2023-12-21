@@ -36,9 +36,11 @@ AGV_NAMESPACE_BEGIN
 struct RunContext
 {
     bool is_running = false;
-    int run_result = 0;
+    int32_t run_result = 0;
     uint64_t occur_time = 0;
     uint64_t elapsed_time = 0;
+    uint32_t thread_priority = 0;
+    uint32_t cpu_id = 0;
 };
 
 AGV_NAMESPACE_END
