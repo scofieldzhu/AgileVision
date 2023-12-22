@@ -103,11 +103,6 @@ bool Tool::setPinConnection(const PinKey& consume_key, const ProduceInfo& pi)
 
 bool Tool::run()
 {
-    auto procedure = belongedProcedure();
-    if(procedure == nullptr){
-        SPDLOG_ERROR("No procedure object exists!");
-        return false;
-    }
     if(!checkPinDataCompatible()){
         SPDLOG_ERROR("CheckPinDataCompatible failed!");
         return false;
@@ -222,16 +217,6 @@ void Tool::addPin(const PinKey& key, ToolPinPtr pin)
     if(tool_pin_dict_.find(key) == tool_pin_dict_.end()){
         tool_pin_dict_[key] = pin;
     }
-}
-
-Procedure* Tool::belongedProcedure()
-{
-    return nullptr;
-}
-
-const Procedure* Tool::belongedProcedure()const
-{
-    return nullptr;
 }
 
 AGV_NAMESPACE_END

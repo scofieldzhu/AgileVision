@@ -45,14 +45,13 @@ public:
     const PropPin* getPropPin(const PinKey& key)const;
     const ToolPin* getToolPin(const PinKey& key)const;
     const std::string& iid()const{ return iid_; }
-    Procedure* belongedProcedure();
-    const Procedure* belongedProcedure()const;
     void setName(const AgvString& str);
     const auto& name()const{ return name_; }
     Tool(const std::string& iid);
     virtual ~Tool();
 
 protected:
+    using ToolPinPtr = std::shared_ptr<ToolPin>;
     OutputPin* getOutputPin(const PinKey& key);
     InputPin* getInputPin(const PinKey& key);
     PropPin* getPropPin(const PinKey& key);

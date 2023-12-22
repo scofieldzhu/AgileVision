@@ -21,7 +21,7 @@ target_compile_definitions(${proj_name} PRIVATE
 )
 
 if(WIN32)
-	target_compile_definitions(${proj_name} PRIVATE AGILE_VISION_EXPORT)
+	target_compile_definitions(${proj_name} PRIVATE AGILE_VISION_CORE_EXPORT)
 endif()
 
 set(deplibs_dbg spdlogd)

@@ -1,4 +1,4 @@
-set(proj_name "agile_vision.basic")
+set(proj_name "agile_vision.stdtool")
 
 project(${proj_name})
 
@@ -21,8 +21,10 @@ target_compile_definitions(${proj_name} PRIVATE
 )
 
 if(WIN32)
-	target_compile_definitions(${proj_name} PRIVATE AGILE_VISION_BASIC_EXPORT)
+	target_compile_definitions(${proj_name} PRIVATE AGILE_VISION_STDTOOL_EXPORT)
 endif()
+
+target_link_libraries(${proj_name} basic core)
 
 set(deplibs_dbg spdlogd)
 set(deplibs_opt spdlog)
@@ -38,7 +40,7 @@ target_link_libraries(${proj_name} debug ${deplibs_dbg} optimized ${deplibs_opt}
 install(TARGETS ${proj_name} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(TARGETS ${proj_name} ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 file(GLOB HEADERS "*.h" "*.hpp")
-install(FILES ${HEADERS} DESTINATION ${CMAKE_ISNTALL_INCLUDE}/basic)
+install(FILES ${HEADERS} DESTINATION ${CMAKE_ISNTALL_INCLUDE}/stdtool)
 
 
 
