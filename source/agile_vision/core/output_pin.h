@@ -39,6 +39,8 @@ class AGV_CORE_API OutputPin : public ToolPin
 public:
     DataBuffer& mutableDataBuffer(){ return data_buffer_; }
     const DataBuffer& dataBuffer()const{ return data_buffer_; }
+    bool canReferenceData() const override;
+    PinType getPinType()const override;
     OutputPin(const DataSpec& ds);
     ~OutputPin();
 

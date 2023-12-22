@@ -36,6 +36,16 @@ OutputPin::OutputPin(const DataSpec& ds)
 {
 }
 
+bool OutputPin::canReferenceData()const
+{
+    return false;
+}
+
+PinType OutputPin::getPinType() const
+{
+    return PinType::kOutput;
+}
+
 OutputPin::~OutputPin()
 {
 

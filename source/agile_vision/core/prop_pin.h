@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: input_pin.cpp  
+ *   File: prop_pin.h  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -26,27 +26,30 @@
  *   SOFTWARE.
  */
 
-#include "input_pin.h"
+#ifndef __prop_pin_h__
+#define __prop_pin_h__
+
+#include "agile_vision/core/tool_pin.h"
+#include "agile_vision/core/data_buffer.h"
 
 AGV_NAMESPACE_BEGIN
 
-InputPin::InputPin(const DataSpec &ds)
-    :ToolPin(ds)
+class AGV_CORE_API PropPin : public ToolPin
 {
-}
+public:
+    bool loadProps(const AgvBytes& data);
+    void serializeProps(AgvBytes& data)const;
+    DataBuffer& mutableDataBuffer(){ return data_buffer_; }
+    const DataBuffer& dataBuffer()const{ return data_buffer_; }
+    bool canReferenceData() const override;
+    PinType getPinType()const override;
+    PropPin(const DataSpec& ds);
+    ~PropPin();
 
-InputPin::~InputPin()
-{
-}
-
-bool InputPin::canReferenceData()const
-{
-    return true;
-}
-
-PinType InputPin::getPinType() const
-{
-    return PinType::kInput;
-}
+private:
+    DataBuffer data_buffer_;
+};
 
 AGV_NAMESPACE_END
+
+#endif

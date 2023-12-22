@@ -38,6 +38,8 @@ class AGV_CORE_API InputPin : public ToolPin
 public:
     void setOptional(bool s){ optional_ = s; }
     bool optional()const{ return optional_; }
+    bool canReferenceData() const override;
+    PinType getPinType()const override;
     InputPin(const DataSpec& ds);
     ~InputPin();
 

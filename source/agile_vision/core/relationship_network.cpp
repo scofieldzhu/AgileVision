@@ -65,7 +65,7 @@ void RelationshipNetwork::makeRelationship(const ToolLinkage& linkage)
     ArcData ad;
     ad.produce_pin_key = linkage.produce_pin_key;
     ad.data_location = linkage.data_location;
-    ad.consume_pin_key = linkage.consum_pin_key;
+    ad.consume_pin_key = linkage.consume_pin_key;
     dg_.addArc(linkage.producer->iid(), linkage.consumer->iid(), ad);
 }
 
@@ -84,7 +84,7 @@ bool RelationshipNetwork::getToolRelationships(const Tool* t, ToolLinkageList* p
             VertexData vd;
             dg_.getVertexData(out_arc_info.target_vertex, vd);
             tl.consumer = vd.t;
-            tl.consum_pin_key = out_arc_info.data.consume_pin_key;
+            tl.consume_pin_key = out_arc_info.data.consume_pin_key;
             produce_linkages->push_back(std::move(tl));
         }
     }
@@ -97,7 +97,7 @@ bool RelationshipNetwork::getToolRelationships(const Tool* t, ToolLinkageList* p
             tl.produce_pin_key = in_arc_info.data.produce_pin_key;
             tl.data_location = in_arc_info.data.data_location;
             tl.consumer = t;
-            tl.consum_pin_key = in_arc_info.data.consume_pin_key;
+            tl.consume_pin_key = in_arc_info.data.consume_pin_key;
             produce_linkages->push_back(std::move(tl));
         }
     }

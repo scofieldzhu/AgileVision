@@ -38,10 +38,12 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API Tool
 {
 public:
-    bool setInputConnection(const PinKey& consume_key, Tool* producer, const PinKey& produce_key, unsigned int data_location = 0);
+    bool setPinConnection(const PinKey& consume_key, Tool* producer, const PinKey& produce_key, unsigned int data_location = 0);
     bool run();
     const OutputPin* getOutputPin(const PinKey& key)const;
     const InputPin* getInputPin(const PinKey& key)const;
+    const PropPin* getPropPin(const PinKey& key)const;
+    const ToolPin* getToolPin(const PinKey& key)const;
     const std::string& iid()const{ return iid_; }
     Procedure* belongedProcedure();
     const Procedure* belongedProcedure()const;
@@ -52,15 +54,14 @@ public:
 
 protected:
     bool checkPinDataCompatible()const;
-    void addOutputPin(const PinKey& key, OutputPinPtr pin);
-    void addInputPin(const PinKey& key, InputPinPtr pin);
+    void addPin(const PinKey& key, ToolPinPtr pin);
     virtual bool requestOutputData() = 0;
 
 private:
     const std::string iid_;
     AgvString name_ = "unnamed";
-    std::map<PinKey, OutputPinPtr> output_pin_dict_;
-    std::map<PinKey, InputPinPtr> input_pin_dict_;
+    using ToolPinDict = std::map<PinKey, ToolPinPtr>;
+    ToolPinDict tool_pin_dict_;
 };
 
 AGV_NAMESPACE_END

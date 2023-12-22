@@ -42,6 +42,7 @@ public:
     void addTool(const Tool* t);
     bool existTool(const Tool* t)const;
     void makeRelationship(const ToolLinkage& linkage);
+    void breakRelationship();
     bool getToolRelationships(const Tool* t, ToolLinkageList* produce_linkages, ToolLinkageList* consume_linkages)const;
     RelationshipNetwork();
     ~RelationshipNetwork();

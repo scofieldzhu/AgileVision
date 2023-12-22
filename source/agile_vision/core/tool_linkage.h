@@ -35,12 +35,12 @@ AGV_NAMESPACE_BEGIN
 
 struct ToolLinkage 
 {
-    bool isValid()const{ return producer && !produce_pin_key.empty() && consumer && !consum_pin_key.empty(); }
+    bool isValid()const{ return producer && !produce_pin_key.empty() && consumer && !consume_pin_key.empty(); }
     const Tool* producer = nullptr;
     PinKey produce_pin_key;
     unsigned int data_location = 0;
     const Tool* consumer = nullptr;
-    PinKey consum_pin_key;
+    PinKey consume_pin_key;
 };
 
 using ToolLinkageList = std::vector<ToolLinkage>;

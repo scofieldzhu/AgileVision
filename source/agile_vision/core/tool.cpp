@@ -32,6 +32,7 @@
 #include "data_spec.h"
 #include "input_pin.h"
 #include "output_pin.h"
+#include "prop_pin.h"
 #include "spdlog/spdlog.h"
 
 AGV_NAMESPACE_BEGIN
@@ -50,13 +51,23 @@ bool Tool::requestOutputData()
     return false;
 }
 
-bool Tool::setInputConnection(const PinKey& consume_key, Tool* producer, const PinKey& produce_key, unsigned int data_location)
+bool Tool::setPinConnection(const PinKey& consume_key, Tool* producer, const PinKey& produce_key, unsigned int data_location)
 {
     auto procedure = belongedProcedure();
     if(procedure == nullptr){
-        SPDLOG_ERROR("No procedure object exists!");
+        SPDLOG_WARN("Connection will break with consume key:{}", consume_key);
+        //??? how to do?
+        return true;
+    }       
+    auto consume_pin = this->getToolPin(consume_key);
+    if(consume_pin == nullptr){
+        SPDLOG_ERROR("No such pin exists with name:{}!", consume_key);
         return false;
-    }        
+    }
+    if(consume_pin->canReferenceData()){
+        SPDLOG_ERROR("This pin type:{} cannot consume any data!", (int)consume_pin->getPinType());
+        return false;
+    }
     auto rsn = belongedProcedure()->tool_relationships_;
     if(!rsn->existTool(this))
         rsn->addTool(this);
@@ -67,7 +78,7 @@ bool Tool::setInputConnection(const PinKey& consume_key, Tool* producer, const P
     tl.produce_pin_key = produce_key;
     tl.data_location = data_location;
     tl.consumer = this;
-    tl.consum_pin_key = consume_key;
+    tl.consume_pin_key = consume_key;
     rsn->makeRelationship(tl);
     return true;
 }
@@ -90,22 +101,37 @@ bool Tool::run()
     return true;
 }
 
-const OutputPin* Tool::getOutputPin(const PinKey &key) const
+template <class PinCls, PinType Type>
+const PinCls* ObtainPinObject(const std::map<PinKey, ToolPinPtr>& dict, const PinKey &key)
 {
-    for(const auto& kv : output_pin_dict_){
-        if(key == kv.first && !kv.second->deprecated())
-            return kv.second.get();
+    for(const auto& kv : dict){
+        auto& cur_pin = kv.second;
+        const auto& cur_key = kv.first;
+        if(key == kv.first && cur_pin->getPinType() == Type && !kv.second->deprecated())
+            return dynamic_cast<PinCls*>(cur_pin.get());
     }
     return nullptr;
 }
 
+const OutputPin* Tool::getOutputPin(const PinKey &key) const
+{
+    return ObtainPinObject<OutputPin, PinType::kOutput>(tool_pin_dict_, key);
+}
+
 const InputPin* Tool::getInputPin(const PinKey &key) const
 {
-    for(const auto& kv : input_pin_dict_){
-        if(key == kv.first && !kv.second->deprecated())
-            return kv.second.get();
-    }
-    return nullptr;
+    return ObtainPinObject<InputPin, PinType::kInput>(tool_pin_dict_, key);
+}
+
+const PropPin* Tool::getPropPin(const PinKey &key) const
+{
+    return ObtainPinObject<PropPin, PinType::kProp>(tool_pin_dict_, key);
+}
+
+const ToolPin* Tool::getToolPin(const PinKey& key) const
+{
+    ToolPinDict::const_iterator cit = tool_pin_dict_.find(key);
+    return cit != tool_pin_dict_.end() ? (*cit).second.get() : nullptr;
 }
 
 bool Tool::checkPinDataCompatible() const
@@ -116,13 +142,13 @@ bool Tool::checkPinDataCompatible() const
     for(const auto& tl : produce_linkages){
         auto producer = tl.producer;
         auto output_pin = producer->getOutputPin(tl.produce_pin_key);
-        auto input_pin = tl.consumer->getInputPin(tl.consum_pin_key);
+        auto input_pin = tl.consumer->getInputPin(tl.consume_pin_key);
         if(output_pin == nullptr || input_pin == nullptr){
             SPDLOG_ERROR("Invalid pin with key:{}", tl.produce_pin_key);
             return false;
         }
         if(!output_pin->dataSpec().compatibleWith(input_pin->dataSpec())){
-            SPDLOG_ERROR("Output pin:{} data spec is not compatile with input pin:{} data spec!", tl.produce_pin_key, tl.consum_pin_key);
+            SPDLOG_ERROR("Output pin:{} data spec is not compatile with input pin:{} data spec!", tl.produce_pin_key, tl.consume_pin_key);
             return false;
         }
         if(input_pin->optional() || input_pin->deprecated()){
@@ -134,12 +160,11 @@ bool Tool::checkPinDataCompatible() const
     return true;
 }
 
-void Tool::addOutputPin(const PinKey& key, OutputPinPtr pin)
+void Tool::addPin(const PinKey& key, ToolPinPtr pin)
 {
-}
-
-void Tool::addInputPin(const PinKey& key, InputPinPtr pin)
-{
+    if(tool_pin_dict_.find(key) == tool_pin_dict_.end()){
+        tool_pin_dict_[key] = pin;
+    }
 }
 
 Procedure* Tool::belongedProcedure()

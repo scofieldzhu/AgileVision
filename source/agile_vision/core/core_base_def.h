@@ -58,11 +58,11 @@ inline unsigned int GetFundamentalTypeSize(DataType t)
     return 0;
 }
 
-enum class PinDirection
+enum class PinType
 {
-    kNoDir,
-    kIn,
-    kOut
+    kInput,
+    kOutput,
+    kProp
 };
 
 class DataBuffer;
@@ -70,8 +70,6 @@ using DataBufferPtr = std::shared_ptr<DataBuffer>;
 
 struct DataSpec;
 
-class Pin;
-using PinPtr = std::shared_ptr<Pin>;
 using PinKey = AgvString;
 
 class Tool;
@@ -92,6 +90,12 @@ using OutputPinPtr = std::shared_ptr<OutputPin>;
 
 class InputPin;
 using InputPinPtr = std::shared_ptr<InputPin>;
+
+class PropPin;
+using PropPinPtr = std::shared_ptr<PropPin>;
+
+class ToolPin;
+using ToolPinPtr = std::shared_ptr<ToolPin>;
 
 AGV_NAMESPACE_END
 

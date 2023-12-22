@@ -42,6 +42,8 @@ public:
     void setAlias(const AgvString& s){ alias_ = s; }
     void setDeprecated(bool s){ deprecated_ = s; }
     bool deprecated()const{ return deprecated_; }
+    virtual bool canReferenceData() const = 0;
+    virtual PinType getPinType()const = 0;
     ToolPin(const DataSpec& ds);
     virtual ~ToolPin();
 
