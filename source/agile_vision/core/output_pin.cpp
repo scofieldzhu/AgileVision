@@ -36,9 +36,21 @@ OutputPin::OutputPin(const DataSpec& ds)
 {
 }
 
-bool OutputPin::canReferenceData()const
+void OutputPin::addConsumeInfo(const ConsumeInfo& inf)
 {
-    return false;
+    if(inf && std::find_if( consume_info_list_.begin(), 
+                            consume_info_list_.end(), 
+                            [&inf](const auto& it){ return inf == (it); }) == consume_info_list_.end()){
+        consume_info_list_.push_back(inf);
+    }
+}
+
+void OutputPin::removeConsumePin(ToolPin* consume_pin)
+{
+    if(consume_pin){
+        auto it = std::remove_if(consume_info_list_.begin(), consume_info_list_.end(), [&consume_pin](const auto& it){ return consume_pin == it.pin; });
+        consume_info_list_.erase(it, consume_info_list_.end());
+    }
 }
 
 PinType OutputPin::getPinType() const

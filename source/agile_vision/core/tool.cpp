@@ -51,36 +51,54 @@ bool Tool::requestOutputData()
     return false;
 }
 
-bool Tool::setPinConnection(const PinKey& consume_key, Tool* producer, const PinKey& produce_key, unsigned int data_location)
+// bool Tool::setPinConnection(const PinKey& consume_key, Tool* producer, const PinKey& produce_key, unsigned int data_location)
+// {
+//     auto procedure = belongedProcedure();
+//     if(procedure == nullptr){
+//         SPDLOG_WARN("Connection will break with consume key:{}", consume_key);
+//         //??? how to do?
+//         return true;
+//     }       
+//     auto consume_pin = this->getToolPin(consume_key);
+//     if(consume_pin == nullptr){
+//         SPDLOG_ERROR("No such pin exists with name:{}!", consume_key);
+//         return false;
+//     }
+//     if(consume_pin->canReferenceData()){
+//         SPDLOG_ERROR("This pin type:{} cannot consume any data!", (int)consume_pin->getPinType());
+//         return false;
+//     }
+//     auto rsn = belongedProcedure()->tool_relationships_;
+//     if(!rsn->existTool(this))
+//         rsn->addTool(this);
+//     if(producer && !rsn->existTool(producer))
+//         rsn->addTool(producer);
+//     ToolLinkage tl;
+//     tl.producer = producer;
+//     tl.produce_pin_key = produce_key;
+//     tl.data_location = data_location;
+//     tl.consumer = this;
+//     tl.consume_pin_key = consume_key;
+//     rsn->makeRelationship(tl);
+//     return true;
+// }
+
+bool Tool::setPinConnection(const PinKey& consume_key, const ProduceInfo& pi)
 {
-    auto procedure = belongedProcedure();
-    if(procedure == nullptr){
-        SPDLOG_WARN("Connection will break with consume key:{}", consume_key);
-        //??? how to do?
-        return true;
-    }       
-    auto consume_pin = this->getToolPin(consume_key);
+    auto consume_pin = getInputPin(consume_key);
     if(consume_pin == nullptr){
-        SPDLOG_ERROR("No such pin exists with name:{}!", consume_key);
+        SPDLOG_ERROR("No such consume key:{} exists!", consume_key);
         return false;
     }
-    if(consume_pin->canReferenceData()){
-        SPDLOG_ERROR("This pin type:{} cannot consume any data!", (int)consume_pin->getPinType());
-        return false;
-    }
-    auto rsn = belongedProcedure()->tool_relationships_;
-    if(!rsn->existTool(this))
-        rsn->addTool(this);
-    if(producer && !rsn->existTool(producer))
-        rsn->addTool(producer);
-    ToolLinkage tl;
-    tl.producer = producer;
-    tl.produce_pin_key = produce_key;
-    tl.data_location = data_location;
-    tl.consumer = this;
-    tl.consume_pin_key = consume_key;
-    rsn->makeRelationship(tl);
-    return true;
+    const auto& old_info = consume_pin->produceInfo();
+    if(old_info)
+        old_info.pin->removeConsumePin(consume_pin);
+    consume_pin->unbind();
+    if(pi.isNull())//disconnect pin relationship.        
+        return true;
+    consume_pin->bindProduceInfo(pi);
+    pi.pin->addConsumeInfo({pi.pin});
+    return false;
 }
 
 bool Tool::run()
@@ -102,7 +120,7 @@ bool Tool::run()
 }
 
 template <class PinCls, PinType Type>
-const PinCls* ObtainPinObject(const std::map<PinKey, ToolPinPtr>& dict, const PinKey &key)
+PinCls* ObtainPinObject(const std::map<PinKey, ToolPinPtr>& dict, const PinKey &key)
 {
     for(const auto& kv : dict){
         auto& cur_pin = kv.second;
@@ -128,33 +146,72 @@ const PropPin* Tool::getPropPin(const PinKey &key) const
     return ObtainPinObject<PropPin, PinType::kProp>(tool_pin_dict_, key);
 }
 
-const ToolPin* Tool::getToolPin(const PinKey& key) const
+OutputPin* Tool::getOutputPin(const PinKey &key)
 {
-    ToolPinDict::const_iterator cit = tool_pin_dict_.find(key);
+    return ObtainPinObject<OutputPin, PinType::kOutput>(tool_pin_dict_, key);
+}
+
+InputPin* Tool::getInputPin(const PinKey &key) 
+{
+    return ObtainPinObject<InputPin, PinType::kInput>(tool_pin_dict_, key);
+}
+
+PropPin* Tool::getPropPin(const PinKey &key) 
+{
+    return ObtainPinObject<PropPin, PinType::kProp>(tool_pin_dict_, key);
+}
+
+ToolPin* Tool::getToolPin(const PinKey& key) 
+{
+    ToolPinDict::iterator cit = tool_pin_dict_.find(key);
     return cit != tool_pin_dict_.end() ? (*cit).second.get() : nullptr;
 }
 
+// bool Tool::checkPinDataCompatible() const
+// {
+//     auto rsn = belongedProcedure()->tool_relationships_;
+//     ToolLinkageList produce_linkages;
+//     rsn->getToolRelationships(this, &produce_linkages, nullptr);
+//     for(const auto& tl : produce_linkages){
+//         auto producer = tl.producer;
+//         auto output_pin = producer->getOutputPin(tl.produce_pin_key);
+//         auto input_pin = tl.consumer->getInputPin(tl.consume_pin_key);
+//         if(output_pin == nullptr || input_pin == nullptr){
+//             SPDLOG_ERROR("Invalid pin with key:{}", tl.produce_pin_key);
+//             return false;
+//         }
+//         if(!output_pin->dataSpec().compatibleWith(input_pin->dataSpec())){
+//             SPDLOG_ERROR("Output pin:{} data spec is not compatile with input pin:{} data spec!", tl.produce_pin_key, tl.consume_pin_key);
+//             return false;
+//         }
+//         if(input_pin->optional() || input_pin->deprecated()){
+//             continue;
+//         }
+//         // other stuffs:
+//         //...
+//     }
+//     return true;
+// }
+
 bool Tool::checkPinDataCompatible() const
 {
-    auto rsn = belongedProcedure()->tool_relationships_;
-    ToolLinkageList produce_linkages;
-    rsn->getToolRelationships(this, &produce_linkages, nullptr);
-    for(const auto& tl : produce_linkages){
-        auto producer = tl.producer;
-        auto output_pin = producer->getOutputPin(tl.produce_pin_key);
-        auto input_pin = tl.consumer->getInputPin(tl.consume_pin_key);
-        if(output_pin == nullptr || input_pin == nullptr){
-            SPDLOG_ERROR("Invalid pin with key:{}", tl.produce_pin_key);
-            return false;
-        }
-        if(!output_pin->dataSpec().compatibleWith(input_pin->dataSpec())){
-            SPDLOG_ERROR("Output pin:{} data spec is not compatile with input pin:{} data spec!", tl.produce_pin_key, tl.consume_pin_key);
-            return false;
-        }
-        if(input_pin->optional() || input_pin->deprecated()){
+    for(auto& kv : tool_pin_dict_){
+        auto pin = kv.second;
+        if(pin->getPinType() != PinType::kInput || dynamic_cast<InputPin*>(pin.get())->optional())
             continue;
+        auto input_pin = dynamic_cast<InputPin*>(pin.get());
+        auto produce_info = input_pin->produceInfo();
+        if(produce_info.isNull()){
+            SPDLOG_WARN("No producer bind at input pin:{}", kv.first);
+            return false;
         }
-        // other stuffs:
+        const auto& output_spec = produce_info.pin->dataSpec();
+        const auto& input_spec = input_pin->dataSpec();
+        if(!input_spec.compatibleWith(output_spec)){
+            SPDLOG_WARN("Producer pin's data spec is not compatible with consumer pin's:{}", kv.first);
+            return false;
+        }
+        //other stuffs
         //...
     }
     return true;

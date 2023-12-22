@@ -30,6 +30,7 @@
 #define __output_pin_h__
 
 #include "agile_vision/core/tool_pin.h"
+#include "agile_vision/core/consume_info.h"
 #include "agile_vision/core/data_buffer.h"
 
 AGV_NAMESPACE_BEGIN
@@ -39,13 +40,18 @@ class AGV_CORE_API OutputPin : public ToolPin
 public:
     DataBuffer& mutableDataBuffer(){ return data_buffer_; }
     const DataBuffer& dataBuffer()const{ return data_buffer_; }
-    bool canReferenceData() const override;
+    void addConsumeInfo(const ConsumeInfo& inf);
+    void removeConsumePin(ToolPin* consume_pin);
+    void removeConsumeTool(Tool* t);
+    void clear();
+    const auto& consumeInfoList()const{ return consume_info_list_; }
     PinType getPinType()const override;
     OutputPin(const DataSpec& ds);
     ~OutputPin();
 
 private:
     DataBuffer data_buffer_;
+    std::vector<ConsumeInfo> consume_info_list_;
 };
 
 AGV_NAMESPACE_END

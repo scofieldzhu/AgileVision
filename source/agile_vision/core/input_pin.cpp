@@ -39,9 +39,14 @@ InputPin::~InputPin()
 {
 }
 
-bool InputPin::canReferenceData()const
+void InputPin::bindProduceInfo(const ProduceInfo& pi)
 {
-    return true;
+    produce_info_ = pi;
+}
+
+void InputPin::unbind()
+{
+    produce_info_.pin = nullptr;
 }
 
 PinType InputPin::getPinType() const

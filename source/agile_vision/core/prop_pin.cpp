@@ -36,6 +36,10 @@ PropPin::PropPin(const DataSpec &ds)
 {
 }
 
+PropPin::~PropPin()
+{
+}
+
 bool PropPin::loadProps(const AgvBytes &data)
 {
     return false;
@@ -45,18 +49,19 @@ void PropPin::serializeProps(AgvBytes &data) const
 {
 }
 
-bool PropPin::canReferenceData()const
+void PropPin::bindProduceInfo(const ProduceInfo& ci)
 {
-    return true;
+    produce_info_ = ci;
+}
+
+void PropPin::unbind()
+{
+    produce_info_.pin = nullptr;
 }
 
 PinType PropPin::getPinType() const
 {
     return PinType::kProp;
-}
-
-PropPin::~PropPin()
-{
 }
 
 AGV_NAMESPACE_END

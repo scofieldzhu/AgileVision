@@ -30,7 +30,7 @@
 #define __tool_h__
 
 #include <map>
-#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/produce_info.h"
 #include "agile_vision/core/core_export.h"
 
 AGV_NAMESPACE_BEGIN
@@ -38,7 +38,7 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API Tool
 {
 public:
-    bool setPinConnection(const PinKey& consume_key, Tool* producer, const PinKey& produce_key, unsigned int data_location = 0);
+    bool setPinConnection(const PinKey& consume_key, const ProduceInfo& pi);
     bool run();
     const OutputPin* getOutputPin(const PinKey& key)const;
     const InputPin* getInputPin(const PinKey& key)const;
@@ -53,6 +53,10 @@ public:
     virtual ~Tool();
 
 protected:
+    OutputPin* getOutputPin(const PinKey& key);
+    InputPin* getInputPin(const PinKey& key);
+    PropPin* getPropPin(const PinKey& key);
+    ToolPin* getToolPin(const PinKey& key);
     bool checkPinDataCompatible()const;
     void addPin(const PinKey& key, ToolPinPtr pin);
     virtual bool requestOutputData() = 0;

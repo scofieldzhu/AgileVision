@@ -30,6 +30,7 @@
 #define __input_pin_h__
 
 #include "agile_vision/core/tool_pin.h"
+#include "agile_vision/core/produce_info.h"
 
 AGV_NAMESPACE_BEGIN
 
@@ -38,13 +39,16 @@ class AGV_CORE_API InputPin : public ToolPin
 public:
     void setOptional(bool s){ optional_ = s; }
     bool optional()const{ return optional_; }
-    bool canReferenceData() const override;
+    void bindProduceInfo(const ProduceInfo& pi);
+    void unbind();
+    const auto& produceInfo()const{ return produce_info_; }
     PinType getPinType()const override;
     InputPin(const DataSpec& ds);
     ~InputPin();
 
 private:
     bool optional_ = false;
+    ProduceInfo produce_info_;
 };
 
 AGV_NAMESPACE_END

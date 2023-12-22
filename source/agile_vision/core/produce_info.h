@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: core_base_def.h  
+ *   File: produce_info.h  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -26,73 +26,21 @@
  *   SOFTWARE.
  */
 
-#ifndef __core_base_def_h__
-#define __core_base_def_h__
+#ifndef __produce_info_h__
+#define __produce_info_h__
 
-#include "agile_vision/basic/base_type_def.h"
-#include <memory>
+#include "agile_vision/core/core_base_def.h"
 
 AGV_NAMESPACE_BEGIN
 
-enum class DataType
+struct ProduceInfo 
 {
-    kUnk,
-    kInt,
-    kFloat,
-    kString,
-    kBytes,
-    kImage
+    bool isNull()const{ return !(bool)(*this); }
+    operator bool()const{ return pin != nullptr; }
+    bool operator==(const ProduceInfo& other)const{ return pin == other.pin; }
+    OutputPin* pin = nullptr;
+    uint32_t data_location = 0;
 };
-
-inline bool IsFundamentalType(DataType t)
-{
-    return t == DataType::kInt || t == DataType::kFloat;
-}
-
-inline unsigned int GetFundamentalTypeSize(DataType t)
-{
-    if(t == DataType::kInt)
-        return sizeof(int);
-    if(t == DataType::kFloat)
-        return sizeof(float);
-    return 0;
-}
-
-enum class PinType
-{
-    kInput,
-    kOutput,
-    kProp
-};
-
-class DataBuffer;
-using DataBufferPtr = std::shared_ptr<DataBuffer>;
-
-struct DataSpec;
-
-using PinKey = AgvString;
-
-class Tool;
-using ToolPtr = std::shared_ptr<Tool>;
-using ToolList = std::vector<ToolPtr>;
-
-class Process;
-using ProcessPtr = std::shared_ptr<Process>;
-
-class Procedure;
-using ProcedurePtr = std::shared_ptr<Procedure>;
-
-class OutputPin;
-using OutputPinPtr = std::shared_ptr<OutputPin>;
-
-class InputPin;
-using InputPinPtr = std::shared_ptr<InputPin>;
-
-class PropPin;
-using PropPinPtr = std::shared_ptr<PropPin>;
-
-class ToolPin;
-using ToolPinPtr = std::shared_ptr<ToolPin>;
 
 AGV_NAMESPACE_END
 
