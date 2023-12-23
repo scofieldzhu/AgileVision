@@ -53,6 +53,7 @@ public:
     void removeTool(Tool* t);
     void removeTool(const_iterator pos);
     void removeTool(iterator pos);
+    auto sizeOfTools()const{ return tools_.size(); }
     void setAlias(const AgvString& s);
     const AgvString& alias()const{ return alias_; }
     const std::string& iid()const{ return iid_; }

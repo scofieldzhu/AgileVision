@@ -25,4 +25,40 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+#ifndef __solution_h__
+#define __solution_h__
+
+#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/core_export.h"
+
+AGV_NAMESPACE_BEGIN
+
+class AGV_CORE_API Solution 
+{
+    using ProcedureList = std::vector<std::unique_ptr<Procedure>>;
+public:
+    using iterator = ProcedureList::iterator;
+    using const_iterator = ProcedureList::const_iterator;
+    iterator begin(){ return procedure_list_.begin(); }
+    const_iterator begin()const{ return procedure_list_.begin(); }
+    iterator end(){ return procedure_list_.end(); }
+    const_iterator end()const{ return procedure_list_.end(); }
+    Procedure* createProcedure(const std::string& iid);
+    const Procedure* findProcedure(const std::string& iid)const;
+    void removeProcedure(const std::string& iid);
+    void removeProcedure(const_iterator pos);
+    auto numberOfProcedures()const{ return procedure_list_.size(); }
+    Solution& operator=(const Solution&) = delete;
+    Solution();
+    Solution(const Solution&) = delete;
+    ~Solution();
+
+private:
+    using ProcedurePtr = std::unique_ptr<Procedure>;
+    std::vector<ProcedurePtr> procedure_list_;
+};
+
+AGV_NAMESPACE_END
+
+#endif
 

@@ -79,6 +79,8 @@ using ToolList = std::vector<ToolPtr>;
 class Process;
 using ProcessPtr = std::shared_ptr<Process>;
 
+class ProcessManager;
+
 class Procedure;
 using ProcedurePtr = std::shared_ptr<Procedure>;
 

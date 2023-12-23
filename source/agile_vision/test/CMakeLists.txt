@@ -16,14 +16,10 @@ target_compile_definitions(${proj_name} PRIVATE
 	SPDLOG_USE_STD_FORMAT
 )
 
-set(deplibs_dbg agile_vision.core spdlogd)
-set(deplibs_opt agile_vision.core spdlog)
-# target_link_libraries(${proj_name} 
-#                       debug ${deplibs_dbg} 
-#                       optimized ${deplibs_opt})
+target_link_libraries(${proj_name} agile_vision.basic agile_vision.core agile_vision.stdtool)
 
-target_link_libraries(${proj_name} agile_vision.core spdlog)
-#                       debug ${deplibs_dbg} 
-#                       optimized ${deplibs_opt})
+set(deplibs_dbg spdlogd)
+set(deplibs_opt spdlog)
+target_link_libraries(${proj_name} debug ${deplibs_dbg} optimized ${deplibs_opt})
 
 install(TARGETS ${proj_name} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

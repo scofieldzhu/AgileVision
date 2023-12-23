@@ -29,21 +29,25 @@
 #ifndef __procedure_h__
 #define __procedure_h__
 
-#include "agile_vision/core/core_base_def.h"
 #include "agile_vision/core/core_export.h"
+#include "agile_vision/core/process.h"
 
 AGV_NAMESPACE_BEGIN
 
-class RelationshipNetwork;
 class AGV_CORE_API Procedure
 {
 public:
-    Procedure();
+    const Process* root()const{ return root_.get(); }
+    void setAlias(const AgvString& str);
+    const auto& alias()const{ return alias_; }
+    const auto& iid()const{ return iid_; }
+    Procedure(const std::string& iid);
     ~Procedure();
 
 private:
-    friend class Tool;
-    RelationshipNetwork* tool_relationships_;
+    std::shared_ptr<Process> root_;
+    AgvString alias_{"unnamed"};
+    const std::string iid_;
 };
 
 AGV_NAMESPACE_END

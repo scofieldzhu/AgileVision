@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: tool.h  
+ *   File: process_manager.h  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -26,46 +26,35 @@
  *   SOFTWARE.
  */
 
-#ifndef __tool_h__
-#define __tool_h__
+#ifndef __process_manager_h__
+#define __process_manager_h__
 
-#include <map>
-#include "agile_vision/core/produce_info.h"
+#include "agile_vision/core/core_base_def.h"
 #include "agile_vision/core/core_export.h"
 
 AGV_NAMESPACE_BEGIN
 
-class AGV_CORE_API Tool
+class AGV_CORE_API ProcessManager 
 {
+    using ProcessList = std::vector<ProcessPtr>;
 public:
-    bool setPinConnection(const PinKey& consume_key, const ProduceInfo& pi);
-    bool run();
-    const OutputPin* getOutputPin(const PinKey& key)const;
-    const InputPin* getInputPin(const PinKey& key)const;
-    const PropPin* getPropPin(const PinKey& key)const;
-    const ToolPin* getToolPin(const PinKey& key)const;
-    const std::string& iid()const{ return iid_; }
-    void setName(const AgvString& str);
-    const auto& name()const{ return name_; }
-    virtual const ProcessManager* getProcessManager()const;
-    Tool(const std::string& iid);
-    virtual ~Tool();
-
-protected:
-    using ToolPinPtr = std::shared_ptr<ToolPin>;
-    OutputPin* getOutputPin(const PinKey& key);
-    InputPin* getInputPin(const PinKey& key);
-    PropPin* getPropPin(const PinKey& key);
-    ToolPin* getToolPin(const PinKey& key);
-    bool checkPinDataCompatible()const;
-    void addPin(const PinKey& key, ToolPinPtr pin);
-    virtual bool requestOutputData() = 0;
+    using iterator = ProcessList::iterator;
+    using const_iterator = ProcessList::const_iterator;
+    iterator begin(){ return process_list_.begin(); }
+    const_iterator begin()const{ return process_list_.begin(); }
+    iterator end(){ return process_list_.end(); }
+    const_iterator end()const{ return process_list_.end(); }
+    void insertProcess(const_iterator pos, ProcessPtr p);
+    const Process* findProcess(const std::string& iid)const;
+    void appendProcess(ProcessPtr p);
+    void removeProcess(const std::string& iid);
+    void removeProcess(iterator pos);
+    auto size()const{ return process_list_.size(); }
+    ProcessManager();
+    ~ProcessManager();
 
 private:
-    const std::string iid_;
-    AgvString name_ = "unnamed";
-    using ToolPinDict = std::map<PinKey, ToolPinPtr>;
-    ToolPinDict tool_pin_dict_;
+    ProcessList process_list_;
 };
 
 AGV_NAMESPACE_END

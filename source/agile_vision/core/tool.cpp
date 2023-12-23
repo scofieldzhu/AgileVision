@@ -42,6 +42,11 @@ Tool::Tool(const std::string& iid)
 {
 }
 
+const ProcessManager *Tool::getProcessManager() const
+{
+    return nullptr;
+}
+
 Tool::~Tool()
 {
 }

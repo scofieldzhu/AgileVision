@@ -24,6 +24,8 @@ if(WIN32)
 	target_compile_definitions(${proj_name} PRIVATE AGILE_VISION_CORE_EXPORT)
 endif()
 
+target_link_libraries(${proj_name} agile_vision.basic)
+
 set(deplibs_dbg spdlogd)
 set(deplibs_opt spdlog)
 target_link_libraries(${proj_name} debug ${deplibs_dbg} optimized ${deplibs_opt})

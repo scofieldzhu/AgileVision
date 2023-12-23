@@ -25,4 +25,25 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+#include "procedure.h"
+#include "process.h"
+
+AGV_NAMESPACE_BEGIN
+
+Procedure::Procedure(const std::string& iid)
+    :iid_(iid),
+    root_(std::make_shared<Process>(iid)) //same iid with procedure's
+{
+}
+
+Procedure::~Procedure()
+{
+}
+
+void Procedure::setAlias(const AgvString& str)
+{
+    alias_ = str;
+}
+
+AGV_NAMESPACE_END
 
