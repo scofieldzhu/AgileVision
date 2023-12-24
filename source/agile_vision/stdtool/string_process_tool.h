@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: process_manager.h  
+ *   File: string_process_tool.h  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -26,36 +26,26 @@
  *   SOFTWARE.
  */
 
-#ifndef __process_manager_h__
-#define __process_manager_h__
+#ifndef __string_process_tool_h__
+#define __string_process_tool_h__
 
-#include "agile_vision/core/core_base_def.h"
-#include "agile_vision/core/core_export.h"
+#include "agile_vision/core/tool.h"
+#include "agile_vision/stdtool/stdtool_export.h"
 
 AGV_NAMESPACE_BEGIN
 
-class AGV_CORE_API ProcessManager 
+class AGV_STDTOOL_API StringProcessTool : public Tool
 {
-    using ProcessList = std::vector<ProcessPtr>;
 public:
-    using iterator = ProcessList::iterator;
-    using const_iterator = ProcessList::const_iterator;
-    iterator begin(){ return process_list_.begin(); }
-    const_iterator begin()const{ return process_list_.begin(); }
-    iterator end(){ return process_list_.end(); }
-    const_iterator end()const{ return process_list_.end(); }
-    void insertProcess(const_iterator pos, ProcessPtr p);
-    Process* findProcess(const std::string& iid);
-    const Process* findProcess(const std::string& iid)const;
-    void appendProcess(ProcessPtr p);
-    void removeProcess(const std::string& iid);
-    void removeProcess(iterator pos);
-    auto size()const{ return process_list_.size(); }
-    ProcessManager();
-    ~ProcessManager();
+    void setProcessTriggerString(const std::string& process_iid, const AgvString& trigger_str);
+    AgvString getProcessTriggerString(const std::string& process_iid)const;
+    StringProcessTool(const std::string& iid);
+    virtual ~StringProcessTool();
 
 private:
-    ProcessList process_list_;
+    std::string getClsGuid()const override;
+    bool requestOutputData() override;
+    std::map<std::string, AgvString> trigger_string_dict_;
 };
 
 AGV_NAMESPACE_END

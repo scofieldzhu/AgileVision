@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: process_tool.h  
+ *   File: async_process.h  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -26,21 +26,3 @@
  *   SOFTWARE.
  */
 
-#ifndef __process_tool_h__
-#define __process_tool_h__
-
-#include "agile_vision/core/tool.h"
-#include "agile_vision/stdtool/stdtool_export.h"
-
-AGV_NAMESPACE_BEGIN
-
-class AGV_STDTOOL_API ProcessTool : public Tool
-{
-public:
-    ProcessTool(const std::string& iid);
-    virtual ~ProcessTool();
-};
-
-AGV_NAMESPACE_END
-
-#endif

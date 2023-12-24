@@ -47,7 +47,8 @@ public:
     const std::string& iid()const{ return iid_; }
     void setName(const AgvString& str);
     const auto& name()const{ return name_; }
-    virtual const ProcessManager* getProcessManager()const;
+    virtual std::string getClsGuid()const = 0;
+    const ProcessManager* getProcessManager()const{ return child_process_manager_.get(); }
     Tool(const std::string& iid);
     virtual ~Tool();
 
@@ -60,6 +61,7 @@ protected:
     bool checkPinDataCompatible()const;
     void addPin(const PinKey& key, ToolPinPtr pin);
     virtual bool requestOutputData() = 0;
+    std::shared_ptr<ProcessManager> child_process_manager_;
 
 private:
     const std::string iid_;
