@@ -38,6 +38,8 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API Tool
 {
 public:
+    virtual AgvBytes serializeToBytes()const;
+    virtual size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
     bool setPinConnection(const PinKey& consume_key, const ProduceInfo& pi);
     bool run();
     const OutputPin* getOutputPin(const PinKey& key)const;
@@ -64,7 +66,7 @@ protected:
     std::shared_ptr<ProcessManager> child_process_manager_;
 
 private:
-    const std::string iid_;
+    std::string iid_;
     AgvString name_ = "unnamed";
     using ToolPinDict = std::map<PinKey, ToolPinPtr>;
     ToolPinDict tool_pin_dict_;

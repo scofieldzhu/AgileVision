@@ -40,16 +40,17 @@ PropPin::~PropPin()
 {
 }
 
-bool PropPin::loadProps(const AgvBytes &data)
+AgvBytes PropPin::serializeToBytes() const
 {
-    return false;
+    return data_buffer_.serializeToBytes();
 }
 
-void PropPin::serializeProps(AgvBytes &data) const
+size_t PropPin::loadBytes(ConsAgvBytePtr buffer, size_t size)
 {
+    return data_buffer_.loadBytes(buffer, size);
 }
 
-void PropPin::bindProduceInfo(const ProduceInfo& ci)
+void PropPin::bindProduceInfo(const ProduceInfo &ci)
 {
     produce_info_ = ci;
 }

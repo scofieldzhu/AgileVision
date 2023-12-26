@@ -62,17 +62,21 @@ AgvBytes DataBuffer::serializeToBytes() const
     total_bytes += ds_bv.size();
 
     VecByteProxy vbp;
-    auto& vbp_m_data = vbp.mutableData();
-    vbp_m_data.resize(fundamental_bytes_.size());
-    memcpy(vbp_m_data.data(), fundamental_bytes_.data(), fundamental_bytes_.size());
+    if(!fundamental_bytes_.empty()){
+        auto& vbp_m_data = vbp.mutableData();
+        vbp_m_data.resize(fundamental_bytes_.size());
+        memcpy(vbp_m_data.data(), fundamental_bytes_.data(), fundamental_bytes_.size());
+    }
     auto fdb_bv = vbp.serializeToBytes();
     total_bytes += fdb_bv.size();
 
     VecVBPProxy vvpp;
-    auto& vvpp_m_data = vvpp.mutableData();
-    vvpp_m_data.resize(bytes_table_.size());
-    for(unsigned int i = 0; i < bytes_table_.size(); ++i)
-        vvpp_m_data[i].mutableData() = bytes_table_[i];
+    if(!bytes_table_.empty()){
+        auto& vvpp_m_data = vvpp.mutableData();
+        vvpp_m_data.resize(bytes_table_.size());
+        for(unsigned int i = 0; i < bytes_table_.size(); ++i)
+            vvpp_m_data[i].mutableData() = bytes_table_[i];
+    }
     auto vvpp_bv = vvpp.serializeToBytes();
     total_bytes += vvpp_bv.size();
 

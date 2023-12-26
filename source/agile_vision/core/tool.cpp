@@ -33,9 +33,18 @@
 #include "input_pin.h"
 #include "output_pin.h"
 #include "prop_pin.h"
+#include "ratel/geometry/element_proxy.hpp"
+#include "ratel/geometry/dict_proxy.hpp"
 #include "spdlog/spdlog.h"
+using namespace ratel;
 
 AGV_NAMESPACE_BEGIN
+
+namespace {
+    using StrPxEP = ElementProxy<StringProxy>;
+    using ByteVecPx = VecProxy<agv_byte>;
+    using PinDictProxy = DictProxy<std::string, ByteVecPx>;
+}
 
 Tool::Tool(const std::string& iid)
     :iid_(iid)
@@ -83,7 +92,69 @@ bool Tool::requestOutputData()
 //     return true;
 // }
 
-bool Tool::setPinConnection(const PinKey& consume_key, const ProduceInfo& pi)
+AgvBytes Tool::serializeToBytes() const
+{
+    StrPxEP str_ep(StringProxy(iid_.c_str()));
+    auto bv = str_ep.serializeToBytes();
+    str_ep.mutableElement() = name_;
+    auto bv_n = str_ep.serializeToBytes();
+    std::copy(bv_n.begin(), bv_n.end(), std::back_inserter(bv));
+    PinDictProxy pdp;
+    for(const auto& kv : tool_pin_dict_){
+        auto pin = kv.second;
+        if(pin->getPinType() == PinType::kProp){
+            std::string key = kv.first;
+            ByteVecPx bvp;
+            bvp.mutableData() = dynamic_cast<PropPin*>(pin.get())->serializeToBytes();
+            pdp.mutableData().insert({std::move(key), std::move(bvp)});
+        }
+    }
+    auto bv_dt = pdp.serializeToBytes();
+    std::copy(bv_dt.begin(), bv_dt.end(), std::back_inserter(bv));
+    return bv;
+}
+
+size_t Tool::loadBytes(ConsAgvBytePtr buffer, size_t size)
+{
+    if(buffer == nullptr)
+        return 0;
+    auto cur_data = buffer;
+    auto left_size = size;
+    StrPxEP str_ep;
+    auto finish_bytes = str_ep.loadBytes(cur_data, left_size);
+    if(finish_bytes == 0)
+        return 0;
+    iid_ = str_ep.element().stdStr();
+    cur_data += finish_bytes;
+    left_size -= finish_bytes;
+    finish_bytes = str_ep.loadBytes(cur_data, left_size);
+    if(finish_bytes == 0)
+        return 0;
+    name_ = str_ep.element().stdStr();
+    cur_data += finish_bytes;
+    left_size -= finish_bytes;
+    PinDictProxy pdp;
+    finish_bytes = pdp.loadBytes(cur_data, left_size);
+    if(finish_bytes == 0)
+        return 0;
+    cur_data += finish_bytes;
+    left_size -= finish_bytes;
+    for(const auto& kv : pdp.data()){
+        PinKey key = kv.first;
+        const auto& bv = kv.second.data();
+        auto ppin = getPropPin(key);
+        if(ppin == nullptr){
+            SPDLOG_WARN("Prop pin:{} not exists!", key);
+            continue;
+        }
+        if(ppin->loadBytes(bv.data(), bv.size()) == 0){
+            return 0; // exception occur!
+        }
+    }
+    return size - left_size;
+}
+
+bool Tool::setPinConnection(const PinKey &consume_key, const ProduceInfo &pi)
 {
     auto consume_pin = getInputPin(consume_key);
     if(consume_pin == nullptr){

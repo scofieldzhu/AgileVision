@@ -43,6 +43,8 @@ public:
     const_iterator begin()const{ return tools_.begin(); }
     iterator end(){ return tools_.end(); }
     const_iterator end()const{ return tools_.end(); }
+    AgvBytes serializeToBytes()const;
+    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
     RunContext& runContext(){ return run_context_; }
     const RunContext& runContext()const{ return run_context_; }
     bool run();
@@ -61,7 +63,7 @@ public:
     ~Process();
 
 private:
-    const std::string iid_;
+    std::string iid_;
     AgvString alias_{"null"};
     ToolList tools_;
     RunContext run_context_;

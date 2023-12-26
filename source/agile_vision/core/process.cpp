@@ -28,8 +28,17 @@
 
 #include "process.h"
 #include "tool.h"
+#include "ratel/geometry/element_proxy.hpp"
+#include "ratel/geometry/dict_proxy.hpp"
+using namespace ratel;
 
 AGV_NAMESPACE_BEGIN
+namespace {
+    using StrPxEP = ElementProxy<StringProxy>;
+    using ByteVecPx = VecProxy<agv_byte>;
+    using PinDictProxy = DictProxy<std::string, ByteVecPx>;
+}
+
 Process::Process(const std::string &iid)
     :iid_(iid)
 {
@@ -37,6 +46,49 @@ Process::Process(const std::string &iid)
 
 Process::~Process()
 {
+}
+
+AgvBytes Process::serializeToBytes() const
+{
+    StrPxEP str_ep(StringProxy(iid_.c_str()));
+    auto bv = str_ep.serializeToBytes();
+    str_ep.mutableElement() = alias_;
+    auto bv_n = str_ep.serializeToBytes();
+    std::copy(bv_n.begin(), bv_n.end(), std::back_inserter(bv));
+    for(auto& t : tools_){
+        auto bv_t = t->serializeToBytes();
+        std::copy(bv_t.begin(), bv_t.end(), std::back_inserter(bv));
+    }
+    return bv;
+}
+
+size_t Process::loadBytes(ConsAgvBytePtr buffer, size_t size)
+{
+    if(buffer == nullptr)
+        return 0;
+    auto cur_data = buffer;
+    auto left_size = size;
+    StrPxEP str_ep;
+    auto finish_bytes = str_ep.loadBytes(cur_data, left_size);
+    if(finish_bytes == 0)
+        return 0;
+    iid_ = str_ep.element().stdStr();
+    cur_data += finish_bytes;
+    left_size -= finish_bytes;
+    finish_bytes = str_ep.loadBytes(cur_data, left_size);
+    if(finish_bytes == 0)
+        return 0;
+    alias_ = str_ep.element().stdStr();
+    cur_data += finish_bytes;
+    left_size -= finish_bytes;
+    for(auto& t : tools_){
+        finish_bytes = t->loadBytes(cur_data, left_size);
+        if(finish_bytes == 0)
+            return 0;
+        cur_data += finish_bytes;
+        left_size -= finish_bytes;
+    }
+    return size - left_size;
 }
 
 bool Process::run()

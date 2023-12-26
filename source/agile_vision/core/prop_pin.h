@@ -38,8 +38,8 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API PropPin : public ToolPin
 {
 public:
-    bool loadProps(const AgvBytes& data);
-    void serializeProps(AgvBytes& data)const;
+    AgvBytes serializeToBytes()const;
+    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
     void bindProduceInfo(const ProduceInfo& pi);
     void unbind();
     const auto& produceInfo()const{ return produce_info_; }

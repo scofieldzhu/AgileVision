@@ -37,6 +37,8 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API ToolPin
 {
 public:
+    // virtual AgvBytes serializeToBytes()const;
+    // virtual size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
     const auto& dataSpec()const{ return ds_; }
     const auto& alias()const{ return alias_; }
     void setAlias(const AgvString& s){ alias_ = s; }
@@ -47,7 +49,7 @@ public:
     virtual ~ToolPin();
 
 private:
-    const DataSpec ds_;
+    DataSpec ds_;
     AgvString alias_{"null"};
     bool deprecated_ = false;
 };

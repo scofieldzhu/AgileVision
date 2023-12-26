@@ -27,6 +27,13 @@
  */
 
 #include "tool_pin.h"
+#include "ratel/geometry/element_proxy.hpp"
+using namespace ratel;
+
+namespace {
+    using StringEP = ElementProxy<StringProxy>;
+    using IntEP = ElementProxy<int>;
+}
 
 AGV_NAMESPACE_BEGIN
 
@@ -36,5 +43,52 @@ ToolPin::ToolPin(const DataSpec& ds)
 
 ToolPin::~ToolPin()
 {}
+
+// AgvBytes ToolPin::serializeToBytes() const
+// {
+//     auto bv_ds = ds_.serializeToBytes();
+//     StringProxy sp(alias_);
+//     StringEP str_ep(sp);
+//     auto bv_s = str_ep.serializeToBytes();
+//     IntEP i_ep((int)deprecated_);
+//     auto bv_i = i_ep.serializeToBytes();
+//     AgvBytes bv(bv_ds.size() + bv_s.size() + bv_i.size(), 0);
+//     auto cur_data = bv.data();
+//     memcpy(cur_data, bv_ds.data(), bv_ds.size());
+//     cur_data += bv_ds.size();
+//     memcpy(cur_data, bv_s.data(), bv_s.size());
+//     cur_data += bv_s.size();
+//     memcpy(cur_data, bv_i.data(), bv_i.size());
+//     cur_data += bv_i.size();
+//     return bv;
+// }
+
+// size_t ToolPin::loadBytes(ConsAgvBytePtr buffer, size_t size)
+// {
+//     if(buffer == nullptr)
+//         return 0;
+//     auto cur_data = buffer;
+//     auto left_size = size;
+//     auto finish_bytes = ds_.loadBytes(cur_data, left_size);
+//     if(finish_bytes == 0)
+//         return 0;
+//     cur_data += finish_bytes;
+//     left_size -= finish_bytes;
+//     StringEP str_ep;
+//     finish_bytes = str_ep.loadBytes(cur_data, left_size);
+//     if(finish_bytes == 0)
+//         return 0;
+//     alias_ = str_ep.element().stdStr();
+//     cur_data += finish_bytes;
+//     left_size -= finish_bytes;
+//     IntEP i_ep;
+//     finish_bytes = i_ep.loadBytes(cur_data, left_size);
+//     if(finish_bytes == 0)
+//         return 0;
+//     deprecated_ = (bool)i_ep.element();
+//     cur_data += finish_bytes;
+//     left_size -= finish_bytes;
+//     return size - left_size;
+// }
 
 AGV_NAMESPACE_END

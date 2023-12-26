@@ -26,8 +26,8 @@ endif()
 
 target_link_libraries(${proj_name} agile_vision.basic)
 
-set(deplibs_dbg spdlogd)
-set(deplibs_opt spdlog)
+set(deplibs_dbg spdlogd ratel.basic_d)
+set(deplibs_opt spdlog ratel.basic)
 target_link_libraries(${proj_name} debug ${deplibs_dbg} optimized ${deplibs_opt})
 
 # if(WIN32)
