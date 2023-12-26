@@ -37,6 +37,8 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API DataBuffer
 {
 public:
+    AgvBytes serializeToBytes()const;
+    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
     auto dataSpec()const{ return ds_; }
     size_t valueSize()const;
     bool isFixedSize()const{ return ds_.isStaticArray(); }
@@ -67,7 +69,7 @@ public:
 
 private:
     size_t getSize()const;
-    const DataSpec ds_;
+    DataSpec ds_;
     AgvBytes fundamental_bytes_;
     AgvMultiBytes bytes_table_;
     size_t value_size_ = 0;

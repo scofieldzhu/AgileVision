@@ -29,16 +29,17 @@
 #ifndef __base_type_def_h__
 #define __base_type_def_h__
 
-#include "agile_vision/basic/agv_nps.h"
 #include <cstdint>
 #include <string>
-#include <vector>
 #include <optional>
+#include "agile_vision/basic/agv_nps.h"
+#include "ratel/basic/base_type.h"
 
 AGV_NAMESPACE_BEGIN
 
-using agv_byte = char;
-using AgvBytes = std::vector<agv_byte>;
+using agv_byte = ratel::Byte;
+using ConsAgvBytePtr = const ratel::Byte*;
+using AgvBytes = ratel::ByteVec;
 using AgvMultiBytes = std::vector<AgvBytes>;
 using AgvString = std::string;
 using AgvMultiString = std::vector<AgvString>;

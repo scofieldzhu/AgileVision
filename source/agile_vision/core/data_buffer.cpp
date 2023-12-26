@@ -27,9 +27,15 @@
  */
 
 #include "data_buffer.h"
+#include "ratel/geometry/vec_proxy.hpp"
 #include "spdlog/spdlog.h"
 
 AGV_NAMESPACE_BEGIN
+
+namespace{
+    using VecByteProxy = ratel::VecProxy<agv_byte>;
+    using VecVBPProxy = ratel::VecProxy<VecByteProxy>;
+}
 
 DataBuffer::DataBuffer(const DataSpec& spec)
     :ds_(spec)
@@ -46,6 +52,74 @@ DataBuffer::DataBuffer(const DataSpec& spec)
 
 DataBuffer::~DataBuffer()
 {
+}
+
+AgvBytes DataBuffer::serializeToBytes() const
+{
+    size_t total_bytes = 0;
+    
+    auto ds_bv = ds_.serializeToBytes();
+    total_bytes += ds_bv.size();
+
+    VecByteProxy vbp;
+    auto& vbp_m_data = vbp.mutableData();
+    vbp_m_data.resize(fundamental_bytes_.size());
+    memcpy(vbp_m_data.data(), fundamental_bytes_.data(), fundamental_bytes_.size());
+    auto fdb_bv = vbp.serializeToBytes();
+    total_bytes += fdb_bv.size();
+
+    VecVBPProxy vvpp;
+    auto& vvpp_m_data = vvpp.mutableData();
+    vvpp_m_data.resize(bytes_table_.size());
+    for(unsigned int i = 0; i < bytes_table_.size(); ++i)
+        vvpp_m_data[i].mutableData() = bytes_table_[i];
+    auto vvpp_bv = vvpp.serializeToBytes();
+    total_bytes += vvpp_bv.size();
+
+    AgvBytes bv(total_bytes + ratel::kUIntSize, 0);
+    auto cur_data = bv.data();
+    memcpy(cur_data, ds_bv.data(), ds_bv.size());
+    cur_data += ds_bv.size();
+    memcpy(cur_data, fdb_bv.data(), fdb_bv.size());
+    cur_data += fdb_bv.size();
+    memcpy(cur_data, vvpp_bv.data(), vvpp_bv.size());
+    cur_data += vvpp_bv.size();
+    auto value_size = (unsigned int)value_size_;
+    memcpy(cur_data, &value_size, ratel::kUIntSize);
+    return bv;
+}
+
+size_t DataBuffer::loadBytes(ConsAgvBytePtr buffer, size_t size)
+{
+    auto cur_data = buffer;
+    auto left_size = size;
+    auto finish_bytes = ds_.loadBytes(cur_data, left_size);
+    if(finish_bytes == 0)
+        return 0;
+    cur_data += finish_bytes;
+    left_size -= finish_bytes;
+    VecByteProxy vbp;
+    finish_bytes = vbp.loadBytes(cur_data, left_size);
+    if(finish_bytes == 0)
+        return 0;
+    fundamental_bytes_ = vbp.data();
+
+    cur_data += finish_bytes;
+    left_size -= finish_bytes;
+    VecVBPProxy vvpp;
+    finish_bytes = vvpp.loadBytes(cur_data, left_size);
+    if(finish_bytes == 0)
+        return 0;
+    bytes_table_.resize(vvpp.data().size());
+    for(unsigned int i = 0; i < bytes_table_.size(); ++i)
+        bytes_table_[i] = vvpp.data().at(i).data();
+
+    unsigned int value_size = 0;
+    memcpy(&value_size, cur_data, ratel::kUIntSize);
+    value_size_ = value_size;
+    cur_data += ratel::kUIntSize;
+    left_size -= ratel::kUIntSize;
+    return size - left_size;
 }
 
 size_t DataBuffer::valueSize() const

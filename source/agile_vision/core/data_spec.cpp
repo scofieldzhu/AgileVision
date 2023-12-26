@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: data_spec.h  
+ *   File: data_spec.cpp  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -26,39 +26,31 @@
  *   SOFTWARE.
  */
 
-#ifndef __data_spec_h__
-#define __data_spec_h__
-
-#include <cassert>
-#include "agile_vision/core/core_export.h"
-#include "agile_vision/core/core_base_def.h"
+#include "data_spec.h"
+#include "ratel/geometry/array_x.hpp"
 
 AGV_NAMESPACE_BEGIN
 
-struct AGV_CORE_API DataSpec
+namespace{
+    using Arry3u = ratel::ArrayX<unsigned int, 3>;
+}
+
+AgvBytes DataSpec::serializeToBytes() const
 {
-    AgvBytes serializeToBytes()const;
-    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    static DataSpec Single(DataType type){ return {type}; }
-    static DataSpec SingleInt(){ return StaticArray(DataType::kInt); }
-    static DataSpec SingleFloat(){ return StaticArray(DataType::kFloat); }
-    static DataSpec SingleString(){ return StaticArray(DataType::kString); }
-    static DataSpec SingleBytes(){ return StaticArray(DataType::kBytes); }
-    static DataSpec StaticArray(DataType type, unsigned int fixed_size = 1)
-    { 
-        assert(fixed_size);
-        return {type, 0, fixed_size}; 
-    }
-    static DataSpec DynamicArray(DataType type){ return {type, 0, 0}; }
-    bool isStaticArray()const{ return arry_size > 0; }
-    bool isDynamicArray()const{ return arry_size == 0; }    
-    bool compatibleWith(const DataSpec& ds)const;
-    DataType major_type = DataType::kUnk;
-    unsigned int subtype = 0;
-    unsigned int arry_size = 1; // 0 means: size dynamic, other value means fix size
-};
+    Arry3u arry_d = {(unsigned int)major_type, subtype, arry_size};
+    return arry_d.serializeToBytes();
+}
+
+size_t DataSpec::loadBytes(ConsAgvBytePtr buffer, size_t size)
+{
+    Arry3u arry_d;
+    return arry_d.loadBytes(buffer, size);
+}
+
+bool DataSpec::compatibleWith(const DataSpec &ds) const
+{        
+    return ds.major_type == major_type && ds.subtype == subtype && ds.arry_size == arry_size;
+}
 
 AGV_NAMESPACE_END
-
-#endif
 
