@@ -272,7 +272,7 @@ std::optional<float> DataBuffer::getFloatValue(size_t idx) const
     return std::optional<float>(*(pvalue + idx));
 }
 
-float *DataBuffer::getFloatPointer()
+float* DataBuffer::getFloatPointer()
 {
     return const_cast<float*>(const_cast<const DataBuffer*>(this)->getFloatPointer());
 }
@@ -288,22 +288,112 @@ const float *DataBuffer::getFloatPointer() const
     return reinterpret_cast<const float*>(fundamental_bytes_.data());
 }
 
-void DataBuffer::setStringValue(const char *s, size_t idx)
+void DataBuffer::setImageValue(const ImageData& v, size_t idx)
 {
+    if(ds_.major_type != DataType::kImage){
+        SPDLOG_ERROR("Data buffer is not image type!");
+        return;
+    }
+    if(idx >= value_size_){
+        SPDLOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+        return;
+    }
+    ImageData* pvalue = reinterpret_cast<ImageData*>(fundamental_bytes_.data());
+    *(pvalue + idx) = v;
 }
 
-void DataBuffer::setStringValue(const AgvMultiString &strs)
+std::optional<ImageData> DataBuffer::getImageValue(size_t idx) const
 {
+    if(ds_.major_type != DataType::kImage){
+        SPDLOG_ERROR("Data buffer is not image type!");
+        return std::nullopt;
+    }
+    if(idx >= value_size_){
+        SPDLOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+        return std::nullopt;
+    }
+    const ImageData* pvalue = reinterpret_cast<const ImageData*>(fundamental_bytes_.data());
+    assert(pvalue);
+    return std::optional<ImageData>(*(pvalue + idx));
 }
 
-const char *DataBuffer::getStringValue(size_t idx) const
+ImageData* DataBuffer::getImagePointer()
 {
-    return nullptr;
+    return const_cast<ImageData*>(const_cast<const DataBuffer*>(this)->getImagePointer());
+}
+
+const ImageData* DataBuffer::getImagePointer() const
+{
+    if(ds_.major_type != DataType::kImage){
+        SPDLOG_ERROR("Data buffer is not image type!");
+        return nullptr;
+    }
+    if(fundamental_bytes_.empty())
+        return nullptr;
+    return reinterpret_cast<const ImageData*>(fundamental_bytes_.data());
+}
+
+void DataBuffer::setStringValue(const char* source, size_t idx)
+{
+    if(ds_.major_type != DataType::kString){
+        SPDLOG_ERROR("Data buffer is not 'string' type!");
+        return;
+    }
+    if(idx >= value_size_){
+        SPDLOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+        return;
+    }
+    if(source == nullptr){
+        bytes_table_[idx].clear();
+        return;
+    }
+    auto& dst_bytes = bytes_table_[idx];
+    dst_bytes.resize(strlen(source));
+    memcpy(dst_bytes.data(), source, strlen(source));
+}
+
+void DataBuffer::setStringValue(const AgvMultiString& strs)
+{
+    if(ds_.major_type != DataType::kString){
+        SPDLOG_ERROR("Data buffer is not 'string' type!");
+        return;
+    }
+    if(strs.empty()){
+        bytes_table_.clear();
+        return;
+    }
+    auto safe_size = std::min<size_t>(strs.size(), value_size_);
+    std::transform(strs.begin(), strs.end(), bytes_table_.begin(), [](const auto& s){
+        AgvBytes bytes(s.size(), 0);
+        memcpy(bytes.data(), s.c_str(), s.size());
+        return bytes;
+    });
+}
+
+const char* DataBuffer::getStringValue(size_t idx) const
+{
+    if(ds_.major_type != DataType::kString){
+        SPDLOG_ERROR("Data buffer is not 'string' type!");
+        return nullptr;
+    }
+    if(idx >= value_size_){
+        SPDLOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+        return nullptr;
+    }
+    return (const char*)bytes_table_[idx].data();
 }
 
 AgvMultiString DataBuffer::getAllStringValues() const
 {
-    return AgvMultiString();
+    if(ds_.major_type != DataType::kString){
+        SPDLOG_ERROR("Data buffer is not 'string' type!");
+        return {};
+    }
+    AgvMultiString strs;
+    std::for_each(bytes_table_.begin(), bytes_table_.end(), [&strs](const auto& it){
+        strs.push_back((const char*)it.data());
+    });
+    return strs;
 }
 
 void DataBuffer::setBytesValue(const agv_byte* source, size_t byte_size, size_t idx)
@@ -321,6 +411,7 @@ void DataBuffer::setBytesValue(const agv_byte* source, size_t byte_size, size_t 
         return;
     }
     auto& dst_bytes = bytes_table_[idx];
+    dst_bytes.resize(byte_size);
     memcpy(dst_bytes.data(), source, byte_size);
 }
 

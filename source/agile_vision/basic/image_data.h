@@ -33,7 +33,18 @@
 
 AGV_NAMESPACE_BEGIN
 
-struct ImageData
+#ifdef _MSC_VER
+    #pragma pack(push, 1)
+#endif
+
+#ifdef __GNUC__
+    #define PRE_PACKED __attribute__ ((__packed__))
+#else 
+    #define PRE_PACKED
+    #pragma pack(1) // For other compilers like MSVC
+#endif
+
+struct PRE_PACKED ImageData
 {
     enum DataType
     {
@@ -51,6 +62,10 @@ struct ImageData
     uint32_t size = 0;
     void* data = nullptr;
 };
+
+#ifdef _MSC_VER
+    #pragma pack(pop)
+#endif
 
 AGV_NAMESPACE_END
 

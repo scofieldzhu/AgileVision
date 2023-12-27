@@ -31,6 +31,7 @@
 
 #include "agile_vision/core/data_spec.h"
 #include "agile_vision/core/core_export.h"
+#include "agile_vision/basic/image_data.h"
 
 AGV_NAMESPACE_BEGIN
 
@@ -55,6 +56,10 @@ public:
     std::optional<float> getFloatValue(size_t idx = 0)const;
     float* getFloatPointer();
     const float* getFloatPointer()const;
+    void setImageValue(const ImageData& v, size_t idx = 0);
+    std::optional<ImageData> getImageValue(size_t idx = 0)const;
+    ImageData* getImagePointer();
+    const ImageData* getImagePointer()const;
     void setStringValue(const char* s, size_t idx = 0);
     void setStringValue(const AgvMultiString& strs);
     const char* getStringValue(size_t idx = 0)const;    

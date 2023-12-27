@@ -18,8 +18,8 @@ target_compile_definitions(${proj_name} PRIVATE
 
 target_link_libraries(${proj_name} agile_vision.basic agile_vision.core agile_vision.stdtool)
 
-set(deplibs_dbg spdlogd)
-set(deplibs_opt spdlog)
+set(deplibs_dbg spdlogd ratel.basic_d)
+set(deplibs_opt spdlog  ratel.basic)
 target_link_libraries(${proj_name} debug ${deplibs_dbg} optimized ${deplibs_opt})
 
 install(TARGETS ${proj_name} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

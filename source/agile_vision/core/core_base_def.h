@@ -29,8 +29,8 @@
 #ifndef __core_base_def_h__
 #define __core_base_def_h__
 
-#include "agile_vision/basic/base_type_def.h"
 #include <memory>
+#include "agile_vision/basic/image_data.h"
 
 AGV_NAMESPACE_BEGIN
 
@@ -46,7 +46,7 @@ enum class DataType
 
 inline bool IsFundamentalType(DataType t)
 {
-    return t == DataType::kInt || t == DataType::kFloat;
+    return t == DataType::kInt || t == DataType::kFloat || t == DataType::kImage;
 }
 
 inline unsigned int GetFundamentalTypeSize(DataType t)
@@ -55,6 +55,8 @@ inline unsigned int GetFundamentalTypeSize(DataType t)
         return sizeof(int);
     if(t == DataType::kFloat)
         return sizeof(float);
+    if(t == DataType::kImage)
+        return sizeof(ImageData);
     return 0;
 }
 
