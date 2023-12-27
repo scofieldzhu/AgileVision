@@ -28,8 +28,7 @@
 
 #include "process.h"
 #include "tool.h"
-#include "ratel/geometry/element_proxy.hpp"
-#include "ratel/geometry/dict_proxy.hpp"
+#include "ratel/geometry/geometry.h"
 using namespace ratel;
 
 AGV_NAMESPACE_BEGIN

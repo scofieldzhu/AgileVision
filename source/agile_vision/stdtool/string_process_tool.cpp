@@ -29,6 +29,7 @@
 #include "string_process_tool.h"
 #include "agile_vision/core/input_pin.h"
 #include "agile_vision/core/output_pin.h"
+#include "agile_vision/core/prop_pin.h"
 #include "agile_vision/core/process.h"
 #include "agile_vision/core/process_manager.h"
 #include "spdlog/spdlog.h"
@@ -41,23 +42,14 @@ StringProcessTool::StringProcessTool(const std::string& iid)
     child_process_manager_ = std::make_shared<ProcessManager>();
     auto new_input_pin = std::make_shared<InputPin>(DataSpec::SingleString());
     addPin("ReferenceString", new_input_pin);
+    auto prop_process_iid_list = std::make_shared<PropPin>(DataSpec::DynamicArray(DataType::kString));
+    addPin(PK_P_ProcessIIDList, prop_process_iid_list);
+    auto prop_trigger_string_list = std::make_shared<PropPin>(DataSpec::DynamicArray(DataType::kString));
+    addPin(PK_P_TriggerStringList, prop_trigger_string_list);
 }
 
 StringProcessTool::~StringProcessTool()
 {
-}
-
-void StringProcessTool::setProcessTriggerString(const std::string& process_iid, const AgvString& trigger_str)
-{
-    trigger_string_dict_[process_iid] = trigger_str;
-}
-
-AgvString StringProcessTool::getProcessTriggerString(const std::string& process_iid) const
-{
-    auto it = trigger_string_dict_.find(process_iid);
-    if(it != trigger_string_dict_.end())
-        return (*it).second;
-    return "";
 }
 
 std::string StringProcessTool::getClsGuid() const
@@ -68,10 +60,17 @@ std::string StringProcessTool::getClsGuid() const
 bool StringProcessTool::requestOutputData()
 {
     auto referenced_string_pin = getInputPin("ReferenceString")->produceInfo().pin;
+    auto process_iid_list_pin = getPropPin(PK_P_ProcessIIDList);
+    auto trigger_string_list_pin = getPropPin(PK_P_TriggerStringList);
+    if(process_iid_list_pin->dataBuffer().valueSize() != trigger_string_list_pin->dataBuffer().valueSize()){
+        SPDLOG_ERROR("Process IID list size is not equal with trigger string List size!", process_iid_list_pin->dataBuffer().valueSize(), trigger_string_list_pin->dataBuffer().valueSize());
+        return false;
+    }
     AgvString cur_trigger_string = referenced_string_pin->dataBuffer().getStringValue();
-    for(const auto& kv : trigger_string_dict_){
-        if(kv.second == cur_trigger_string){
-            const std::string process_iid =  kv.first;
+    for(unsigned int i = 0; i < trigger_string_list_pin->dataBuffer().valueSize(); ++i){
+        std::string cur_string = trigger_string_list_pin->dataBuffer().getStringValue(i);
+        if(cur_string == cur_trigger_string){
+            const std::string process_iid =  process_iid_list_pin->dataBuffer().getStringValue(i);
             auto process = child_process_manager_->findProcess(process_iid);
             if(process == nullptr){
                 SPDLOG_ERROR("No process object exists with iid:{}", process_iid);

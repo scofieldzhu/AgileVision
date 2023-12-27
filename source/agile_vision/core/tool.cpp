@@ -33,8 +33,7 @@
 #include "input_pin.h"
 #include "output_pin.h"
 #include "prop_pin.h"
-#include "ratel/geometry/element_proxy.hpp"
-#include "ratel/geometry/dict_proxy.hpp"
+#include "ratel/geometry/geometry.h"
 #include "spdlog/spdlog.h"
 using namespace ratel;
 
@@ -49,6 +48,8 @@ namespace {
 Tool::Tool(const std::string& iid)
     :iid_(iid)
 {
+    OutputPinPtr status_pin = std::make_shared<OutputPin>(DataSpec::SingleInt());
+    addPin(PK_O_Status, status_pin);
 }
 
 Tool::~Tool()
@@ -174,12 +175,16 @@ bool Tool::setPinConnection(const PinKey &consume_key, const ProduceInfo &pi)
 
 bool Tool::run()
 {
+    auto status_pin = getOutputPin(PK_O_Status);
+    status_pin->mutableDataBuffer().setIntValue(0);
     if(!checkPinDataCompatible()){
         SPDLOG_ERROR("CheckPinDataCompatible failed!");
+        status_pin->mutableDataBuffer().setIntValue(1);
         return false;
     }
     if(!requestOutputData()){
         SPDLOG_ERROR("RequestOutputData failed!");
+        status_pin->mutableDataBuffer().setIntValue(2);
         return false;
     }
     return true;

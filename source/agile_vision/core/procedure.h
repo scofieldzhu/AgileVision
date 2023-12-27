@@ -37,17 +37,20 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API Procedure
 {
 public:
+    AgvBytes serializeToBytes()const;
+    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
     const Process* root()const{ return root_.get(); }
     void setAlias(const AgvString& str);
     const auto& alias()const{ return alias_; }
     const auto& iid()const{ return iid_; }
+    Procedure() = default;
     Procedure(const std::string& iid);
     ~Procedure();
 
 private:
-    std::shared_ptr<Process> root_;
+    std::string iid_;
     AgvString alias_{"unnamed"};
-    const std::string iid_;
+    std::shared_ptr<Process> root_;
 };
 
 AGV_NAMESPACE_END

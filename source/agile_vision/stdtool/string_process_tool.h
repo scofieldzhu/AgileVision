@@ -37,15 +37,14 @@ AGV_NAMESPACE_BEGIN
 class AGV_STDTOOL_API StringProcessTool : public Tool
 {
 public:
-    void setProcessTriggerString(const std::string& process_iid, const AgvString& trigger_str);
-    AgvString getProcessTriggerString(const std::string& process_iid)const;
+    static constexpr std::string PK_P_ProcessIIDList = "ProcessIIDList";
+    static constexpr std::string PK_P_TriggerStringList = "TriggerStringList";
     StringProcessTool(const std::string& iid);
     virtual ~StringProcessTool();
 
 private:
     std::string getClsGuid()const override;
     bool requestOutputData() override;
-    std::map<std::string, AgvString> trigger_string_dict_;
 };
 
 AGV_NAMESPACE_END
