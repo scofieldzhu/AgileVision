@@ -1,22 +1,23 @@
-/* 
+#include "test_solution.h"
+/*
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
- *  
- *   File: run_context.h  
+ *
+ *   File: test_solution.cpp
  *   Copyright (c) 2023-2023 scofieldzhu
- *  
+ *
  *   MIT License
- *  
+ *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
  *   in the Software without restriction, including without limitation the rights
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
- *  
+ *
  *   The above copyright notice and this permission notice shall be included in all
  *   copies or substantial portions of the Software.
- *  
+ *
  *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,25 +26,36 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+#include "test_solution.h"
+#include "local_image2d.h"
+#include "agile_vision/core/procedure.h"
+#include "agile_vision/core/solution.h"
+#include "agile_vision/core/engine.h"
+#include "ratel/basic/string_proxy.h"
+using namespace agile_vision;
+using namespace ratel;
+using UIDGen = StringProxy;
 
-#ifndef __run_context_h__
-#define __run_context_h__
-
-#include "agile_vision/core/core_base_def.h"
-
-AGV_NAMESPACE_BEGIN
-
-struct RunContext
+void InitProcess(Process* p)
 {
-    bool is_running = false;
-    int32_t run_result = 0;
-    uint64_t occur_time = 0;
-    uint64_t elapsed_time = 0;
-    uint32_t thread_priority = 0;
-    uint32_t cpu_id = 0;
-    uint32_t wait_id = 0;
-};
+    UIDGen iid_gen;
+    ToolPtr local_image = std::make_shared<LocalImage2d>(iid_gen.NewUID().stdStr());    
+    local_image->getPropPin(LocalImage2d::PK_P_ImagePath)->mutableDataBuffer().setStringValue("F:\\Program Files\\CKVisionBuilder\\Images\\ImageCalib.bmp");
+    local_image->getPropPin(LocalImage2d::PK_P_DirType)->mutableDataBuffer().setIntValue(0);
+    p->appendTool(local_image);
+}
 
-AGV_NAMESPACE_END
+void InitProcedure(Solution* sln)
+{
+    UIDGen iid_gen;
+    Procedure* pc = sln->createProcedure(iid_gen.NewUID().stdStr());
+    InitProcess(pc->mutableRoot());
+}
 
-#endif
+void Test_Solution()
+{
+    Engine* e = new Engine();
+    Solution* sln = new Solution();
+    InitProcedure(sln);
+    sln->run(e);
+}

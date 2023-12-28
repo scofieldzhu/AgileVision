@@ -27,10 +27,17 @@
  */
 
 #include <iostream>
+#include "test_solution.h"
+#include "spdlog/spdlog.h"
 
 int main()
 {
+    spdlog::set_level(spdlog::level::trace);
+    SPDLOG_TRACE("Enter test main...");
     std::cout << "Enter test main..." << std::endl;
+
+    Test_Solution();
+
     std::cout << "Leave test main..." << std::endl;
     return 0;
 }

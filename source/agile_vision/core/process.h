@@ -48,6 +48,7 @@ public:
     RunContext& runContext(){ return run_context_; }
     const RunContext& runContext()const{ return run_context_; }
     bool run();
+    void appendTool(ToolPtr t);
     void insertTool(const_iterator pos, ToolPtr t);
     Tool* findTool(const AgvString& name, bool recursive)const;
     const_iterator findTool(Tool* t)const;
@@ -62,7 +63,7 @@ public:
     Process(const std::string& iid);
     ~Process();
 
-private:
+private:    
     std::string iid_;
     AgvString alias_{"null"};
     ToolList tools_;

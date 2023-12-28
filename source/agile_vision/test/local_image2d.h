@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: data_spec.h  
+ *   File: local_image2d.h  
  *   Copyright (c) 2023-2023 scofieldzhu
  *  
  *   MIT License
@@ -26,40 +26,23 @@
  *   SOFTWARE.
  */
 
-#ifndef __data_spec_h__
-#define __data_spec_h__
+#pragma once
 
-#include <cassert>
-#include "agile_vision/core/core_export.h"
-#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/tool.h"
+#include <opencv2/opencv.hpp>
 
-AGV_NAMESPACE_BEGIN
-
-struct AGV_CORE_API DataSpec
+class LocalImage2d : public agile_vision::Tool
 {
-    AgvBytes serializeToBytes()const;
-    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    static DataSpec Single(DataType type){ return {type}; }
-    static DataSpec SingleInt(){ return StaticArray(DataType::kInt); }
-    static DataSpec SingleFloat(){ return StaticArray(DataType::kFloat); }
-    static DataSpec SingleString(){ return StaticArray(DataType::kString); }
-    static DataSpec SingleBytes(){ return StaticArray(DataType::kBytes); }
-    static DataSpec SingleImage(){ return StaticArray(DataType::kImage); }
-    static DataSpec StaticArray(DataType type, unsigned int fixed_size = 1)
-    { 
-        assert(fixed_size);
-        return {type, 0, fixed_size}; 
-    }
-    static DataSpec DynamicArray(DataType type){ return {type, 0, 0}; }
-    bool isStaticArray()const{ return arry_size > 0; }
-    bool isDynamicArray()const{ return arry_size == 0; }    
-    bool compatibleWith(const DataSpec& ds)const;
-    DataType major_type = DataType::kUnk;
-    unsigned int subtype = 0;
-    unsigned int arry_size = 1; // 0 means: size dynamic, other value means fix size
+public:
+    static constexpr std::string PK_P_ImagePath = "ImagePath";
+    static constexpr std::string PK_P_DirType = "DirType";
+    static constexpr std::string PK_O_ImageData = "ImageData";
+    std::string getClsGuid()const override;
+    LocalImage2d(const std::string& iid);
+    ~LocalImage2d();
+
+private:
+    bool requestOutputData() override;
+    cv::Mat image_;
 };
-
-AGV_NAMESPACE_END
-
-#endif
 

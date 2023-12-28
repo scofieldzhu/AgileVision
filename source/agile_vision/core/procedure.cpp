@@ -27,8 +27,9 @@
  */
 
 #include "procedure.h"
-#include "process.h"
+#include "engine.h"
 #include "ratel/geometry/geometry.h"
+
 using namespace ratel;
 
 AGV_NAMESPACE_BEGIN
@@ -39,9 +40,9 @@ namespace{
     using CombineB = ProxyCombine<CombineA, Process>;
 }
 
-Procedure::Procedure(const std::string& iid)
-    :iid_(iid),
-    root_(std::make_shared<Process>(iid)) //same iid with procedure's
+Procedure::Procedure(const std::string &iid)
+    : iid_(iid),
+      root_(std::make_shared<Process>(iid)) // same iid with procedure's
 {
 }
 
@@ -79,6 +80,21 @@ size_t Procedure::loadBytes(ConsAgvBytePtr buffer, size_t size)
 void Procedure::setAlias(const AgvString &str)
 {
     alias_ = str;
+}
+
+void Procedure::run(Engine* e)
+{
+    if(e){
+        run_context_.wait_id = e->createWork(root_);
+        e->commitWork(run_context_.wait_id);
+    }else{
+        root_->run();
+    }
+}
+
+void Procedure::setActiveRun(bool s)
+{
+    active_run_ = s;
 }
 
 AGV_NAMESPACE_END

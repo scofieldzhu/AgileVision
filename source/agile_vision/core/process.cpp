@@ -93,15 +93,22 @@ size_t Process::loadBytes(ConsAgvBytePtr buffer, size_t size)
 bool Process::run()
 {
     bool s = true;
-    for(auto& t : tools_){
+    run_context_.is_running = true;
+    for(auto& t : tools_)
         s = s && t->run();
-    }
+    run_context_.is_running = false;
     return s;
+}
+
+void Process::appendTool(ToolPtr t)
+{
+    if(t && !existsTool(t.get()))
+        tools_.push_back(t);
 }
 
 void Process::insertTool(const_iterator pos, ToolPtr t)
 {
-    if(!existsTool(t.get()))
+    if(t && !existsTool(t.get()))
         tools_.insert(pos, t);
 }
 

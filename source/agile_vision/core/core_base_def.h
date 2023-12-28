@@ -98,6 +98,8 @@ using PropPinPtr = std::shared_ptr<PropPin>;
 class ToolPin;
 using ToolPinPtr = std::shared_ptr<ToolPin>;
 
+class Engine;
+
 AGV_NAMESPACE_END
 
 #endif

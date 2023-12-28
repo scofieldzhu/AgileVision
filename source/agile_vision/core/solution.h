@@ -29,7 +29,7 @@
 #ifndef __solution_h__
 #define __solution_h__
 
-#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/run_context.h"
 #include "agile_vision/core/core_export.h"
 
 AGV_NAMESPACE_BEGIN
@@ -44,6 +44,7 @@ public:
     const_iterator begin()const{ return procedure_list_.begin(); }
     iterator end(){ return procedure_list_.end(); }
     const_iterator end()const{ return procedure_list_.end(); }
+    void run(Engine* e);
     Procedure* createProcedure(const std::string& iid);
     const Procedure* findProcedure(const std::string& iid)const;
     void removeProcedure(const std::string& iid);
@@ -55,6 +56,7 @@ public:
     ~Solution();
 
 private:
+    RunContext run_context_;
     using ProcedurePtr = std::unique_ptr<Procedure>;
     std::vector<ProcedurePtr> procedure_list_;
 };

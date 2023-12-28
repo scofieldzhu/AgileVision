@@ -27,9 +27,6 @@
  */
 
 #include "string_process_tool.h"
-#include "agile_vision/core/input_pin.h"
-#include "agile_vision/core/output_pin.h"
-#include "agile_vision/core/prop_pin.h"
 #include "agile_vision/core/process.h"
 #include "agile_vision/core/process_manager.h"
 #include "spdlog/spdlog.h"

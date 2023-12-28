@@ -29,10 +29,6 @@
 #include "tool.h"
 #include "procedure.h"
 #include "relationship_network.h"
-#include "data_spec.h"
-#include "input_pin.h"
-#include "output_pin.h"
-#include "prop_pin.h"
 #include "ratel/geometry/geometry.h"
 #include "spdlog/spdlog.h"
 using namespace ratel;

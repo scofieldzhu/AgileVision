@@ -68,7 +68,17 @@ Solution::~Solution()
 {
 }
 
-Procedure* Solution::createProcedure(const std::string& iid)
+void Solution::run(Engine *e)
+{
+    if(e){
+        for(auto& p : procedure_list_){
+            if(p->activeRun())
+                p->run(e);
+        }
+    }
+}
+
+Procedure *Solution::createProcedure(const std::string &iid)
 {
     if(findProcedure(iid)){
         SPDLOG_WARN("Procedure with iid:{} already exists!", iid);

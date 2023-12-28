@@ -30,8 +30,9 @@
 #define __tool_h__
 
 #include <map>
-#include "agile_vision/core/produce_info.h"
-#include "agile_vision/core/core_export.h"
+#include "agile_vision/core/input_pin.h"
+#include "agile_vision/core/output_pin.h"
+#include "agile_vision/core/prop_pin.h"
 
 AGV_NAMESPACE_BEGIN
 
@@ -45,6 +46,7 @@ public:
     bool run();
     const OutputPin* getOutputPin(const PinKey& key)const;
     const InputPin* getInputPin(const PinKey& key)const;
+    PropPin* getPropPin(const PinKey& key);
     const PropPin* getPropPin(const PinKey& key)const;
     const ToolPin* getToolPin(const PinKey& key)const;
     const std::string& iid()const{ return iid_; }
@@ -58,8 +60,7 @@ public:
 protected:
     using ToolPinPtr = std::shared_ptr<ToolPin>;
     OutputPin* getOutputPin(const PinKey& key);
-    InputPin* getInputPin(const PinKey& key);
-    PropPin* getPropPin(const PinKey& key);
+    InputPin* getInputPin(const PinKey& key);    
     ToolPin* getToolPin(const PinKey& key);
     bool checkPinDataCompatible()const;
     void addPin(const PinKey& key, ToolPinPtr pin);

@@ -50,7 +50,7 @@ struct PRE_PACKED ImageData
     {
         DT_UNK,
         DT_UCHAR,
-        DT_SHORT,
+        DT_USHORT,
         DT_INT,
         DT_FLOAT
     };

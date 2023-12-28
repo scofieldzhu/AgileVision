@@ -31,7 +31,6 @@
 
 #include "agile_vision/core/data_spec.h"
 #include "agile_vision/core/core_export.h"
-#include "agile_vision/basic/image_data.h"
 
 AGV_NAMESPACE_BEGIN
 

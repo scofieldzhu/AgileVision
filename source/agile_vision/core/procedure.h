@@ -39,15 +39,20 @@ class AGV_CORE_API Procedure
 public:
     AgvBytes serializeToBytes()const;
     size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+    Process* mutableRoot(){ return root_.get(); }
     const Process* root()const{ return root_.get(); }
     void setAlias(const AgvString& str);
     const auto& alias()const{ return alias_; }
     const auto& iid()const{ return iid_; }
-    Procedure() = default;
+    void run(Engine* e);
+    void setActiveRun(bool s);
+    bool activeRun()const{ return active_run_; }
     Procedure(const std::string& iid);
     ~Procedure();
 
 private:
+    bool active_run_ = true;
+    RunContext run_context_;
     std::string iid_;
     AgvString alias_{"unnamed"};
     std::shared_ptr<Process> root_;
