@@ -100,7 +100,7 @@ AgvBytes Tool::serializeToBytes() const
     for(const auto& kv : tool_pin_dict_){
         auto pin = kv.second;
         if(pin->getPinType() == PinType::kProp){
-            std::string key = kv.first;
+            std::string key(kv.first);
             ByteVecPx bvp;
             bvp.mutableData() = dynamic_cast<PropPin*>(pin.get())->serializeToBytes();
             pdp.mutableData().insert({std::move(key), std::move(bvp)});

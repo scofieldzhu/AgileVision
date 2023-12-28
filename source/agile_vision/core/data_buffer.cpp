@@ -348,8 +348,9 @@ void DataBuffer::setStringValue(const char* source, size_t idx)
         return;
     }
     auto& dst_bytes = bytes_table_[idx];
-    dst_bytes.resize(strlen(source));
+    dst_bytes.resize(strlen(source) + 1);
     memcpy(dst_bytes.data(), source, strlen(source));
+    dst_bytes[strlen(source)] = '\0';
 }
 
 void DataBuffer::setStringValue(const AgvMultiString& strs)
@@ -364,8 +365,9 @@ void DataBuffer::setStringValue(const AgvMultiString& strs)
     }
     auto safe_size = std::min<size_t>(strs.size(), value_size_);
     std::transform(strs.begin(), strs.end(), bytes_table_.begin(), [](const auto& s){
-        AgvBytes bytes(s.size(), 0);
+        AgvBytes bytes(s.size() + 1, 0);
         memcpy(bytes.data(), s.c_str(), s.size());
+        bytes[s.size()] = '\0';
         return bytes;
     });
 }

@@ -37,8 +37,8 @@ AGV_NAMESPACE_BEGIN
 class AGV_STDTOOL_API StringProcessTool : public Tool
 {
 public:
-    static constexpr std::string PK_P_ProcessIIDList = "ProcessIIDList";
-    static constexpr std::string PK_P_TriggerStringList = "TriggerStringList";
+    static constexpr PinKey PK_P_ProcessIIDList = "ProcessIIDList";
+    static constexpr PinKey PK_P_TriggerStringList = "TriggerStringList";
     StringProcessTool(const std::string& iid);
     virtual ~StringProcessTool();
 

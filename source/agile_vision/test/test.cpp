@@ -26,19 +26,40 @@
  *   SOFTWARE.
  */
 
-#include <iostream>
 #include "test_solution.h"
 #include "spdlog/spdlog.h"
 
 int main()
 {
     spdlog::set_level(spdlog::level::trace);
-    SPDLOG_TRACE("Enter test main...");
-    std::cout << "Enter test main..." << std::endl;
+    spdlog::trace("Enter test main...");
 
     Test_Solution();
 
-    std::cout << "Leave test main..." << std::endl;
+    spdlog::trace("Leave test main...");
     return 0;
 }
 
+// #include <opencv2/opencv.hpp> // 包含OpenCV主要头文件
+
+// int main() {
+//     // 图片路径，替换为你的图片路径
+//     std::string image_path = "F:\\Program Files\\CKVisionBuilder\\Images\\ImageCalib.bmp";
+
+//     // 读取图片
+//     cv::Mat img = cv::imread(image_path, cv::IMREAD_COLOR);
+
+//     // 判断图片是否成功加载
+//     if(img.empty()) {
+//         std::cerr << "Could not read the image: " << image_path << std::endl;
+//         return 1;
+//     }
+
+//     // 显示图片
+//     cv::imshow("Display window", img);
+
+//     // 等待用户输入，参数为0表示无限期等待
+//     cv::waitKey(0); 
+
+//     return 0;
+// }

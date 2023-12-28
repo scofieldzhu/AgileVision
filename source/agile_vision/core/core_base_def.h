@@ -30,6 +30,7 @@
 #define __core_base_def_h__
 
 #include <memory>
+#include <string_view>
 #include "agile_vision/basic/image_data.h"
 
 AGV_NAMESPACE_BEGIN
@@ -72,7 +73,7 @@ using DataBufferPtr = std::shared_ptr<DataBuffer>;
 
 struct DataSpec;
 
-using PinKey = AgvString;
+using PinKey = std::string_view;
 
 class Tool;
 using ToolPtr = std::shared_ptr<Tool>;

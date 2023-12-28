@@ -34,9 +34,9 @@
 class LocalImage2d : public agile_vision::Tool
 {
 public:
-    static constexpr std::string PK_P_ImagePath = "ImagePath";
-    static constexpr std::string PK_P_DirType = "DirType";
-    static constexpr std::string PK_O_ImageData = "ImageData";
+    static constexpr agile_vision::PinKey PK_P_ImagePath = "ImagePath";
+    static constexpr agile_vision::PinKey PK_P_DirType = "DirType";
+    static constexpr agile_vision::PinKey PK_O_ImageData = "ImageData";
     std::string getClsGuid()const override;
     LocalImage2d(const std::string& iid);
     ~LocalImage2d();

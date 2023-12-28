@@ -39,7 +39,7 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API Tool
 {
 public:
-    static constexpr std::string PK_O_Status = "Status";
+    static constexpr PinKey PK_O_Status = "Status";
     virtual AgvBytes serializeToBytes()const;
     virtual size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
     bool setPinConnection(const PinKey& consume_key, const ProduceInfo& pi);

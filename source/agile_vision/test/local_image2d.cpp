@@ -52,16 +52,18 @@ std::string LocalImage2d::getClsGuid() const
 
 bool LocalImage2d::requestOutputData()
 {
+    spdlog::trace("Enter requestOutputData..");
     auto dir_type = getPropPin(PK_P_DirType)->dataBuffer().getIntValue();
     auto image_path = getPropPin(PK_P_ImagePath)->dataBuffer().getStringValue();
     if(dir_type == 0){ // regular file
-        image_ = imread(image_path);
+        std::string path_str("a.bmp");
+        image_ = imread(path_str);
         if(image_.empty()){
-            SPDLOG_ERROR("Image path:'{}' not exists!", image_path);
+            spdlog::error("Image path:'{}' not exists!", image_path);
             return false;
         }
     }else{
-        SPDLOG_TRACE("Image dir path type not supported at present!", image_path);
+        spdlog::error("Image dir path type not supported at present!", image_path);
         return false;
     }
     ImageData img;
@@ -80,6 +82,6 @@ bool LocalImage2d::requestOutputData()
     img.size = (uint32_t)(image_.total() * image_.elemSize());
     img.data = image_.ptr(0);
     getOutputPin(PK_O_ImageData)->mutableDataBuffer().setImageValue(img);
-    SPDLOG_TRACE("Read image data from path:{} successfully!", image_path);
+    spdlog::trace("Read image data from path:{} successfully!", image_path);
     return true;
 }

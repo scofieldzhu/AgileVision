@@ -86,7 +86,7 @@ Procedure *Solution::createProcedure(const std::string &iid)
     }
     auto procedure = std::make_unique<Procedure>(iid);
     procedure_list_.push_back(std::move(procedure));
-    return procedure.get();
+    return procedure_list_.back().get();
 }
 
 const Procedure* Solution::findProcedure(const std::string& iid) const
