@@ -27,58 +27,18 @@
  */
 
 #include "test_solution.h"
-#include "opencv2/opencv.hpp"
 #include "spdlog/spdlog.h"
+#include "ratel/basic/dbg_tracker.h"
 
 int main()
 {
     spdlog::set_level(spdlog::level::trace);
-    spdlog::trace("Enter test main...");
-
-    // std::string image_path = "F:\\Github\\AgileVision\\build\\bin\\Debug\\a.bmp";
-    // cv::Mat img = cv::imread(image_path, cv::IMREAD_COLOR);
-    // if(img.empty()) {
-    //     std::cerr << "Could not read the image: " << image_path << std::endl;
-    //     return 1;
-    // }
-    // cv::imshow("Display window", img);
-
+    _AUTO_FUNC_TRACK_
     Test_Solution();
-    cv::waitKey(0); 
-
-    getchar();
-
-    while(true)
-    {
+    // cv::waitKey(0); 
+    // getchar();
+    while(true){
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     };
-
-
-
-    spdlog::trace("Leave test main...");
     return 0;
 }
-
-// #include <opencv2/opencv.hpp> // 包含OpenCV主要头文件
-
-// int main() {
-//     // 图片路径，替换为你的图片路径
-//     std::string image_path = "F:\\Program Files\\CKVisionBuilder\\Images\\ImageCalib.bmp";
-
-//     // 读取图片
-//     cv::Mat img = cv::imread(image_path, cv::IMREAD_COLOR);
-
-//     // 判断图片是否成功加载
-//     if(img.empty()) {
-//         std::cerr << "Could not read the image: " << image_path << std::endl;
-//         return 1;
-//     }
-
-//     // 显示图片
-//     cv::imshow("Display window", img);
-
-//     // 等待用户输入，参数为0表示无限期等待
-//     cv::waitKey(0); 
-
-//     return 0;
-// }

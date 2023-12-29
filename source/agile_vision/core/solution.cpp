@@ -81,7 +81,7 @@ void Solution::run(Engine *e)
 Procedure *Solution::createProcedure(const std::string &iid)
 {
     if(findProcedure(iid)){
-        SPDLOG_WARN("Procedure with iid:{} already exists!", iid);
+        spdlog::warn("Procedure with iid:{} already exists!", iid);
         return nullptr;
     }
     auto procedure = std::make_unique<Procedure>(iid);

@@ -32,6 +32,7 @@
 #include "agile_vision/core/solution.h"
 #include "agile_vision/core/engine.h"
 #include "ratel/basic/string_proxy.h"
+#include "ratel/basic/dbg_tracker.h"
 #include "spdlog/spdlog.h"
 using namespace agile_vision;
 using namespace ratel;
@@ -41,30 +42,27 @@ using UIDGen = StringProxy;
 
 void InitProcess(Process* p)
 {
-    spdlog::trace("Enter InitProcess...");
+    _AUTO_FUNC_TRACK_
     UIDGen iid_gen;
     ToolPtr local_image = std::make_shared<LocalImage2d>(iid_gen.NewUID().stdStr());    
     local_image->getPropPin(LocalImage2d::PK_P_ImagePath)->mutableDataBuffer().setStringValue("F:\\Program Files\\CKVisionBuilder\\Images\\ImageCalib.bmp");
     local_image->getPropPin(LocalImage2d::PK_P_DirType)->mutableDataBuffer().setIntValue(0);
     p->appendTool(local_image);
-    spdlog::trace("Leave InitProcess...");
 }
 
 void InitProcedure(Solution* sln)
 {
-    spdlog::trace("Enter InitProcedure...");
+    _AUTO_FUNC_TRACK_
     UIDGen iid_gen;
     Procedure* pc = sln->createProcedure(iid_gen.NewUID().stdStr());
     InitProcess(pc->mutableRoot());
-    spdlog::trace("Leave InitProcedure...");
 }
 
 void Test_Solution()
 {
-    spdlog::trace("Enter Test_Solution...");
+    _AUTO_FUNC_TRACK_
     Engine* e = new Engine();
     Solution* sln = new Solution();
     InitProcedure(sln);
     sln->run(e);
-    spdlog::trace("Leave Test_Solution...");
 }

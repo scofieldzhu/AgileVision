@@ -60,7 +60,7 @@ bool StringProcessTool::requestOutputData()
     auto process_iid_list_pin = getPropPin(PK_P_ProcessIIDList);
     auto trigger_string_list_pin = getPropPin(PK_P_TriggerStringList);
     if(process_iid_list_pin->dataBuffer().valueSize() != trigger_string_list_pin->dataBuffer().valueSize()){
-        SPDLOG_ERROR("Process IID list size is not equal with trigger string List size!", process_iid_list_pin->dataBuffer().valueSize(), trigger_string_list_pin->dataBuffer().valueSize());
+        spdlog::error("Process IID list size is not equal with trigger string List size!", process_iid_list_pin->dataBuffer().valueSize(), trigger_string_list_pin->dataBuffer().valueSize());
         return false;
     }
     AgvString cur_trigger_string = referenced_string_pin->dataBuffer().getStringValue();
@@ -70,14 +70,14 @@ bool StringProcessTool::requestOutputData()
             const std::string process_iid =  process_iid_list_pin->dataBuffer().getStringValue(i);
             auto process = child_process_manager_->findProcess(process_iid);
             if(process == nullptr){
-                SPDLOG_ERROR("No process object exists with iid:{}", process_iid);
+                spdlog::error("No process object exists with iid:{}", process_iid);
                 return false;
             }
             process->run(); //sync run;
             return true;
         }
     }
-    SPDLOG_ERROR("No trigger string matched with input string:{}", cur_trigger_string);
+    spdlog::error("No trigger string matched with input string:{}", cur_trigger_string);
     return false;
 }
 

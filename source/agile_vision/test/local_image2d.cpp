@@ -58,7 +58,6 @@ bool LocalImage2d::requestOutputData()
     auto image_path = getPropPin(PK_P_ImagePath)->dataBuffer().getStringValue();
     if(dir_type == 0){ // regular file
         image_ = imread(image_path, cv::IMREAD_COLOR);
-        //cv::imshow("Display window", image_);
         if(image_.empty()){
             spdlog::error("Image path:'{}' not exists!", image_path);
             return false;

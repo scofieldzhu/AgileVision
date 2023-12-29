@@ -62,17 +62,17 @@ bool Tool::requestOutputData()
 // {
 //     auto procedure = belongedProcedure();
 //     if(procedure == nullptr){
-//         SPDLOG_WARN("Connection will break with consume key:{}", consume_key);
+//         spdlog::warn("Connection will break with consume key:{}", consume_key);
 //         //??? how to do?
 //         return true;
 //     }       
 //     auto consume_pin = this->getToolPin(consume_key);
 //     if(consume_pin == nullptr){
-//         SPDLOG_ERROR("No such pin exists with name:{}!", consume_key);
+//         spdlog::error("No such pin exists with name:{}!", consume_key);
 //         return false;
 //     }
 //     if(consume_pin->canReferenceData()){
-//         SPDLOG_ERROR("This pin type:{} cannot consume any data!", (int)consume_pin->getPinType());
+//         spdlog::error("This pin type:{} cannot consume any data!", (int)consume_pin->getPinType());
 //         return false;
 //     }
 //     auto rsn = belongedProcedure()->tool_relationships_;
@@ -142,7 +142,7 @@ size_t Tool::loadBytes(ConsAgvBytePtr buffer, size_t size)
         const auto& bv = kv.second.data();
         auto ppin = getPropPin(key);
         if(ppin == nullptr){
-            SPDLOG_WARN("Prop pin:{} not exists!", key);
+            spdlog::warn("Prop pin:{} not exists!", key);
             continue;
         }
         if(ppin->loadBytes(bv.data(), bv.size()) == 0){
@@ -156,7 +156,7 @@ bool Tool::setPinConnection(const PinKey &consume_key, const ProduceInfo &pi)
 {
     auto consume_pin = getInputPin(consume_key);
     if(consume_pin == nullptr){
-        SPDLOG_ERROR("No such consume key:{} exists!", consume_key);
+        spdlog::error("No such consume key:{} exists!", consume_key);
         return false;
     }
     const auto& old_info = consume_pin->produceInfo();
@@ -245,11 +245,11 @@ ToolPin* Tool::getToolPin(const PinKey& key)
 //         auto output_pin = producer->getOutputPin(tl.produce_pin_key);
 //         auto input_pin = tl.consumer->getInputPin(tl.consume_pin_key);
 //         if(output_pin == nullptr || input_pin == nullptr){
-//             SPDLOG_ERROR("Invalid pin with key:{}", tl.produce_pin_key);
+//             spdlog::error("Invalid pin with key:{}", tl.produce_pin_key);
 //             return false;
 //         }
 //         if(!output_pin->dataSpec().compatibleWith(input_pin->dataSpec())){
-//             SPDLOG_ERROR("Output pin:{} data spec is not compatile with input pin:{} data spec!", tl.produce_pin_key, tl.consume_pin_key);
+//             spdlog::error("Output pin:{} data spec is not compatile with input pin:{} data spec!", tl.produce_pin_key, tl.consume_pin_key);
 //             return false;
 //         }
 //         if(input_pin->optional() || input_pin->deprecated()){
@@ -270,13 +270,13 @@ bool Tool::checkPinDataCompatible() const
         auto input_pin = dynamic_cast<InputPin*>(pin.get());
         auto produce_info = input_pin->produceInfo();
         if(produce_info.isNull()){
-            SPDLOG_WARN("No producer bind at input pin:{}", kv.first);
+            spdlog::warn("No producer bind at input pin:{}", kv.first);
             return false;
         }
         const auto& output_spec = produce_info.pin->dataSpec();
         const auto& input_spec = input_pin->dataSpec();
         if(!input_spec.compatibleWith(output_spec)){
-            SPDLOG_WARN("Producer pin's data spec is not compatible with consumer pin's:{}", kv.first);
+            spdlog::warn("Producer pin's data spec is not compatible with consumer pin's:{}", kv.first);
             return false;
         }
         //other stuffs

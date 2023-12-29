@@ -161,7 +161,7 @@ Engine::wtid_t Engine::createWait(wkid_list works, finish_callback cb)
         }
     );
     if(!all_valid){
-        SPDLOG_ERROR("Exist invalid work id in passed id list!");
+        spdlog::error("Exist invalid work id in passed id list!");
         return null_id;
     }
     auto new_wait_id = wait_id_seed_.next();
