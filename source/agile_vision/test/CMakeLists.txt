@@ -3,6 +3,7 @@ set(proj_name "test")
 
 project(${proj_name})
 
+#set(OpenCV_DIR "${trd_root}/x64/vc16/lib")
 set(OpenCV_DIR "${VCPKG_INSTALLED_DIR}/x64-windows/share/opencv4")
 find_package(OpenCV REQUIRED)
 
@@ -24,6 +25,13 @@ target_link_libraries(${proj_name} agile_vision.basic agile_vision.core agile_vi
 
 set(deplibs_dbg spdlogd ratel.basic_d)
 set(deplibs_opt spdlog  ratel.basic)
-target_link_libraries(${proj_name} debug ${deplibs_dbg} optimized ${deplibs_opt})
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+ 	target_link_libraries(${proj_name} ${deplibs_dbg})
+else()
+ 	target_link_libraries(${proj_name} ${deplibs_opt})
+endif()
+
+#target_link_libraries(${proj_name} debug ${deplibs_dbg} optimized ${deplibs_opt})
 
 install(TARGETS ${proj_name} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

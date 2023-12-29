@@ -27,6 +27,7 @@
  */
 
 #include "local_image2d.h"
+#include "ratel/basic/dbg_tracker.h"
 #include "spdlog/spdlog.h"
 using namespace agile_vision;
 using namespace spdlog;
@@ -52,12 +53,12 @@ std::string LocalImage2d::getClsGuid() const
 
 bool LocalImage2d::requestOutputData()
 {
-    spdlog::trace("Enter requestOutputData..");
+    _AUTO_FUNC_TRACK_
     auto dir_type = getPropPin(PK_P_DirType)->dataBuffer().getIntValue();
     auto image_path = getPropPin(PK_P_ImagePath)->dataBuffer().getStringValue();
     if(dir_type == 0){ // regular file
-        std::string path_str("a.bmp");
-        image_ = imread(path_str);
+        image_ = imread(image_path, cv::IMREAD_COLOR);
+        //cv::imshow("Display window", image_);
         if(image_.empty()){
             spdlog::error("Image path:'{}' not exists!", image_path);
             return false;

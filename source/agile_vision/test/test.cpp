@@ -27,6 +27,7 @@
  */
 
 #include "test_solution.h"
+#include "opencv2/opencv.hpp"
 #include "spdlog/spdlog.h"
 
 int main()
@@ -34,7 +35,25 @@ int main()
     spdlog::set_level(spdlog::level::trace);
     spdlog::trace("Enter test main...");
 
+    // std::string image_path = "F:\\Github\\AgileVision\\build\\bin\\Debug\\a.bmp";
+    // cv::Mat img = cv::imread(image_path, cv::IMREAD_COLOR);
+    // if(img.empty()) {
+    //     std::cerr << "Could not read the image: " << image_path << std::endl;
+    //     return 1;
+    // }
+    // cv::imshow("Display window", img);
+
     Test_Solution();
+    cv::waitKey(0); 
+
+    getchar();
+
+    while(true)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    };
+
+
 
     spdlog::trace("Leave test main...");
     return 0;

@@ -30,6 +30,7 @@
 #include "procedure.h"
 #include "relationship_network.h"
 #include "ratel/geometry/geometry.h"
+#include "ratel/basic/dbg_tracker.h"
 #include "spdlog/spdlog.h"
 using namespace ratel;
 
@@ -174,12 +175,12 @@ bool Tool::run()
     auto status_pin = getOutputPin(PK_O_Status);
     status_pin->mutableDataBuffer().setIntValue(0);
     if(!checkPinDataCompatible()){
-        SPDLOG_ERROR("CheckPinDataCompatible failed!");
+        spdlog::error("CheckPinDataCompatible failed!");
         status_pin->mutableDataBuffer().setIntValue(1);
         return false;
     }
     if(!requestOutputData()){
-        SPDLOG_ERROR("RequestOutputData failed!");
+        spdlog::error("RequestOutputData failed!");
         status_pin->mutableDataBuffer().setIntValue(2);
         return false;
     }

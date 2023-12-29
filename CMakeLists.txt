@@ -9,9 +9,10 @@ message(status "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 
 project (${proj_name})
 
-set(trd_incl "${CMAKE_SOURCE_DIR}/third_party/include")
-set(trd_bin "${CMAKE_SOURCE_DIR}/third_party/bin")
-set(trd_lib "${CMAKE_SOURCE_DIR}/third_party/lib")
+set(trd_root "${CMAKE_SOURCE_DIR}/third_party")
+set(trd_incl "${trd_root}/include")
+set(trd_bin "${trd_root}/bin")
+set(trd_lib "${trd_root}/lib")
 set(build_bin "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${build_bin})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${build_bin})

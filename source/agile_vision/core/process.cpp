@@ -29,6 +29,7 @@
 #include "process.h"
 #include "tool.h"
 #include "ratel/geometry/geometry.h"
+#include "ratel/basic/dbg_tracker.h"
 using namespace ratel;
 
 AGV_NAMESPACE_BEGIN
