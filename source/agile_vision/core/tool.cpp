@@ -58,6 +58,11 @@ bool Tool::requestOutputData()
     return false;
 }
 
+void Tool::setJoinedProcess(Process* p)
+{
+    joined_process_ = p;
+}
+
 // bool Tool::setPinConnection(const PinKey& consume_key, Tool* producer, const PinKey& produce_key, unsigned int data_location)
 // {
 //     auto procedure = belongedProcedure();

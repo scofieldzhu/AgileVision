@@ -40,10 +40,7 @@ AGV_NAMESPACE_BEGIN
 
 class AGV_CORE_API Engine 
 {
-public:    
-    static constexpr uint32_t null_id = 0;
-    using wkid_t = uint32_t;
-    using wkid_list = std::vector<wkid_t>;
+public:        
     wkid_t createWork(ProcessPtr p);
     void commitWork(wkid_t w);
     void stopWork(wkid_t w);
@@ -55,6 +52,7 @@ public:
     using finish_callback = std::function<void(wtid_t)>;
     wtid_t createWait(wkid_list works, finish_callback cb);
     void destroyWait(wtid_t wait);
+    void syncRunProcess(ProcessPtr p);
     Engine();
     ~Engine();
 

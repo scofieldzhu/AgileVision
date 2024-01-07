@@ -74,17 +74,12 @@ void ProcessManager::insertProcess(const_iterator pos, ProcessPtr p)
     }
 }
 
-Process* ProcessManager::findProcess(const std::string &iid)
-{
-    return const_cast<Process*>(const_cast<const ProcessManager*>(this)->findProcess(iid));
-}
-
-const Process* ProcessManager::findProcess(const std::string& iid) const
+ProcessPtr ProcessManager::findProcess(const std::string& iid) const
 {
     auto it = std::find_if(process_list_.begin(), process_list_.end(), [&iid](auto p){
         return (*p).iid() == iid;
     });
-    return it != process_list_.end() ? (*it).get() : nullptr;
+    return it != process_list_.end() ? (*it) : nullptr;
 }
 
 void ProcessManager::appendProcess(ProcessPtr p)

@@ -30,7 +30,6 @@
 #include "local_image2d.h"
 #include "agile_vision/core/procedure.h"
 #include "agile_vision/core/solution.h"
-#include "agile_vision/core/engine.h"
 #include "ratel/basic/string_proxy.h"
 #include "ratel/basic/dbg_tracker.h"
 #include "spdlog/spdlog.h"
@@ -61,8 +60,7 @@ void InitProcedure(Solution* sln)
 void Test_Solution()
 {
     _AUTO_FUNC_TRACK_
-    Engine* e = new Engine();
     Solution* sln = new Solution();
     InitProcedure(sln);
-    sln->run(e);
+    sln->run();
 }

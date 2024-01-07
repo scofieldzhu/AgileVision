@@ -100,6 +100,9 @@ class ToolPin;
 using ToolPinPtr = std::shared_ptr<ToolPin>;
 
 class Engine;
+constexpr uint32_t null_id = 0; // null id for wkid_t\wtid_t
+using wkid_t = uint32_t; //work id for process in engine
+using wkid_list = std::vector<wkid_t>;
 
 AGV_NAMESPACE_END
 

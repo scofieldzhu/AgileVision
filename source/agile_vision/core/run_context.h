@@ -42,6 +42,9 @@ struct RunContext
     uint32_t thread_priority = 0;
     uint32_t cpu_id = 0;
     uint32_t wait_id = 0;
+    Engine* engine = nullptr;
+    bool async_run = false;
+    wkid_t work_id = null_id;
 };
 
 AGV_NAMESPACE_END

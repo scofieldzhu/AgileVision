@@ -29,6 +29,7 @@
 #include "procedure.h"
 #include "engine.h"
 #include "ratel/geometry/geometry.h"
+#include "spdlog/spdlog.h"
 
 using namespace ratel;
 
@@ -82,13 +83,18 @@ void Procedure::setAlias(const AgvString &str)
     alias_ = str;
 }
 
-void Procedure::run(Engine* e)
+void Procedure::run()
 {
-    if(e){
-        run_context_.wait_id = e->createWork(root_);
-        e->commitWork(run_context_.wait_id);
+    if(run_context_.engine ==  nullptr){
+        spdlog::error("No engine object attached!");
+        return;
+    }
+    auto cur_engine = run_context_.engine;
+    if(run_context_.async_run){ 
+        run_context_.work_id = cur_engine->createWork(root_);
+        cur_engine->commitWork(run_context_.work_id);
     }else{
-        root_->run();
+        cur_engine->syncRunProcess(root_);
     }
 }
 

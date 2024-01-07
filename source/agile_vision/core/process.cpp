@@ -103,14 +103,18 @@ bool Process::run()
 
 void Process::appendTool(ToolPtr t)
 {
-    if(t && !existsTool(t.get()))
+    if(t && !existsTool(t.get())){
         tools_.push_back(t);
+        t->setJoinedProcess(this);
+    }
 }
 
 void Process::insertTool(const_iterator pos, ToolPtr t)
 {
-    if(t && !existsTool(t.get()))
+    if(t && !existsTool(t.get())){
         tools_.insert(pos, t);
+        t->setJoinedProcess(this);
+    }
 }
 
 Tool* Process::findTool(const AgvString& name, bool recursive) const
@@ -138,18 +142,28 @@ bool Process::existsTool(Tool *t) const
 void Process::removeTool(Tool* t)
 {
     auto it = findTool(t);
-    if(it != end())
+    if(it != end()){
+        t->setJoinedProcess(nullptr);
         tools_.erase(it);
+    }        
 }
 
 void Process::removeTool(const_iterator pos)
 {
-    tools_.erase(pos);
+    if(pos != end()){
+        auto t = *pos;
+        t->setJoinedProcess(nullptr);
+        tools_.erase(pos);
+    }
 }
 
 void Process::removeTool(iterator pos)
 {
-    tools_.erase(pos);
+    if(pos != end()){
+        auto t = *pos;
+        t->setJoinedProcess(nullptr);
+        tools_.erase(pos);
+    }
 }
 
 AGV_NAMESPACE_END

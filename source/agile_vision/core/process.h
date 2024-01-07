@@ -31,6 +31,7 @@
 
 #include "agile_vision/core/run_context.h"
 #include "agile_vision/core/core_export.h"
+#include "ratel/basic/timestamp.h"
 
 AGV_NAMESPACE_BEGIN
 
@@ -46,8 +47,7 @@ public:
     AgvBytes serializeToBytes()const;
     size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
     RunContext& runContext(){ return run_context_; }
-    const RunContext& runContext()const{ return run_context_; }
-    bool run();
+    const RunContext& runContext()const{ return run_context_; }    
     void appendTool(ToolPtr t);
     void insertTool(const_iterator pos, ToolPtr t);
     Tool* findTool(const AgvString& name, bool recursive)const;
@@ -64,10 +64,13 @@ public:
     ~Process();
 
 private:    
+    friend class Engine;
+    bool run();
     std::string iid_;
     AgvString alias_{"null"};
     ToolList tools_;
     RunContext run_context_;
+    ratel::Timestamp timestamp_ = {0};
 };
 
 AGV_NAMESPACE_END

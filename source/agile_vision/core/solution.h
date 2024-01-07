@@ -44,7 +44,7 @@ public:
     const_iterator begin()const{ return procedure_list_.begin(); }
     iterator end(){ return procedure_list_.end(); }
     const_iterator end()const{ return procedure_list_.end(); }
-    void run(Engine* e);
+    void run();
     Procedure* createProcedure(const std::string& iid);
     const Procedure* findProcedure(const std::string& iid)const;
     void removeProcedure(const std::string& iid);
@@ -56,6 +56,7 @@ public:
     ~Solution();
 
 private:
+    std::unique_ptr<Engine> engine_;
     RunContext run_context_;
     using ProcedurePtr = std::unique_ptr<Procedure>;
     std::vector<ProcedurePtr> procedure_list_;

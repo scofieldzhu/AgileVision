@@ -45,8 +45,7 @@ public:
     iterator end(){ return process_list_.end(); }
     const_iterator end()const{ return process_list_.end(); }
     void insertProcess(const_iterator pos, ProcessPtr p);
-    Process* findProcess(const std::string& iid);
-    const Process* findProcess(const std::string& iid)const;
+    ProcessPtr findProcess(const std::string& iid)const;
     void appendProcess(ProcessPtr p);
     void removeProcess(const std::string& iid);
     void removeProcess(iterator pos);

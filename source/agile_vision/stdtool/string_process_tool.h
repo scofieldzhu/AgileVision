@@ -39,6 +39,7 @@ class AGV_STDTOOL_API StringProcessTool : public Tool
 public:
     static constexpr PinKey PK_P_ProcessIIDList = "ProcessIIDList";
     static constexpr PinKey PK_P_TriggerStringList = "TriggerStringList";
+    static constexpr PinKey PK_P_TriggerModeList = "TriggerModeList";
     StringProcessTool(const std::string& iid);
     virtual ~StringProcessTool();
 

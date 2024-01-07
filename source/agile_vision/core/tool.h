@@ -54,6 +54,8 @@ public:
     const auto& name()const{ return name_; }
     virtual std::string getClsGuid()const = 0;
     const ProcessManager* getProcessManager()const{ return child_process_manager_.get(); }
+    Process* joinedProcess(){ return joined_process_; }
+    const Process* joinedProcess()const { return joined_process_; }
     Tool(const std::string& iid);
     virtual ~Tool();
 
@@ -68,10 +70,13 @@ protected:
     std::shared_ptr<ProcessManager> child_process_manager_;
 
 private:
+    friend class Process;
+    void setJoinedProcess(Process* p);
     std::string iid_;
     AgvString name_ = "unnamed";
     using ToolPinDict = std::map<PinKey, ToolPinPtr>;
     ToolPinDict tool_pin_dict_;
+    Process* joined_process_ = nullptr;
 };
 
 AGV_NAMESPACE_END

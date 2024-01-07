@@ -44,7 +44,9 @@ public:
     void setAlias(const AgvString& str);
     const auto& alias()const{ return alias_; }
     const auto& iid()const{ return iid_; }
-    void run(Engine* e);
+    void run();
+    auto& runContext(){ return run_context_; }
+    const auto& runContext()const{ return run_context_; }
     void setActiveRun(bool s);
     bool activeRun()const{ return active_run_; }
     Procedure(const std::string& iid);

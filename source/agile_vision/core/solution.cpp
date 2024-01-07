@@ -56,11 +56,13 @@
  */
 #include "solution.h"
 #include "procedure.h"
+#include "engine.h"
 #include "spdlog/spdlog.h"
 
 AGV_NAMESPACE_BEGIN
 
 Solution::Solution()
+    :engine_(std::make_unique<Engine>())
 {
 }
 
@@ -68,12 +70,13 @@ Solution::~Solution()
 {
 }
 
-void Solution::run(Engine *e)
+void Solution::run()
 {
-    if(e){
-        for(auto& p : procedure_list_){
-            if(p->activeRun())
-                p->run(e);
+    for(auto& p : procedure_list_){
+        if(p->activeRun()){
+            p->runContext().async_run = true;
+            p->runContext().engine = engine_.get();
+            p->run();
         }
     }
 }

@@ -62,6 +62,7 @@ void Engine::makeActiveWork(wkid_t w) const
 
 void Engine::runThreadProc(wkid_t wk_id)
 {
+    work_table_[wk_id]->process->runContext().engine = this;
     work_table_[wk_id]->process->run(); //sync running...
     {
         std::lock_guard<std::mutex> lk(access_wait_mutex_);
@@ -108,7 +109,7 @@ void Engine::updateWaitThreadProc()
     };
 }
 
-Engine::wkid_t Engine::createWork(ProcessPtr p)
+wkid_t Engine::createWork(ProcessPtr p)
 {
     if(p == nullptr || isValidWork(p.get()))
         return null_id;    
@@ -171,6 +172,15 @@ Engine::wtid_t Engine::createWait(wkid_list works, finish_callback cb)
     for(auto id : works)
         new_wait->status_dict.insert({id, false});
     return new_wait_id;
+}
+
+void Engine::syncRunProcess(ProcessPtr p)
+{
+    if(p){
+        p->runContext().work_id = null_id;
+        p->runContext().async_run = false;
+        p->run();
+    }
 }
 
 AGV_NAMESPACE_END
