@@ -3,7 +3,7 @@
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
  *   File: procedure.cpp  
- *   Copyright (c) 2023-2023 scofieldzhu
+ *   Copyright (c) 2023-2024 scofieldzhu
  *  
  *   MIT License
  *  
@@ -91,10 +91,17 @@ void Procedure::run()
     }
     auto cur_engine = run_context_.engine;
     if(run_context_.async_run){ 
-        run_context_.work_id = cur_engine->createWork(root_);
-        cur_engine->commitWork(run_context_.work_id);
+        auto finish_func = [this](wkid_t w){
+            spdlog::trace("Procedure:{} root run done!", this->alias_);
+        };
+        run_context_.work_id = cur_engine->commit(root_, finish_func);
+        if(run_context_.work_id == null_id){
+            spdlog::error("Engine commit root process:{} work failed!", root_->iid());
+        }
     }else{
-        cur_engine->syncRunProcess(root_);
+        if(!cur_engine->syncRunProcess(root_)){
+            spdlog::error("Engine syncRunProcess root process:{} work failed!", root_->iid());
+        }
     }
 }
 

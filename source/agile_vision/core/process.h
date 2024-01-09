@@ -3,7 +3,7 @@
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
  *   File: process.h  
- *   Copyright (c) 2023-2023 scofieldzhu
+ *   Copyright (c) 2023-2024 scofieldzhu
  *  
  *   MIT License
  *  
@@ -29,6 +29,7 @@
 #ifndef __process_h__
 #define __process_h__
 
+#include <mutex>
 #include "agile_vision/core/run_context.h"
 #include "agile_vision/core/core_export.h"
 #include "ratel/basic/timestamp.h"
@@ -46,6 +47,7 @@ public:
     const_iterator end()const{ return tools_.end(); }
     AgvBytes serializeToBytes()const;
     size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+    bool run();
     RunContext& runContext(){ return run_context_; }
     const RunContext& runContext()const{ return run_context_; }    
     void appendTool(ToolPtr t);
@@ -57,20 +59,21 @@ public:
     void removeTool(const_iterator pos);
     void removeTool(iterator pos);
     auto sizeOfTools()const{ return tools_.size(); }
+    void setInterrupt(bool s);
     void setAlias(const AgvString& s);
     const AgvString& alias()const{ return alias_; }
     const std::string& iid()const{ return iid_; }
     Process(const std::string& iid);
     ~Process();
 
-private:    
-    friend class Engine;
-    bool run();
+private:        
     std::string iid_;
     AgvString alias_{"null"};
     ToolList tools_;
     RunContext run_context_;
     ratel::Timestamp timestamp_ = {0};
+    bool interrupt_ = false;
+    std::mutex run_mutex_;
 };
 
 AGV_NAMESPACE_END

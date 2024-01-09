@@ -3,7 +3,7 @@
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
  *   File: engine.h  
- *   Copyright (c) 2023-2023 scofieldzhu
+ *   Copyright (c) 2023-2024 scofieldzhu
  *  
  *   MIT License
  *  
@@ -29,10 +29,10 @@
 #ifndef __engine_h__
 #define __engine_h__
 
-#include <thread>
-#include <condition_variable>
-#include "ratel/basic/notifier.hpp"
+#include <map>
+#include <future>
 #include "ratel/basic/id_seed.hpp"
+#include "ratel/basic/thread_pool.h"
 #include "agile_vision/core/core_base_def.h"
 #include "agile_vision/core/core_export.h"
 
@@ -41,53 +41,40 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API Engine 
 {
 public:        
-    wkid_t createWork(ProcessPtr p);
-    void commitWork(wkid_t w);
-    void stopWork(wkid_t w);
-    bool isValidWork(wkid_t w)const;
-    bool isActiveWork(wkid_t w)const;
-    void destroyWork(wkid_t w);
-    bool existsWork(wkid_t w)const;
-    using wtid_t = uint32_t;
-    using finish_callback = std::function<void(wtid_t)>;
-    wtid_t createWait(wkid_list works, finish_callback cb);
-    void destroyWait(wtid_t wait);
-    void syncRunProcess(ProcessPtr p);
-    Engine();
+    using finish_callback = std::function<void(wkid_t)>;
+    wkid_t get(Process* p)const;
+    wkid_t commit(ProcessPtr p, finish_callback cb);
+    void cancel(wkid_t w, bool wait_infinite);
+    enum class WaitResult{
+        kOk, //result waited or already done!
+        kTimeout,
+        kUnk
+    };
+    WaitResult wait(wkid_t w, std::chrono::milliseconds timeout);
+    bool exist(wkid_t w)const;
+    bool syncRunProcess(ProcessPtr p);
+    explicit Engine(size_t max_thread_number);
     ~Engine();
 
 private:
-    bool isValidWork(Process* p)const;
-    int locateWorkPos(wkid_t w)const;
-    void makeActiveWork(wkid_t w)const;
-    void runThreadProc(wkid_t);
-    void updateWaitThreadProc();
-    enum Status
-    {
-        STATUS_IDLE,
-        STATUS_RUNNING
-    };
+    friend struct RunThreadTask;
+    ratel::ThreadPool thread_pool_;
     struct Work
     {
         ProcessPtr process;
-        std::thread thread;
-        Status status = STATUS_IDLE;
+        finish_callback callback; //for async notify
+        std::promise<wkid_t> prm;
+        std::future<wkid_t> fut;
     };
     using WorkPtr = std::shared_ptr<Work>;
-    std::map<wkid_t, WorkPtr> work_table_;
-    struct Wait 
-    {
-        std::map<wkid_t, bool> status_dict;
-        std::function<void(wtid_t)> cb;
-    };
-    using WaitPtr = std::shared_ptr<Wait>;
-    std::map<wtid_t, WaitPtr> wait_table_;
-    ratel::IdSeed<wkid_t> work_id_seed_{1};
-    ratel::IdSeed<wtid_t> wait_id_seed_{1};
-    bool stop_update_wait_ = false;
-    wtid_t finish_work_id_ = null_id;
-    std::condition_variable check_wait_cv_;
-    std::mutex access_wait_mutex_;
+    using WorkTableType = std::map<wkid_t, WorkPtr>;
+    WorkTableType running_work_table_;
+    std::mutex running_work_table_mutex_;
+    ratel::IdSeed<wkid_t> work_id_seed_{0};
+    std::condition_variable rem_work_cv_;
+    std::mutex rem_work_mutex_;
+    wkid_t rem_work_id_ = null_id;
+    bool exit_rem_task_ = false;
 };
 
 AGV_NAMESPACE_END

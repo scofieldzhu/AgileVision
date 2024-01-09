@@ -3,7 +3,7 @@
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
  *   File: relationship_network.h  
- *   Copyright (c) 2023-2023 scofieldzhu
+ *   Copyright (c) 2023-2024 scofieldzhu
  *  
  *   MIT License
  *  

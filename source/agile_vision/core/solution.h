@@ -3,7 +3,7 @@
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
  *   File: solution.h  
- *   Copyright (c) 2023-2023 scofieldzhu
+ *   Copyright (c) 2023-2024 scofieldzhu
  *  
  *   MIT License
  *  
@@ -51,7 +51,7 @@ public:
     void removeProcedure(const_iterator pos);
     auto numberOfProcedures()const{ return procedure_list_.size(); }
     Solution& operator=(const Solution&) = delete;
-    Solution();
+    explicit Solution(size_t max_run_thread_number);
     Solution(const Solution&) = delete;
     ~Solution();
 

@@ -3,7 +3,7 @@
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
  *   File: process.cpp  
- *   Copyright (c) 2023-2023 scofieldzhu
+ *   Copyright (c) 2023-2024 scofieldzhu
  *  
  *   MIT License
  *  
@@ -93,11 +93,16 @@ size_t Process::loadBytes(ConsAgvBytePtr buffer, size_t size)
 
 bool Process::run()
 {
+    std::lock_guard __auto_lock(run_mutex_);
     bool s = true;
     run_context_.is_running = true;
-    for(auto& t : tools_)
+    for(auto& t : tools_){
+        if(interrupt_)
+            break;
         s = s && t->run();
+    }        
     run_context_.is_running = false;
+    interrupt_ = false;
     return s;
 }
 
@@ -164,6 +169,11 @@ void Process::removeTool(iterator pos)
         t->setJoinedProcess(nullptr);
         tools_.erase(pos);
     }
+}
+
+void Process::setInterrupt(bool s)
+{
+    interrupt_ = s;
 }
 
 AGV_NAMESPACE_END

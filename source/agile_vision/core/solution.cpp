@@ -3,7 +3,7 @@
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
  *   File: solution.cpp  
- *   Copyright (c) 2023-2023 scofieldzhu
+ *   Copyright (c) 2023-2024 scofieldzhu
  *  
  *   MIT License
  *  
@@ -61,8 +61,8 @@
 
 AGV_NAMESPACE_BEGIN
 
-Solution::Solution()
-    :engine_(std::make_unique<Engine>())
+Solution::Solution(size_t max_run_thread_number)
+    :engine_(std::make_unique<Engine>(max_run_thread_number))
 {
 }
 

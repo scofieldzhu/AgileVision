@@ -2,8 +2,8 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: wait_tool.h  
- *   Copyright (c) 2023-2023 scofieldzhu
+ *   File: wait_process_tool.h  
+ *   Copyright (c) 2023-2024 scofieldzhu
  *  
  *   MIT License
  *  
@@ -26,3 +26,11 @@
  *   SOFTWARE.
  */
 
+#ifndef __wait_process_tool_h__
+#define __wait_process_tool_h__
+
+#include "agile_vision/core/tool.h"
+
+
+
+#endif

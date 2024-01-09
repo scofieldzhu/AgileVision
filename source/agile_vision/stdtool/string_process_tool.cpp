@@ -3,7 +3,7 @@
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
  *   File: string_process_tool.cpp  
- *   Copyright (c) 2023-2023 scofieldzhu
+ *   Copyright (c) 2023-2024 scofieldzhu
  *  
  *   MIT License
  *  
@@ -87,8 +87,11 @@ bool StringProcessTool::requestOutputData()
                 proc_engine->syncRunProcess(process); 
             }else{ //async mode
                 auto proc_ctx = process->runContext();
-                proc_ctx.work_id = proc_engine->createWork(process);
-                proc_engine->commitWork(proc_ctx.work_id);
+                proc_ctx.work_id = proc_engine->commit(process, Engine::finish_callback());
+                if(proc_ctx.work_id == null_id){
+                    spdlog::error("Commit process:{} work failed!", process->alias());
+                    return false;
+                }
             }
             return true;
         }
