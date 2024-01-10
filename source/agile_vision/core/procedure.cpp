@@ -38,7 +38,7 @@ AGV_NAMESPACE_BEGIN
 namespace{
     using StrPxEP = ElementProxy<StringProxy>;
     using CombineA = ProxyCombine<StrPxEP, StrPxEP>;
-    using CombineB = ProxyCombine<CombineA, Process>;
+    using CombineB = ProxyCombineRef<CombineA, Process>;
 }
 
 Procedure::Procedure(const std::string &iid)
@@ -56,26 +56,20 @@ AgvBytes Procedure::serializeToBytes() const
     CombineA ca;
     ca.proxyA().mutableElement() = iid_;
     ca.proxyB().mutableElement() = alias_;
-    auto bv = ca.serializeToBytes();
-    auto bv_r = root_->serializeToBytes();
-    std::copy(bv_r.begin(), bv_r.end(), std::back_inserter(bv));
-    return bv;
+    CombineB cb(ca, *root_);
+    return cb.serializeToBytes();
 }
 
 size_t Procedure::loadBytes(ConsAgvBytePtr buffer, size_t size)
 {
     CombineA ca;
-    auto finish_bytes = ca.loadBytes(buffer, size);
+    CombineB cb(ca, *root_);
+    auto finish_bytes = cb.loadBytes(buffer, size);
     if(finish_bytes == 0)
         return 0;
-    auto left_size = size - finish_bytes;
     iid_ = ca.proxyA().element().stdStr();
     alias_ = ca.proxyB().element().stdStr();
-    finish_bytes = root_->loadBytes(buffer + finish_bytes, left_size);
-    if(finish_bytes == 0)
-        return 0;
-    left_size -= finish_bytes;
-    return size - left_size;
+    return finish_bytes;
 }
 
 void Procedure::setAlias(const AgvString &str)

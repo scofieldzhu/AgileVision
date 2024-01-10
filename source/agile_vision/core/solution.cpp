@@ -70,6 +70,46 @@ Solution::~Solution()
 {
 }
 
+AgvBytes Solution::serializeToBytes() const
+{
+    using namespace ratel;
+
+    ByteVec bv(kUIntSize, 0);
+    unsigned int element_count = (unsigned int)procedure_list_.size();
+    memcpy(bv.data(), &element_count, kUIntSize);
+    for(const auto& v : procedure_list_){
+        auto mbv = v->serializeToBytes();
+        if(mbv.empty())
+            return {};
+        std::copy(mbv.begin(), mbv.end(), std::back_inserter(bv));
+    }
+    return bv;
+}
+
+size_t Solution::loadBytes(ConsAgvBytePtr buffer, size_t size)
+{
+    using namespace ratel;
+
+    if(buffer == nullptr || size < kUIntSize)
+        return 0;
+    auto byte_cursor = buffer;
+    unsigned int element_count = 0;
+    memcpy(&element_count, byte_cursor, kUIntSize);
+    byte_cursor += kUIntSize;
+    size_t left_size = size - kUIntSize;
+    removeAll();
+    for(unsigned int i = 0; i < element_count; ++i){
+        ProcedurePtr e = std::make_unique<Procedure>("xxxx");
+        auto finish_size = e->loadBytes(byte_cursor, left_size);
+        if(finish_size == 0)
+            return 0;
+        byte_cursor += finish_size;
+        left_size -= finish_size;
+        procedure_list_.push_back(std::move(e));
+    }
+    return size - left_size;
+}
+
 void Solution::run()
 {
     for(auto& p : procedure_list_){
@@ -113,6 +153,11 @@ void Solution::removeProcedure(const std::string &iid)
 void Solution::removeProcedure(const_iterator pos)
 {
     procedure_list_.erase(pos);
+}
+
+void Solution::removeAll()
+{
+    procedure_list_.clear();
 }
 
 AGV_NAMESPACE_END

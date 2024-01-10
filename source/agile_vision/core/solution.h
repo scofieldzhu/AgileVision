@@ -44,11 +44,14 @@ public:
     const_iterator begin()const{ return procedure_list_.begin(); }
     iterator end(){ return procedure_list_.end(); }
     const_iterator end()const{ return procedure_list_.end(); }
+    AgvBytes serializeToBytes()const;
+    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
     void run();
     Procedure* createProcedure(const std::string& iid);
     const Procedure* findProcedure(const std::string& iid)const;
     void removeProcedure(const std::string& iid);
     void removeProcedure(const_iterator pos);
+    void removeAll();
     auto numberOfProcedures()const{ return procedure_list_.size(); }
     Solution& operator=(const Solution&) = delete;
     explicit Solution(size_t max_run_thread_number);
