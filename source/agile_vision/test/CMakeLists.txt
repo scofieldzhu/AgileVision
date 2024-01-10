@@ -34,4 +34,4 @@ endif()
 
 #target_link_libraries(${proj_name} debug ${deplibs_dbg} optimized ${deplibs_opt})
 
-install(TARGETS ${proj_name} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(TARGETS ${proj_name} DESTINATION ${CMAKE_INSTALL_BIN})

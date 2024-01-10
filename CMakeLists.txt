@@ -29,11 +29,11 @@ link_directories(
 
 add_compile_options(/wd4996 /wd4275 /wd4251)
 
-set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/${proj_name}" CACHE PATH "Installation prefix")
+set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install")
 
-set(CMAKE_ISNTALL_INCLUDE "${CMAKE_INSTALL_PREFIX}/include/${proj_name}")
-
-set(license_file "${CMAKE_CURRENT_SOURCE_DIR}/doc/license_template.txt" )
+set(CMAKE_INSTALL_INCLUDE "${CMAKE_INSTALL_PREFIX}/include/${proj_name}")
+set(CMAKE_INSTALL_LIB "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_BIN "${CMAKE_INSTALL_PREFIX}/bin")
 
 add_subdirectory(source/agile_vision/basic)
 
