@@ -25,6 +25,7 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+
 #include "test_solution.h"
 #include "local_image2d.h"
 #include "agile_vision/core/procedure.h"

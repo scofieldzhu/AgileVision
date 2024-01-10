@@ -26,8 +26,8 @@ endif()
 
 target_link_libraries(${proj_name} agile_vision.basic)
 
-set(deplibs_dbg spdlogd ratel.basic_d)
-set(deplibs_opt spdlog ratel.basic)
+set(deplibs_dbg spdlogd ratel.basic_d ratel.system_d)
+set(deplibs_opt spdlog ratel.basic ratel.system)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
  	target_link_libraries(${proj_name} ${deplibs_dbg})
 else()
