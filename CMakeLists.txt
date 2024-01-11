@@ -31,7 +31,7 @@ add_compile_options(/wd4996 /wd4275 /wd4251)
 
 set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install")
 
-set(CMAKE_INSTALL_INCLUDE "${CMAKE_INSTALL_PREFIX}/include/${proj_name}")
+set(CMAKE_INSTALL_INCLUDE "${CMAKE_INSTALL_PREFIX}/include/agile_vision")
 set(CMAKE_INSTALL_LIB "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_BIN "${CMAKE_INSTALL_PREFIX}/bin")
 

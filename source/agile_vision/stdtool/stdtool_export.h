@@ -29,13 +29,13 @@
 #ifndef __stdtool_export_h__
 #define __stdtool_export_h__
 
-#include "ratel/basic/cross_platform.h"
+#include "ratel/basic/export_macro.h"
 
 #ifdef PLATFORM_WIN
     #ifdef AGILE_VISION_STDTOOL_EXPORT
-        #define AGV_STDTOOL_API __declspec(dllexport)
+        #define AGV_STDTOOL_API RATEL_WIN_DLL_EXPORT
     #else
-        #define AGV_STDTOOL_API __declspec(dllimport)
+        #define AGV_STDTOOL_API RATEL_WIN_DLL_IMPORT
     #endif
 #endif
 

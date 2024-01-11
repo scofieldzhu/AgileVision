@@ -54,11 +54,11 @@ bool ToolFactory::loadToolFile(const path& filepath)
         spdlog::error("Load tool file:{} failed!", filepath.string());
         return false;
     }
-    DllInfo di;
-    di.loader = std::move(loader);
+    DllInfo di;    
     di.get_tool_clsid_func = loader->getFunction<GetToolClsIdFunc>("GetToolClsID");
     di.create_tool_func  = loader->getFunction<CreateToolInstanceFunc>("CreateToolInstance");
     di.destroy_tool_func = loader->getFunction<DestroyToolInstanceFunc>("DestroyToolInstance");
+    di.loader = std::move(loader);
     if(di){
         di.cls_iid = (di.get_tool_clsid_func)();
         loader_dict_[filepath] = std::move(di);
