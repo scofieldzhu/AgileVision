@@ -36,10 +36,10 @@ AGV_NAMESPACE_BEGIN
 struct ToolLinkage 
 {
     bool isValid()const{ return producer && !produce_pin_key.empty() && consumer && !consume_pin_key.empty(); }
-    const Tool* producer = nullptr;
+    ConstToolPtr producer = nullptr;
     PinKey produce_pin_key;
     unsigned int data_location = 0;
-    const Tool* consumer = nullptr;
+    ConstToolPtr consumer = nullptr;
     PinKey consume_pin_key;
 };
 

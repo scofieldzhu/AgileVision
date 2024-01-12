@@ -36,25 +36,32 @@ AGV_NAMESPACE_BEGIN
 
 class AGV_CORE_API ProcessManager 
 {
-    using ProcessList = std::vector<ProcessPtr>;
 public:
+    using ProcessSPtr = std::shared_ptr<Process>;
+    using ProcessList = std::vector<ProcessSPtr>;
     using iterator = ProcessList::iterator;
     using const_iterator = ProcessList::const_iterator;
     iterator begin(){ return process_list_.begin(); }
     const_iterator begin()const{ return process_list_.begin(); }
     iterator end(){ return process_list_.end(); }
     const_iterator end()const{ return process_list_.end(); }
-    void insertProcess(const_iterator pos, ProcessPtr p);
-    ProcessPtr findProcess(const std::string& iid)const;
-    void appendProcess(ProcessPtr p);
+    void insertProcess(const_iterator pos, ProcessSPtr p);
+    ProcessPtr findProcess(const std::string& iid);
+    ConstProcessPtr findProcess(const std::string& iid)const;
+    void appendProcess(ProcessSPtr p);
     void removeProcess(const std::string& iid);
     void removeProcess(iterator pos);
     auto size()const{ return process_list_.size(); }
+    void setActiveProcessIID(const std::string& iid);
+    const auto& activeProcessIID()const{ return active_process_iid_; }
+    ConstProcessPtr getActiveProcess()const;
+    ProcessPtr getActiveProcess();
     ProcessManager();
     ~ProcessManager();
 
-private:
+private:    
     ProcessList process_list_;
+    std::string active_process_iid_;
 };
 
 AGV_NAMESPACE_END

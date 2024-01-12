@@ -65,13 +65,13 @@ struct RunThreadTask
     wkid_t wk_id = null_id;
 };
 
-wkid_t Engine::get(Process* proc) const
+wkid_t Engine::get(ProcessPtr proc) const
 {
     if(proc){
         auto it = std::find_if(running_work_table_.begin(), 
                                running_work_table_.end(),
                                [proc](const auto& pair){
-                                 return pair.second->process.get() == proc;
+                                 return pair.second->process == proc;
                                });
         if(it != running_work_table_.end()){
             return (*it).first;
@@ -82,7 +82,7 @@ wkid_t Engine::get(Process* proc) const
 
 wkid_t Engine::commit(ProcessPtr p, finish_callback cb)
 {    
-    if(p == nullptr || get(p.get()) != null_id){
+    if(p == nullptr || get(p) != null_id){
         spdlog::error("Null process pointer or already running!");
         return null_id;
     } 
@@ -134,7 +134,7 @@ bool Engine::exist(wkid_t w) const
 
 bool Engine::syncRunProcess(ProcessPtr p)
 {
-    if(p == nullptr || get(p.get()) != null_id){
+    if(p == nullptr || get(p) != null_id){
         spdlog::error("This process:{} is null or in runnning state!", p->alias());
         return false;
     }

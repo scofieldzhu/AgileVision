@@ -99,7 +99,7 @@ size_t Solution::loadBytes(ConsAgvBytePtr buffer, size_t size)
     size_t left_size = size - kUIntSize;
     removeAll();
     for(unsigned int i = 0; i < element_count; ++i){
-        ProcedurePtr e = std::make_unique<Procedure>("xxxx");
+        ProcedureUPtr e = std::make_unique<Procedure>("xxxx");
         auto finish_size = e->loadBytes(byte_cursor, left_size);
         if(finish_size == 0)
             return 0;
@@ -132,7 +132,7 @@ Procedure *Solution::createProcedure(const std::string &iid)
     return procedure_list_.back().get();
 }
 
-const Procedure* Solution::findProcedure(const std::string& iid) const
+ConstProcedurePtr Solution::findProcedure(const std::string& iid) const
 {
     auto it = std::find_if(procedure_list_.begin(), procedure_list_.end(), [&iid](auto& it){
         return (*it).iid() == iid;

@@ -54,29 +54,29 @@ public:
     const auto& name()const{ return name_; }
     virtual std::string getClsGuid()const = 0;
     const ProcessManager* getProcessManager()const{ return child_process_manager_.get(); }
-    Process* joinedProcess(){ return joined_process_; }
-    const Process* joinedProcess()const { return joined_process_; }
+    ProcessPtr joinedProcess(){ return joined_process_; }
+    ConstProcessPtr joinedProcess()const { return joined_process_; }
     Tool(const std::string& iid);
     virtual ~Tool();
 
 protected:
-    using ToolPinPtr = std::shared_ptr<ToolPin>;
+    using ToolPinSPtr = std::shared_ptr<ToolPin>;
     OutputPin* getOutputPin(const PinKey& key);
     InputPin* getInputPin(const PinKey& key);    
     ToolPin* getToolPin(const PinKey& key);
     bool checkPinDataCompatible()const;
-    void addPin(const PinKey& key, ToolPinPtr pin);
+    void addPin(const PinKey& key, ToolPinSPtr pin);
     virtual bool requestOutputData() = 0;
     std::shared_ptr<ProcessManager> child_process_manager_;
 
 private:
     friend class Process;
-    void setJoinedProcess(Process* p);
+    void setJoinedProcess(ProcessPtr p);
     std::string iid_;
     AgvString name_ = "unnamed";
-    using ToolPinDict = std::map<PinKey, ToolPinPtr>;
+    using ToolPinDict = std::map<PinKey, ToolPinSPtr>;
     ToolPinDict tool_pin_dict_;
-    Process* joined_process_ = nullptr;
+    ProcessPtr joined_process_ = nullptr;
 };
 
 AGV_NAMESPACE_END

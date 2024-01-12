@@ -41,7 +41,7 @@ class AGV_CORE_API ToolFactory
 {
 public:
     bool loadToolFile(const std::filesystem::path& filepath);
-    ToolPtr createTool(const std::string& clsid, const std::string& iid)const;
+    ToolSPtr createTool(const std::string& clsid, const std::string& iid)const;
     void unloadToolFile(const std::filesystem::path& filepath);
     void unloadAll();
     ToolFactory();
@@ -49,8 +49,8 @@ public:
 
 private:
     using GetToolClsIdFunc = const char*(*)();
-    using CreateToolInstanceFunc = Tool*(*)(const char*);
-    using DestroyToolInstanceFunc = void(*)(Tool*);
+    using CreateToolInstanceFunc = ToolPtr(*)(const char*);
+    using DestroyToolInstanceFunc = void(*)(ToolPtr);
     using DllLoaderPtr = std::shared_ptr<ratel::DynamicLibraryLoader>;
     struct DllInfo
     {

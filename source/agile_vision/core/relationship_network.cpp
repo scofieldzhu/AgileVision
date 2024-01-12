@@ -44,7 +44,7 @@ bool RelationshipNetwork::checkCycle() const
     return dg_.checkCycle();
 }
 
-void RelationshipNetwork::addTool(const Tool *t)
+void RelationshipNetwork::addTool(ConstToolPtr t)
 {
     if(t == nullptr)
         return;    
@@ -53,7 +53,7 @@ void RelationshipNetwork::addTool(const Tool *t)
     dg_.addVertex(t->iid(), vd);
 }
 
-bool RelationshipNetwork::existTool(const Tool *t) const
+bool RelationshipNetwork::existTool(ConstToolPtr t) const
 {
     return dg_.existVertex(t->iid());
 }
@@ -69,7 +69,7 @@ void RelationshipNetwork::makeRelationship(const ToolLinkage& linkage)
     dg_.addArc(linkage.producer->iid(), linkage.consumer->iid(), ad);
 }
 
-bool RelationshipNetwork::getToolRelationships(const Tool* t, ToolLinkageList* produce_linkages, ToolLinkageList* consume_linkages) const
+bool RelationshipNetwork::getToolRelationships(ConstToolPtr t, ToolLinkageList* produce_linkages, ToolLinkageList* consume_linkages) const
 {
     if(t == nullptr || !dg_.existVertex(t->iid()))
         return false;

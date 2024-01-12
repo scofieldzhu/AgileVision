@@ -39,17 +39,17 @@ class AGV_CORE_API RelationshipNetwork
 {
 public:
     bool checkCycle()const;
-    void addTool(const Tool* t);
-    bool existTool(const Tool* t)const;
+    void addTool(ConstToolPtr t);
+    bool existTool(ConstToolPtr t)const;
     void makeRelationship(const ToolLinkage& linkage);
     void breakRelationship();
-    bool getToolRelationships(const Tool* t, ToolLinkageList* produce_linkages, ToolLinkageList* consume_linkages)const;
+    bool getToolRelationships(ConstToolPtr t, ToolLinkageList* produce_linkages, ToolLinkageList* consume_linkages)const;
     RelationshipNetwork();
     ~RelationshipNetwork();
 
 private:
     struct VertexData{
-        const Tool* t = nullptr;
+        ConstToolPtr t = nullptr;
     };
     struct ArcData{
         AgvString produce_pin_key;

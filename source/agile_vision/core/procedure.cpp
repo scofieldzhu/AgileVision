@@ -88,12 +88,12 @@ void Procedure::run()
         auto finish_func = [this](wkid_t w){
             spdlog::trace("Procedure:{} root run done!", this->alias_);
         };
-        run_context_.work_id = cur_engine->commit(root_, finish_func);
+        run_context_.work_id = cur_engine->commit(root_.get(), finish_func);
         if(run_context_.work_id == null_id){
             spdlog::error("Engine commit root process:{} work failed!", root_->iid());
         }
     }else{
-        if(!cur_engine->syncRunProcess(root_)){
+        if(!cur_engine->syncRunProcess(root_.get())){
             spdlog::error("Engine syncRunProcess root process:{} work failed!", root_->iid());
         }
     }

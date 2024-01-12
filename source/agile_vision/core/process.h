@@ -39,6 +39,7 @@ AGV_NAMESPACE_BEGIN
 class AGV_CORE_API Process
 {
 public:
+    using ToolList = std::vector<ToolSPtr>;
     using iterator = ToolList::iterator;
     using const_iterator = ToolList::const_iterator;
     iterator begin(){ return tools_.begin(); }
@@ -50,12 +51,12 @@ public:
     bool run();
     RunContext& runContext(){ return run_context_; }
     const RunContext& runContext()const{ return run_context_; }    
-    void appendTool(ToolPtr t);
-    void insertTool(const_iterator pos, ToolPtr t);
-    Tool* findTool(const AgvString& name, bool recursive)const;
-    const_iterator findTool(Tool* t)const;
-    bool existsTool(Tool* t)const;
-    void removeTool(Tool* t);
+    void appendTool(ToolSPtr t);
+    void insertTool(const_iterator pos, ToolSPtr t);
+    ToolPtr findTool(const AgvString& name, bool recursive)const;
+    const_iterator findTool(ToolPtr t)const;
+    bool existsTool(ToolPtr t)const;
+    void removeTool(ToolPtr t);
     void removeTool(const_iterator pos);
     void removeTool(iterator pos);
     auto sizeOfTools()const{ return tools_.size(); }

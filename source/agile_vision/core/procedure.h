@@ -39,8 +39,8 @@ class AGV_CORE_API Procedure
 public:
     AgvBytes serializeToBytes()const;
     size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    Process* mutableRoot(){ return root_.get(); }
-    const Process* root()const{ return root_.get(); }
+    ProcessPtr mutableRoot(){ return root_.get(); }
+    ConstProcessPtr root()const{ return root_.get(); }
     void setAlias(const AgvString& str);
     const auto& alias()const{ return alias_; }
     const auto& iid()const{ return iid_; }

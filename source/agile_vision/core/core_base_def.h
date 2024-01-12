@@ -69,35 +69,33 @@ enum class PinType
 };
 
 class DataBuffer;
-using DataBufferPtr = std::shared_ptr<DataBuffer>;
 
 struct DataSpec;
 
 using PinKey = std::string_view;
 
 class Tool;
-using ToolPtr = std::shared_ptr<Tool>;
-using ToolList = std::vector<ToolPtr>;
+using ToolSPtr = std::shared_ptr<Tool>;
+using ToolPtr = Tool*;
+using ConstToolPtr = const Tool*;
 
 class Process;
-using ProcessPtr = std::shared_ptr<Process>;
+using ProcessPtr = Process*;
+using ConstProcessPtr = const Process*;
 
 class ProcessManager;
 
 class Procedure;
-using ProcedurePtr = std::shared_ptr<Procedure>;
+using ProcedurePtr = Procedure*;
+using ConstProcedurePtr = const Procedure*;
 
 class OutputPin;
-using OutputPinPtr = std::shared_ptr<OutputPin>;
 
 class InputPin;
-using InputPinPtr = std::shared_ptr<InputPin>;
 
 class PropPin;
-using PropPinPtr = std::shared_ptr<PropPin>;
 
 class ToolPin;
-using ToolPinPtr = std::shared_ptr<ToolPin>;
 
 class Engine;
 constexpr uint32_t null_id = 0; // null id for wkid_t\wtid_t

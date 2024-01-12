@@ -36,7 +36,8 @@ AGV_NAMESPACE_BEGIN
 
 class AGV_CORE_API Solution 
 {
-    using ProcedureList = std::vector<std::unique_ptr<Procedure>>;
+    using ProcedureUPtr = std::unique_ptr<Procedure>;
+    using ProcedureList = std::vector<ProcedureUPtr>;
 public:
     using iterator = ProcedureList::iterator;
     using const_iterator = ProcedureList::const_iterator;
@@ -47,8 +48,8 @@ public:
     AgvBytes serializeToBytes()const;
     size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
     void run();
-    Procedure* createProcedure(const std::string& iid);
-    const Procedure* findProcedure(const std::string& iid)const;
+    ProcedurePtr createProcedure(const std::string& iid);
+    ConstProcedurePtr findProcedure(const std::string& iid)const;
     void removeProcedure(const std::string& iid);
     void removeProcedure(const_iterator pos);
     void removeAll();
@@ -60,9 +61,8 @@ public:
 
 private:
     std::unique_ptr<Engine> engine_;
-    RunContext run_context_;
-    using ProcedurePtr = std::unique_ptr<Procedure>;
-    std::vector<ProcedurePtr> procedure_list_;
+    RunContext run_context_;    
+    std::vector<ProcedureUPtr> procedure_list_;
 };
 
 AGV_NAMESPACE_END

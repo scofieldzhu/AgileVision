@@ -67,22 +67,27 @@ ProcessManager::~ProcessManager()
 {
 }
 
-void ProcessManager::insertProcess(const_iterator pos, ProcessPtr p)
+void ProcessManager::insertProcess(const_iterator pos, ProcessSPtr p)
 {
     if(p && std::find(process_list_.begin(), process_list_.end(), p) == process_list_.end()){
         process_list_.insert(pos, p);
     }
 }
 
-ProcessPtr ProcessManager::findProcess(const std::string& iid) const
+ConstProcessPtr ProcessManager::findProcess(const std::string& iid) const
+{
+    return const_cast<ProcessManager*>(this)->findProcess(iid);
+}
+
+ProcessPtr ProcessManager::findProcess(const std::string& iid)
 {
     auto it = std::find_if(process_list_.begin(), process_list_.end(), [&iid](auto p){
         return (*p).iid() == iid;
     });
-    return it != process_list_.end() ? (*it) : nullptr;
+    return it != process_list_.end() ? (*it).get() : nullptr;
 }
 
-void ProcessManager::appendProcess(ProcessPtr p)
+void ProcessManager::appendProcess(ProcessSPtr p)
 {
     if(p && std::find(process_list_.begin(), process_list_.end(), p) == process_list_.end()){
         process_list_.push_back(p);
@@ -102,6 +107,26 @@ void ProcessManager::removeProcess(iterator pos)
     if(pos != process_list_.end()){
         process_list_.erase(pos);
     }
+}
+
+void ProcessManager::setActiveProcessIID(const std::string& iid)
+{
+    active_process_iid_ = iid;
+}
+
+ConstProcessPtr ProcessManager::getActiveProcess() const
+{
+    return const_cast<ProcessManager*>(this)->getActiveProcess();
+}
+
+ProcessPtr ProcessManager::getActiveProcess()
+{
+    if(active_process_iid_.empty())
+        return nullptr;
+    auto it = std::find_if(process_list_.begin(), process_list_.end(), [this](auto item){ 
+        return (*item).iid() == active_process_iid_; 
+    });
+    return it != process_list_.end() ? (*it).get() : nullptr;
 }
 
 AGV_NAMESPACE_END

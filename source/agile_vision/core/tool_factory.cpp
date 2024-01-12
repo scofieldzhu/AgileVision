@@ -68,13 +68,13 @@ bool ToolFactory::loadToolFile(const path& filepath)
     return false;
 }
 
-ToolPtr ToolFactory::createTool(const std::string& clsid, const std::string& iid) const
+ToolSPtr ToolFactory::createTool(const std::string& clsid, const std::string& iid) const
 {
     for(const auto& kv : loader_dict_){
         if(kv.second.cls_iid == clsid){
             const auto& di = kv.second;
-            Tool* new_instance = (di.create_tool_func)(iid.c_str());
-            ToolPtr new_tool(new_instance, di.destroy_tool_func);
+            ToolPtr new_instance = (di.create_tool_func)(iid.c_str());
+            ToolSPtr new_tool(new_instance, di.destroy_tool_func);
             return new_tool;
         }
     }

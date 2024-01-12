@@ -42,7 +42,7 @@ class AGV_CORE_API Engine
 {
 public:        
     using finish_callback = std::function<void(wkid_t)>;
-    wkid_t get(Process* p)const;
+    wkid_t get(ProcessPtr p)const;
     wkid_t commit(ProcessPtr p, finish_callback cb);
     void cancel(wkid_t w, bool wait_infinite);
     enum class WaitResult{
@@ -61,7 +61,7 @@ private:
     ratel::ThreadPool thread_pool_;
     struct Work
     {
-        ProcessPtr process;
+        ProcessPtr process = nullptr;
         finish_callback callback; //for async notify
         std::promise<wkid_t> prm;
         std::future<wkid_t> fut;

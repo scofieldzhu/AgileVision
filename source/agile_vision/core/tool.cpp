@@ -45,7 +45,7 @@ namespace {
 Tool::Tool(const std::string& iid)
     :iid_(iid)
 {
-    OutputPinPtr status_pin = std::make_shared<OutputPin>(DataSpec::SingleInt());
+    auto status_pin = std::make_shared<OutputPin>(DataSpec::SingleInt());
     addPin(PK_O_Status, status_pin);
 }
 
@@ -58,12 +58,12 @@ bool Tool::requestOutputData()
     return false;
 }
 
-void Tool::setJoinedProcess(Process* p)
+void Tool::setJoinedProcess(ProcessPtr p)
 {
     joined_process_ = p;
 }
 
-// bool Tool::setPinConnection(const PinKey& consume_key, Tool* producer, const PinKey& produce_key, unsigned int data_location)
+// bool Tool::setPinConnection(const PinKey& consume_key, ToolPtr producer, const PinKey& produce_key, unsigned int data_location)
 // {
 //     auto procedure = belongedProcedure();
 //     if(procedure == nullptr){
@@ -193,7 +193,7 @@ bool Tool::run()
 }
 
 template <class PinCls, PinType Type>
-PinCls* ObtainPinObject(const std::map<PinKey, ToolPinPtr>& dict, const PinKey &key)
+PinCls* ObtainPinObject(const std::map<PinKey, std::shared_ptr<ToolPin>>& dict, const PinKey &key)
 {
     for(const auto& kv : dict){
         auto& cur_pin = kv.second;
@@ -290,7 +290,7 @@ bool Tool::checkPinDataCompatible() const
     return true;
 }
 
-void Tool::addPin(const PinKey& key, ToolPinPtr pin)
+void Tool::addPin(const PinKey& key, ToolPinSPtr pin)
 {
     if(tool_pin_dict_.find(key) == tool_pin_dict_.end()){
         tool_pin_dict_[key] = pin;

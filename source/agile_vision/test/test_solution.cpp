@@ -62,13 +62,13 @@ void InitToolFactory()
     }
 }
 
-void InitProcess(Process* p)
+void InitProcess(ProcessPtr p)
 {
     _AUTO_FUNC_TRACK_
     path img_path = sExecDir;
     img_path /= "ImageCalib.bmp";
     UIDGen iid_gen;
-    ToolPtr local_image = sToolFactory.createTool(sLocalImage2dClsId, iid_gen.NewUID().stdStr());
+    ToolSPtr local_image = sToolFactory.createTool(sLocalImage2dClsId, iid_gen.NewUID().stdStr());
     local_image->getPropPin(PK_P_ImagePath)->mutableDataBuffer().setStringValue(img_path.string().c_str());
     local_image->getPropPin(PK_P_DirType)->mutableDataBuffer().setIntValue(0);
     p->appendTool(local_image);
@@ -78,7 +78,7 @@ void InitProcedure(Solution* sln)
 {
     _AUTO_FUNC_TRACK_
     UIDGen iid_gen;
-    Procedure* pc = sln->createProcedure(iid_gen.NewUID().stdStr());
+    ProcedurePtr pc = sln->createProcedure(iid_gen.NewUID().stdStr());
     InitProcess(pc->mutableRoot());
 }
 

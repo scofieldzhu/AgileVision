@@ -42,7 +42,7 @@ public:
     const DataBuffer& dataBuffer()const{ return data_buffer_; }
     void addConsumeInfo(const ConsumeInfo& inf);
     void removeConsumePin(ToolPin* consume_pin);
-    void removeConsumeTool(Tool* t);
+    void removeConsumeTool(ToolPtr t);
     void clear();
     const auto& consumeInfoList()const{ return consume_info_list_; }
     PinType getPinType()const override;

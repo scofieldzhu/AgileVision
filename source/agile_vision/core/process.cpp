@@ -106,7 +106,7 @@ bool Process::run()
     return s;
 }
 
-void Process::appendTool(ToolPtr t)
+void Process::appendTool(ToolSPtr t)
 {
     if(t && !existsTool(t.get())){
         tools_.push_back(t);
@@ -114,7 +114,7 @@ void Process::appendTool(ToolPtr t)
     }
 }
 
-void Process::insertTool(const_iterator pos, ToolPtr t)
+void Process::insertTool(const_iterator pos, ToolSPtr t)
 {
     if(t && !existsTool(t.get())){
         tools_.insert(pos, t);
@@ -122,7 +122,7 @@ void Process::insertTool(const_iterator pos, ToolPtr t)
     }
 }
 
-Tool* Process::findTool(const AgvString& name, bool recursive) const
+ToolPtr Process::findTool(const AgvString& name, bool recursive) const
 {
     if(!tools_.empty()){
         auto it = std::find_if(tools_.begin(), tools_.end(), [name](const auto& item){ return item->name() == name; });
@@ -144,7 +144,7 @@ bool Process::existsTool(Tool *t) const
     return t && !tools_.empty() && std::find_if(tools_.begin(), tools_.end(), [t](const auto& item){ return item.get() == t; }) != tools_.end();
 }
 
-void Process::removeTool(Tool* t)
+void Process::removeTool(ToolPtr t)
 {
     auto it = findTool(t);
     if(it != end()){
