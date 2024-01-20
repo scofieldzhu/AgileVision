@@ -41,6 +41,8 @@ add_subdirectory(source/agile_vision/core)
 
 add_subdirectory(source/agile_vision/stdtool)
 
+add_subdirectory(source/agile_vision/package)
+
 add_subdirectory(source/agile_vision/test)
 
 # install third-party libraries

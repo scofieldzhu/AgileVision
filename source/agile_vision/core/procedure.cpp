@@ -36,9 +36,9 @@ using namespace ratel;
 AGV_NAMESPACE_BEGIN
 
 namespace{
-    using StrPxEP = ElementProxy<StringProxy>;
-    using CombineA = ProxyCombine<StrPxEP, StrPxEP>;
-    using CombineB = ProxyCombineRef<CombineA, Process>;
+    using StrPxEP = StringProxy;
+    using CombineA = ProxyCombine<StringProxy, StringProxy, false>;
+    using CombineB = ProxyCombine<CombineA, Process, true>;
 }
 
 Procedure::Procedure(const std::string &iid)
@@ -54,8 +54,8 @@ Procedure::~Procedure()
 AgvBytes Procedure::serializeToBytes() const
 {
     CombineA ca;
-    ca.proxyA().mutableElement() = iid_;
-    ca.proxyB().mutableElement() = alias_;
+    ca.proxyA() = iid_;
+    ca.proxyB() = alias_;
     CombineB cb(ca, *root_);
     return cb.serializeToBytes();
 }
@@ -67,8 +67,8 @@ size_t Procedure::loadBytes(ConsAgvBytePtr buffer, size_t size)
     auto finish_bytes = cb.loadBytes(buffer, size);
     if(finish_bytes == 0)
         return 0;
-    iid_ = ca.proxyA().element().stdStr();
-    alias_ = ca.proxyB().element().stdStr();
+    iid_ = ca.proxyA().stdStr();
+    alias_ = ca.proxyB().stdStr();
     return finish_bytes;
 }
 

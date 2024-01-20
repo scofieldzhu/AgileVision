@@ -55,9 +55,25 @@
  *   SOFTWARE.
  */
 #include "solution.h"
+#include <ranges>
 #include "procedure.h"
 #include "engine.h"
+#include "serialize_policy.h"
 #include "spdlog/spdlog.h"
+
+RATEL_NAMESPACE_BEGIN
+using Procedure = agile_vision::Procedure;
+
+template <>
+struct DefaultCreator<Procedure*>
+{
+    static Procedure* Create()
+    {
+        return new Procedure("xxx");
+    }
+};
+
+RATEL_NAMESPACE_END
 
 AGV_NAMESPACE_BEGIN
 
@@ -72,42 +88,38 @@ Solution::~Solution()
 
 AgvBytes Solution::serializeToBytes() const
 {
+#ifdef SERIALIZER_RATEL
     using namespace ratel;
+    std::vector<ProcedurePtr> ptr_list;
+    auto transform_view = procedure_list_ | std::views::transform([](auto& p){ return p.get();});
+    std::ranges::copy(transform_view, std::back_inserter(ptr_list));
+    VecProxy<Procedure*, true> pp(ptr_list);
+    return pp.serializeToBytes();    
+#endif 
 
-    ByteVec bv(kUIntSize, 0);
-    unsigned int element_count = (unsigned int)procedure_list_.size();
-    memcpy(bv.data(), &element_count, kUIntSize);
-    for(const auto& v : procedure_list_){
-        auto mbv = v->serializeToBytes();
-        if(mbv.empty())
-            return {};
-        std::copy(mbv.begin(), mbv.end(), std::back_inserter(bv));
-    }
-    return bv;
+#ifdef SERIALIZER_PB 
+#endif
 }
 
 size_t Solution::loadBytes(ConsAgvBytePtr buffer, size_t size)
 {
+#ifdef SERIALIZER_RATEL
     using namespace ratel;
-
-    if(buffer == nullptr || size < kUIntSize)
+    VecProxy<Procedure*> pp;
+    auto finish_bytes = pp.loadBytes(buffer, size);
+    if(finish_bytes == 0)
         return 0;
-    auto byte_cursor = buffer;
-    unsigned int element_count = 0;
-    memcpy(&element_count, byte_cursor, kUIntSize);
-    byte_cursor += kUIntSize;
-    size_t left_size = size - kUIntSize;
+    const auto& pd_list = pp.data();
     removeAll();
-    for(unsigned int i = 0; i < element_count; ++i){
-        ProcedureUPtr e = std::make_unique<Procedure>("xxxx");
-        auto finish_size = e->loadBytes(byte_cursor, left_size);
-        if(finish_size == 0)
-            return 0;
-        byte_cursor += finish_size;
-        left_size -= finish_size;
+    for(unsigned int i = 0; i < pd_list.size(); ++i){
+        ProcedureUPtr e(pd_list[i]);
         procedure_list_.push_back(std::move(e));
     }
-    return size - left_size;
+    return finish_bytes;
+#endif
+
+#ifdef SERIALIZER_PB 
+#endif
 }
 
 void Solution::run()

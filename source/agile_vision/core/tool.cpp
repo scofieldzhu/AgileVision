@@ -29,17 +29,21 @@
 #include "tool.h"
 #include "procedure.h"
 #include "relationship_network.h"
-#include "ratel/geometry/geometry.h"
+#include "serialize_policy.h"
 #include "ratel/basic/dbg_tracker.h"
 #include "spdlog/spdlog.h"
 using namespace ratel;
 
 AGV_NAMESPACE_BEGIN
 
-namespace {
-    using StrPxEP = ElementProxy<StringProxy>;
+namespace 
+{
+#ifdef SERIALIZER_RATEL
     using ByteVecPx = VecProxy<agv_byte>;
     using PinDictProxy = DictProxy<std::string, ByteVecPx>;
+    using StrProCb = ProxyCombine<StringProxy, StringProxy, true>;
+    using FinalCb = ProxyCombine<StrProCb, PinDictProxy, true>;
+#endif
 }
 
 Tool::Tool(const std::string& iid)
@@ -97,11 +101,10 @@ void Tool::setJoinedProcess(ProcessPtr p)
 
 AgvBytes Tool::serializeToBytes() const
 {
-    StrPxEP str_ep(StringProxy(iid_.c_str()));
-    auto bv = str_ep.serializeToBytes();
-    str_ep.mutableElement() = name_;
-    auto bv_n = str_ep.serializeToBytes();
-    std::copy(bv_n.begin(), bv_n.end(), std::back_inserter(bv));
+#ifdef SERIALIZER_RATEL
+    StringProxy sp1(iid_);
+    StringProxy sp2(name_);
+    StrProCb pc1(sp1, sp2); 
     PinDictProxy pdp;
     for(const auto& kv : tool_pin_dict_){
         auto pin = kv.second;
@@ -112,36 +115,24 @@ AgvBytes Tool::serializeToBytes() const
             pdp.mutableData().insert({std::move(key), std::move(bvp)});
         }
     }
-    auto bv_dt = pdp.serializeToBytes();
-    std::copy(bv_dt.begin(), bv_dt.end(), std::back_inserter(bv));
-    return bv;
+    FinalCb fpc(pc1, pdp);
+    return fpc.serializeToBytes();
+#endif
 }
 
 size_t Tool::loadBytes(ConsAgvBytePtr buffer, size_t size)
 {
-    if(buffer == nullptr)
-        return 0;
-    auto cur_data = buffer;
-    auto left_size = size;
-    StrPxEP str_ep;
-    auto finish_bytes = str_ep.loadBytes(cur_data, left_size);
-    if(finish_bytes == 0)
-        return 0;
-    iid_ = str_ep.element().stdStr();
-    cur_data += finish_bytes;
-    left_size -= finish_bytes;
-    finish_bytes = str_ep.loadBytes(cur_data, left_size);
-    if(finish_bytes == 0)
-        return 0;
-    name_ = str_ep.element().stdStr();
-    cur_data += finish_bytes;
-    left_size -= finish_bytes;
+#ifdef SERIALIZER_RATEL    
+    StringProxy sp1;
+    StringProxy sp2;
+    StrProCb pc1(sp1, sp2); 
     PinDictProxy pdp;
-    finish_bytes = pdp.loadBytes(cur_data, left_size);
+    FinalCb fpc(pc1, pdp);
+    auto finish_bytes = fpc.loadBytes(buffer, size);
     if(finish_bytes == 0)
         return 0;
-    cur_data += finish_bytes;
-    left_size -= finish_bytes;
+    iid_ = sp1.stdStr();
+    name_ = sp2.stdStr();
     for(const auto& kv : pdp.data()){
         PinKey key = kv.first;
         const auto& bv = kv.second.data();
@@ -154,7 +145,8 @@ size_t Tool::loadBytes(ConsAgvBytePtr buffer, size_t size)
             return 0; // exception occur!
         }
     }
-    return size - left_size;
+    return finish_bytes;
+#endif
 }
 
 bool Tool::setPinConnection(const PinKey &consume_key, const ProduceInfo &pi)

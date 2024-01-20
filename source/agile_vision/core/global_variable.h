@@ -2,8 +2,8 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: base_type_def.h  
- *   Copyright (c) 2023-2024 scofieldzhu
+ *   File: global_variable.h  
+ *   Copyright (c) 2024-2024 scofieldzhu
  *  
  *   MIT License
  *  
@@ -26,24 +26,45 @@
  *   SOFTWARE.
  */
 
-#ifndef __base_type_def_h__
-#define __base_type_def_h__
+#ifndef __global_variable_h__
+#define __global_variable_h__
 
-#include <cstdint>
+#include <any>
 #include <string>
 #include <optional>
-#include "agile_vision/basic/agv_nps.h"
-#include "ratel/basic/base_type.h"
+#include "agile_vision/core/core_export.h"
+#include "agile_vision/basic/base_type_def.h"
 
 AGV_NAMESPACE_BEGIN
 
-using agv_byte = ratel::Byte;
-using ConsAgvBytePtr = const ratel::Byte*;
-using AgvBytes = ratel::ByteVec;
-using AgvMultiBytes = std::vector<AgvBytes>;
-using AgvString = std::string;
-using AgvMultiString = std::vector<AgvString>;
-using agv_time_t = uint64_t;
+class AGV_CORE_API GlobalVariable final
+{
+public:
+    enum DataType
+    {
+        DT_BOOLEAN,
+        DT_INT,
+        DT_FLOAT,
+        DT_STRING
+    };
+    AgvBytes serializeToBytes()const;
+    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+    void setBool(bool s);
+    std::optional<bool> getBoolValue()const;
+    void setInt(int a);
+    std::optional<int> getIntValue()const;
+    void setFloat(float f);
+    std::optional<float> getFloatValue()const;
+    void setString(const std::string& s);
+    std::optional<std::string> getStringValue()const;
+    auto dataType()const{ return data_type_; }
+    explicit GlobalVariable(DataType type);
+    ~GlobalVariable();
+
+private:
+    DataType data_type_;
+    std::any value_;
+};
 
 AGV_NAMESPACE_END
 

@@ -25,18 +25,22 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
-
+#include <ranges>
 #include "process.h"
 #include "tool.h"
+#include "serialize_policy.h"
 #include "ratel/geometry/geometry.h"
 #include "ratel/basic/dbg_tracker.h"
 using namespace ratel;
 
 AGV_NAMESPACE_BEGIN
-namespace {
-    using StrPxEP = ElementProxy<StringProxy>;
+namespace
+{
+#ifdef SERIALIZER_RATEL
     using ByteVecPx = VecProxy<agv_byte>;
     using PinDictProxy = DictProxy<std::string, ByteVecPx>;
+    using StrPcType = ProxyCombine<StringProxy, StringProxy, true>;
+#endif
 }
 
 Process::Process(const std::string &iid)
@@ -50,37 +54,35 @@ Process::~Process()
 
 AgvBytes Process::serializeToBytes() const
 {
-    StrPxEP str_ep(StringProxy(iid_.c_str()));
-    auto bv = str_ep.serializeToBytes();
-    str_ep.mutableElement() = alias_;
-    auto bv_n = str_ep.serializeToBytes();
-    std::copy(bv_n.begin(), bv_n.end(), std::back_inserter(bv));
-    for(auto& t : tools_){
-        auto bv_t = t->serializeToBytes();
-        std::copy(bv_t.begin(), bv_t.end(), std::back_inserter(bv));
-    }
-    return bv;
+#ifdef SERIALIZER_RATEL    
+    StringProxy sp(iid_);
+    StringProxy sp1(alias_);    
+    StrPcType spc(sp, sp1);
+    std::vector<Tool*> ptr_list;
+    auto transform_view = tools_ | std::views::transform([](auto& t){ return t.get();});
+    std::ranges::copy(transform_view, std::back_inserter(ptr_list));
+    using TVP = VecProxy<Tool*, true>;
+    TVP pp(ptr_list);
+    using PC = ProxyCombine<StrPcType, TVP, true>;
+    PC pc(spc, pp);
+    return pc.serializeToBytes();
+#endif
+
 }
 
 size_t Process::loadBytes(ConsAgvBytePtr buffer, size_t size)
 {
-    if(buffer == nullptr)
-        return 0;
-    auto cur_data = buffer;
-    auto left_size = size;
-    StrPxEP str_ep;
-    auto finish_bytes = str_ep.loadBytes(cur_data, left_size);
+#ifdef SERIALIZER_RATEL  
+    StringProxy sp;
+    StringProxy sp1;    
+    StrPcType spc(sp, sp1);
+    auto finish_bytes = spc.loadBytes(buffer, size);
     if(finish_bytes == 0)
         return 0;
-    iid_ = str_ep.element().stdStr();
-    cur_data += finish_bytes;
-    left_size -= finish_bytes;
-    finish_bytes = str_ep.loadBytes(cur_data, left_size);
-    if(finish_bytes == 0)
-        return 0;
-    alias_ = str_ep.element().stdStr();
-    cur_data += finish_bytes;
-    left_size -= finish_bytes;
+    iid_ = sp.stdStr();
+    alias_ = sp1.stdStr();
+    auto cur_data = buffer + finish_bytes;
+    auto left_size = size - finish_bytes;
     for(auto& t : tools_){
         finish_bytes = t->loadBytes(cur_data, left_size);
         if(finish_bytes == 0)
@@ -89,6 +91,7 @@ size_t Process::loadBytes(ConsAgvBytePtr buffer, size_t size)
         left_size -= finish_bytes;
     }
     return size - left_size;
+#endif
 }
 
 bool Process::run()

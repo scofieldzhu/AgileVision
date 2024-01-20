@@ -2,8 +2,8 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: base_type_def.h  
- *   Copyright (c) 2023-2024 scofieldzhu
+ *   File: serialize_policy.h  
+ *   Copyright (c) 2024-2024 scofieldzhu
  *  
  *   MIT License
  *  
@@ -25,26 +25,16 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+#ifndef __serialize_policy_h__
+#define __serialize_policy_h__
 
-#ifndef __base_type_def_h__
-#define __base_type_def_h__
+#define SERIALIZER_RATEL
 
-#include <cstdint>
-#include <string>
-#include <optional>
-#include "agile_vision/basic/agv_nps.h"
-#include "ratel/basic/base_type.h"
-
-AGV_NAMESPACE_BEGIN
-
-using agv_byte = ratel::Byte;
-using ConsAgvBytePtr = const ratel::Byte*;
-using AgvBytes = ratel::ByteVec;
-using AgvMultiBytes = std::vector<AgvBytes>;
-using AgvString = std::string;
-using AgvMultiString = std::vector<AgvString>;
-using agv_time_t = uint64_t;
-
-AGV_NAMESPACE_END
+#ifdef SERIALIZER_RATEL
+    #include "ratel/geometry/geometry.h"
+    using SerializeDict = ratel::DictProxy<std::string, std::string>;
+#elif defined(SERIALIZER_PB)
+#else 
+#endif
 
 #endif
