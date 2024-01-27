@@ -26,3 +26,34 @@
  *   SOFTWARE.
  */
 
+#include "wait_process_tool.h"
+#include "agile_vision/core/process.h"
+#include "agile_vision/core/procedure.h"
+
+AGV_NAMESPACE_BEGIN
+
+WaitProcessTool::WaitProcessTool(const std::string& iid)
+    :Tool(iid)
+{
+    auto prop_process_iid_list = std::make_shared<PropPin>(DataSpec::DynamicArray(DataType::kString));
+    addPin(PK_P_ProcessIIDList, prop_process_iid_list);
+}
+
+WaitProcessTool::~WaitProcessTool()
+{
+}
+
+bool WaitProcessTool::requestOutputData()
+{
+    //joinedProcess()->root
+    return false;
+}
+
+std::string WaitProcessTool::getClsGuid() const
+{
+    return "70eec671-9f3c-4b15-ad7a-c38b44c4c7da";
+}
+
+AGV_NAMESPACE_END
+
+

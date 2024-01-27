@@ -37,7 +37,7 @@ AGV_NAMESPACE_BEGIN
 StringProcessTool::StringProcessTool(const std::string& iid)
     :Tool(iid)
 {
-    child_process_manager_ = std::make_shared<ProcessManager>();
+    autoCreateProcesManager();
     auto new_input_pin = std::make_shared<InputPin>(DataSpec::SingleString());
     addPin("ReferenceString", new_input_pin);
     auto prop_process_iid_list = std::make_shared<PropPin>(DataSpec::DynamicArray(DataType::kString));
@@ -77,7 +77,7 @@ bool StringProcessTool::requestOutputData()
         auto trigger_mode = trigger_mode_list_pin->dataBuffer().getIntValue(i).value();
         if(cur_string == cur_trigger_string){
             const std::string process_iid =  process_iid_list_pin->dataBuffer().getStringValue(i);
-            auto process = child_process_manager_->findProcess(process_iid);
+            auto process = getMutableProcessManager()->findProcess(process_iid, false);
             if(process == nullptr){
                 spdlog::error("No process object exists with iid:{}", process_iid);
                 return false;

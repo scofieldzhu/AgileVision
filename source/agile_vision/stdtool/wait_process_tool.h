@@ -30,7 +30,24 @@
 #define __wait_process_tool_h__
 
 #include "agile_vision/core/tool.h"
+#include "agile_vision/stdtool/stdtool_export.h"
 
+AGV_NAMESPACE_BEGIN
 
+/// @brief Block current thread to wait target asynchronous process execution finish!
+class AGV_STDTOOL_API WaitProcessTool : public Tool 
+{
+public:
+    static constexpr PinKey PK_P_ProcessIIDList = "ProcessIIDList";
+    std::string getClsGuid() const override;
+    WaitProcessTool(const std::string& iid);
+    ~WaitProcessTool();
+
+private:
+    bool requestOutputData() override;
+
+};
+
+AGV_NAMESPACE_END
 
 #endif

@@ -46,8 +46,8 @@ namespace
 #endif
 }
 
-Tool::Tool(const std::string& iid)
-    :iid_(iid)
+Tool::Tool(const std::string &iid)
+    : iid_(iid)
 {
     auto status_pin = std::make_shared<OutputPin>(DataSpec::SingleInt());
     addPin(PK_O_Status, status_pin);
@@ -287,6 +287,17 @@ void Tool::addPin(const PinKey& key, ToolPinSPtr pin)
     if(tool_pin_dict_.find(key) == tool_pin_dict_.end()){
         tool_pin_dict_[key] = pin;
     }
+}
+
+void Tool::autoCreateProcesManager()
+{
+    if(child_process_manager_ == nullptr)
+        child_process_manager_ = std::make_unique<ProcessManager>(this);
+}
+
+Tool* Tool::clone()const
+{
+    return nullptr;
 }
 
 AGV_NAMESPACE_END

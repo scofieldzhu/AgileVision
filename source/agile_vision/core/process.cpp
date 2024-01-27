@@ -37,14 +37,12 @@ AGV_NAMESPACE_BEGIN
 namespace
 {
 #ifdef SERIALIZER_RATEL
-    using ByteVecPx = VecProxy<agv_byte>;
-    using PinDictProxy = DictProxy<std::string, ByteVecPx>;
     using StrPcType = ProxyCombine<StringProxy, StringProxy, true>;
 #endif
 }
 
 Process::Process(const std::string &iid)
-    :iid_(iid)
+    : iid_(iid)
 {
 }
 
@@ -52,22 +50,24 @@ Process::~Process()
 {
 }
 
+void Process::setManager(ProcessManager* t)
+{
+    manager_ = t;
+}
+
 AgvBytes Process::serializeToBytes() const
 {
 #ifdef SERIALIZER_RATEL    
     StringProxy sp(iid_);
-    StringProxy sp1(alias_);    
+    StringProxy sp1(alias_);   
     StrPcType spc(sp, sp1);
-    std::vector<Tool*> ptr_list;
-    auto transform_view = tools_ | std::views::transform([](auto& t){ return t.get();});
-    std::ranges::copy(transform_view, std::back_inserter(ptr_list));
-    using TVP = VecProxy<Tool*, true>;
-    TVP pp(ptr_list);
-    using PC = ProxyCombine<StrPcType, TVP, true>;
-    PC pc(spc, pp);
-    return pc.serializeToBytes();
+    auto bs = spc.serializeToBytes(); 
+    for(auto& t : tools_){
+        ByteVec mbv = t->serializeToBytes();
+        std::copy(mbv.begin(), mbv.end(), std::back_inserter(bs));
+    }
+    return bs;
 #endif
-
 }
 
 size_t Process::loadBytes(ConsAgvBytePtr buffer, size_t size)
@@ -177,6 +177,44 @@ void Process::removeTool(iterator pos)
 void Process::setInterrupt(bool s)
 {
     interrupt_ = s;
+}
+
+ProcessPtr Process::findMutableChildProcess(const std::string& iid, bool recursive)
+{
+    return const_cast<ProcessPtr>(const_cast<const Process*>(this)->findChildProcess(iid, recursive));
+}
+
+ConstProcessPtr Process::findChildProcess(const std::string &iid, bool recursive) const
+{
+    if(!recursive)
+        return this->iid() == iid ? this : nullptr;
+    for(auto t : tools_){
+        auto mgr = t->getMutableProcessManager();
+        if(mgr){
+            auto target_proc = mgr->findProcess(iid, recursive);
+            if(target_proc)
+                return target_proc;
+        }
+    }
+    return nullptr;
+}
+
+Process *Process::getMutableRootProcess()
+{
+    return const_cast<Process*>(const_cast<const Process*>(this)->getRootProcess());
+}
+
+const Process* Process::getRootProcess() const
+{
+    if(manager_ == nullptr)
+        return this;
+    auto parent = manager_->owner()->joinedProcess();
+    while(parent){
+        if(parent->manager_ == nullptr)
+            return parent;
+        parent = parent->manager_->owner()->joinedProcess();
+    }
+    return nullptr;
 }
 
 AGV_NAMESPACE_END

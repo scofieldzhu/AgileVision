@@ -33,10 +33,11 @@
 #include "agile_vision/core/input_pin.h"
 #include "agile_vision/core/output_pin.h"
 #include "agile_vision/core/prop_pin.h"
+#include "agile_vision/core/process_manager.h"
 
 AGV_NAMESPACE_BEGIN
 
-class AGV_CORE_API Tool
+class AGV_CORE_API Tool 
 {
 public:
     static constexpr PinKey PK_O_Status = "Status";
@@ -54,9 +55,14 @@ public:
     const auto& name()const{ return name_; }
     virtual std::string getClsGuid()const = 0;
     const ProcessManager* getProcessManager()const{ return child_process_manager_.get(); }
+    ProcessManager* getMutableProcessManager(){ return child_process_manager_.get(); }
     ProcessPtr joinedProcess(){ return joined_process_; }
     ConstProcessPtr joinedProcess()const { return joined_process_; }
+    virtual Tool* clone()const;
+    Tool& operator=(const Tool&) = delete;
     Tool(const std::string& iid);
+    Tool(const Tool&) = delete;
+    Tool(Tool&& rhs) = default;
     virtual ~Tool();
 
 protected:
@@ -66,12 +72,13 @@ protected:
     ToolPin* getToolPin(const PinKey& key);
     bool checkPinDataCompatible()const;
     void addPin(const PinKey& key, ToolPinSPtr pin);
+    void autoCreateProcesManager();    
     virtual bool requestOutputData() = 0;
-    std::shared_ptr<ProcessManager> child_process_manager_;
 
 private:
     friend class Process;
     void setJoinedProcess(ProcessPtr p);
+    std::unique_ptr<ProcessManager> child_process_manager_;
     std::string iid_;
     AgvString name_ = "unnamed";
     using ToolPinDict = std::map<PinKey, ToolPinSPtr>;

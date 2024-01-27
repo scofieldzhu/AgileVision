@@ -46,8 +46,8 @@ public:
     iterator end(){ return process_list_.end(); }
     const_iterator end()const{ return process_list_.end(); }
     void insertProcess(const_iterator pos, ProcessSPtr p);
-    ProcessPtr findProcess(const std::string& iid);
-    ConstProcessPtr findProcess(const std::string& iid)const;
+    ProcessPtr findProcess(const std::string& iid, bool recursive);
+    ConstProcessPtr findProcess(const std::string& iid, bool recursive)const;
     void appendProcess(ProcessSPtr p);
     void removeProcess(const std::string& iid);
     void removeProcess(iterator pos);
@@ -56,10 +56,13 @@ public:
     const auto& activeProcessIID()const{ return active_process_iid_; }
     ConstProcessPtr getActiveProcess()const;
     ProcessPtr getActiveProcess();
-    ProcessManager();
+    ToolPtr owner(){ return owner_; }
+    ConstToolPtr owner()const{ return owner_; }
+    ProcessManager(ToolPtr owner);
     ~ProcessManager();
 
 private:    
+    ToolPtr owner_;
     ProcessList process_list_;
     std::string active_process_iid_;
 };

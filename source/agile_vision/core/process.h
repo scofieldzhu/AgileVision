@@ -64,10 +64,19 @@ public:
     void setAlias(const AgvString& s);
     const AgvString& alias()const{ return alias_; }
     const std::string& iid()const{ return iid_; }
+    ProcessManager* manager(){ return manager_; }
+    const ProcessManager* manager()const{ return manager_; }
+    ProcessPtr findMutableChildProcess(const std::string& iid, bool recursive);
+    ConstProcessPtr findChildProcess(const std::string& iid, bool recursive)const;
+    Process* getMutableRootProcess();
+    const Process* getRootProcess()const;
     Process(const std::string& iid);
     ~Process();
 
 private:        
+    friend class ProcessManager;
+    void setManager(ProcessManager* t);
+    ProcessManager* manager_ = nullptr;
     std::string iid_;
     AgvString alias_{"null"};
     ToolList tools_;

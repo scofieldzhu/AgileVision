@@ -40,11 +40,11 @@ public:
     static constexpr PinKey PK_P_ProcessIIDList = "ProcessIIDList";
     static constexpr PinKey PK_P_TriggerStringList = "TriggerStringList";
     static constexpr PinKey PK_P_TriggerModeList = "TriggerModeList";
+    std::string getClsGuid()const override;
     StringProcessTool(const std::string& iid);
     virtual ~StringProcessTool();
 
 private:
-    std::string getClsGuid()const override;
     bool requestOutputData() override;
 };
 

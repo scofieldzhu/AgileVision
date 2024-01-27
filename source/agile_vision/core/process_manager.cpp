@@ -59,7 +59,8 @@
 
 AGV_NAMESPACE_BEGIN
 
-ProcessManager::ProcessManager()
+ProcessManager::ProcessManager(ToolPtr owner)
+    :owner_(owner)
 {
 }
 
@@ -71,41 +72,47 @@ void ProcessManager::insertProcess(const_iterator pos, ProcessSPtr p)
 {
     if(p && std::find(process_list_.begin(), process_list_.end(), p) == process_list_.end()){
         process_list_.insert(pos, p);
+        p->setManager(this);
     }
 }
 
-ConstProcessPtr ProcessManager::findProcess(const std::string& iid) const
+ConstProcessPtr ProcessManager::findProcess(const std::string& iid, bool recursive) const
 {
-    return const_cast<ProcessManager*>(this)->findProcess(iid);
+    return const_cast<ProcessManager*>(this)->findProcess(iid, recursive);
 }
 
-ProcessPtr ProcessManager::findProcess(const std::string& iid)
+ProcessPtr ProcessManager::findProcess(const std::string& iid, bool recursive)
 {
-    auto it = std::find_if(process_list_.begin(), process_list_.end(), [&iid](auto p){
-        return (*p).iid() == iid;
-    });
-    return it != process_list_.end() ? (*it).get() : nullptr;
+    for(auto& p : process_list_){
+        auto dst_p = p->findMutableChildProcess(iid, recursive);
+        if(dst_p)
+            return dst_p;
+    }
+    return nullptr;
 }
 
 void ProcessManager::appendProcess(ProcessSPtr p)
 {
     if(p && std::find(process_list_.begin(), process_list_.end(), p) == process_list_.end()){
         process_list_.push_back(p);
+        p->setManager(this);
     }
 }
 
-void ProcessManager::removeProcess(const std::string &iid)
+void ProcessManager::removeProcess(const std::string& iid)
 {
-    process_list_.erase(
-        std::remove_if(process_list_.begin(), process_list_.end(), [&iid](auto it){ return (*it).iid() == iid; }),
-        process_list_.end()
-    );
+    auto it = std::find_if(process_list_.begin(), process_list_.end(), [&iid](auto it){ return (*it).iid() == iid; });
+    if(it != process_list_.end()){
+        (*it)->setManager(nullptr);
+        process_list_.erase(it);
+    }
 }
 
 void ProcessManager::removeProcess(iterator pos)
 {
     if(pos != process_list_.end()){
         process_list_.erase(pos);
+        (*pos)->setManager(nullptr);
     }
 }
 
@@ -130,5 +137,3 @@ ProcessPtr ProcessManager::getActiveProcess()
 }
 
 AGV_NAMESPACE_END
-
-
