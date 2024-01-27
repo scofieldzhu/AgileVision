@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "common.proto";
+
+package agile_vision;
+
+message pbDataBuffer
+{
+    pbDataSpec ds = 1;
+    repeated float fl = 2;
+    repeated int32 il = 3;
+    repeated bytes bl = 4;
+    repeated string sl = 5;
+    repeated pbImage ml = 6;
+}
+

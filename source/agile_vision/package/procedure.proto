@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "process.proto";
+
+package agile_vision;
+
+message pbProcedure
+{
+    string iid = 1;
+    bool active_run = 2;
+    string alias = 3;
+    pbProcess root = 4;
+}

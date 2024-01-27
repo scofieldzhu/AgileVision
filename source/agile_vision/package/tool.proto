@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "tool_pin.proto";
+
+package agile_vision;
+
+message pbTool
+{
+    string clsid = 1;
+    string iid = 2;
+    string name = 3;
+    map<string, pbInputPin> input_pin_dict = 4;
+    map<string, pbOutputPin> output_pin_dict = 5;
+    map<string, pbPropPin> prop_pin_dict = 6;
+    repeated string process_iid_list = 7;
+}

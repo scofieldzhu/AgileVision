@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+import "common.proto";
+import "data_buffer.proto";
+
+package agile_vision;
+
+message pbToolPin
+{
+    pbDataSpec ds = 1;
+    string alias = 2;
+    bool deprecated = 3;
+}
+
+message pbProduceInfo
+{
+    string tool_clsid = 1;
+    string tool_iid = 2;
+    string pin_key = 3;
+    uint32 data_location = 4;
+}
+
+message pbPropPin
+{
+    pbToolPin base_pin = 1;
+    pbDataBuffer data_buffer = 2;
+    pbProduceInfo produce_info = 3;
+}
+
+message pbOutputPin
+{
+    pbToolPin base_pin = 1;
+    pbDataBuffer data_buffer = 2;
+    repeated pbToolPin consume_pins = 3;
+}
+
+message pbInputPin
+{
+    pbToolPin base_pin = 1;
+    bool optional = 2;
+    pbProduceInfo produce_info = 3;
+}

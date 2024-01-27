@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package agile_vision;
+
+enum pbDataType
+{
+    PB_DT_UNK = 0;
+    PB_DT_INT = 1;
+    PB_DT_FLOAT = 2;
+    PB_DT_STRING = 3;
+    PB_DT_BYTES = 4;
+    PB_DT_IMAGE = 5;
+}
+
+message pbDataSpec
+{
+    pbDataType major_type;
+    uint32 subtype;
+    uint32 arry_size;
+}
+
+message pbIntList
+{
+    repeated int32 list = 1;
+}
+
+message pbImage 
+{
+    pbDataType type = 1;
+    uint8 channel = 2;
+    uint8 bits = 3;
+    uint32 width = 4;
+    uint32 height = 5;
+    uint32 size = 6;
+    uint32 reserved = 7;
+}

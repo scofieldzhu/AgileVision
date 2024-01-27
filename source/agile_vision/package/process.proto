@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "tool.proto";
+
+package agile_vision;
+
+message pbProcess
+{
+    string iid = 1;
+    string alias = 2;
+    repeated pbTool tools = 3;
+}

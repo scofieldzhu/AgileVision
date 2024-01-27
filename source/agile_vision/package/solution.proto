@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+import "procedure.proto";
+
+package agile_vision;
+
+message pbSolution
+{
+    repeated pbProcedure procedure_list;
+}
