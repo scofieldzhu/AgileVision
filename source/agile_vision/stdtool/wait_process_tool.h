@@ -39,6 +39,7 @@ class AGV_STDTOOL_API WaitProcessTool : public Tool
 {
 public:
     static constexpr PinKey PK_P_ProcessIIDList = "ProcessIIDList";
+    static constexpr PinKey PK_P_MaxWaitTimeSeconds = "MaxWaitTimeSeconds";
     std::string getClsGuid() const override;
     WaitProcessTool(const std::string& iid);
     ~WaitProcessTool();
