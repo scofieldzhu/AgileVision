@@ -31,17 +31,17 @@
 
 #include "agile_vision/core/core_base_def.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-struct ProduceInfo 
-{
-    bool isNull()const{ return !(bool)(*this); }
-    operator bool()const{ return pin != nullptr; }
-    bool operator==(const ProduceInfo& other)const{ return pin == other.pin; }
-    OutputPin* pin = nullptr;
-    uint32_t data_location = 0;
-};
+    struct ProduceInfo 
+    {
+        bool isNull()const{ return !(bool)(*this); }
+        operator bool()const{ return pin != nullptr; }
+        bool operator==(const ProduceInfo& other)const{ return pin == other.pin; }
+        OutputPin* pin = nullptr;
+        uint32_t data_location = 0;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

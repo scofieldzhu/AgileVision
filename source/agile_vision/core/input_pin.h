@@ -32,25 +32,25 @@
 #include "agile_vision/core/tool_pin.h"
 #include "agile_vision/core/produce_info.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API InputPin : public ToolPin
-{
-public:
-    void setOptional(bool s){ optional_ = s; }
-    bool optional()const{ return optional_; }
-    void bindProduceInfo(const ProduceInfo& pi);
-    void unbind();
-    const auto& produceInfo()const{ return produce_info_; }
-    PinType getPinType()const override;
-    InputPin(const DataSpec& ds);
-    ~InputPin();
+    class AGV_CORE_API InputPin : public ToolPin
+    {
+    public:
+        void setOptional(bool s){ optional_ = s; }
+        bool optional()const{ return optional_; }
+        void bindProduceInfo(const ProduceInfo& pi);
+        void unbind();
+        const auto& produceInfo()const{ return produce_info_; }
+        PinType getPinType()const override;
+        explicit InputPin(const DataSpec& ds);
+        ~InputPin();
 
-private:
-    bool optional_ = false;
-    ProduceInfo produce_info_;
-};
+    private:
+        bool optional_ = false;
+        ProduceInfo produce_info_;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

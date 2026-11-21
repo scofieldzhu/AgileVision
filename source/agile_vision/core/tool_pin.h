@@ -32,28 +32,28 @@
 #include "agile_vision/core/data_spec.h"
 #include "agile_vision/core/core_export.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API ToolPin
-{
-public:
-    // virtual AgvBytes serializeToBytes()const;
-    // virtual size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    const auto& dataSpec()const{ return ds_; }
-    const auto& alias()const{ return alias_; }
-    void setAlias(const AgvString& s){ alias_ = s; }
-    void setDeprecated(bool s){ deprecated_ = s; }
-    bool deprecated()const{ return deprecated_; }
-    virtual PinType getPinType()const = 0;
-    ToolPin(const DataSpec& ds);
-    virtual ~ToolPin();
+    class AGV_CORE_API ToolPin
+    {
+    public:
+        // virtual AgvBytes serializeToBytes()const;
+        // virtual size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        const auto& dataSpec()const{ return ds_; }
+        const auto& alias()const{ return alias_; }
+        void setAlias(const AgvString& s){ alias_ = s; }
+        void setDeprecated(bool s){ deprecated_ = s; }
+        bool deprecated()const{ return deprecated_; }
+        virtual PinType getPinType()const = 0;
+        explicit ToolPin(const DataSpec& ds);
+        virtual ~ToolPin();
 
-private:
-    DataSpec ds_;
-    AgvString alias_{"null"};
-    bool deprecated_ = false;
-};
+    private:
+        DataSpec ds_;
+        AgvString alias_{"null"};
+        bool deprecated_ = false;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

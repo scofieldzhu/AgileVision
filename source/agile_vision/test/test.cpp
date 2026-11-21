@@ -27,8 +27,11 @@
  */
 
 #include "test_solution.h"
+#include "agile_vision/basic/dbg_tracker.h"
+
+#include <chrono>
+#include <thread>
 #include "spdlog/spdlog.h"
-#include "ratel/basic/dbg_tracker.h"
 
 int main()
 {

@@ -28,81 +28,83 @@
 
 #include "procedure.h"
 #include "engine.h"
-#include "ratel/geometry/geometry.h"
-#include "spdlog/spdlog.h"
+#include "agile_vision/geometry/geometry.h"
+#include "agile_vision/basic/log.h"
 
-using namespace ratel;
+using namespace agv;
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-namespace{
-    using StrPxEP = StringProxy;
-    using CombineA = ProxyCombine<StringProxy, StringProxy, false>;
-    using CombineB = ProxyCombine<CombineA, Process, true>;
-}
-
-Procedure::Procedure(const std::string &iid)
-    : iid_(iid),
-      root_(std::make_shared<Process>(iid)) // same iid with procedure's
-{
-}
-
-Procedure::~Procedure()
-{
-}
-
-AgvBytes Procedure::serializeToBytes() const
-{
-    CombineA ca;
-    ca.proxyA() = iid_;
-    ca.proxyB() = alias_;
-    CombineB cb(ca, *root_);
-    return cb.serializeToBytes();
-}
-
-size_t Procedure::loadBytes(ConsAgvBytePtr buffer, size_t size)
-{
-    CombineA ca;
-    CombineB cb(ca, *root_);
-    auto finish_bytes = cb.loadBytes(buffer, size);
-    if(finish_bytes == 0)
-        return 0;
-    iid_ = ca.proxyA().stdStr();
-    alias_ = ca.proxyB().stdStr();
-    return finish_bytes;
-}
-
-void Procedure::setAlias(const AgvString &str)
-{
-    alias_ = str;
-}
-
-void Procedure::run()
-{
-    if(run_context_.engine ==  nullptr){
-        spdlog::error("No engine object attached!");
-        return;
+    namespace{
+        using StrPxEP = StringProxy;
+        using CombineA = ProxyCombine<StringProxy, StringProxy, false>;
+        using CombineB = ProxyCombine<CombineA, Process, true>;
     }
-    auto cur_engine = run_context_.engine;
-    if(run_context_.async_run){ 
-        auto finish_func = [this](wkid_t w){
-            spdlog::trace("Procedure:{} root run done!", this->alias_);
-        };
-        run_context_.work_id = cur_engine->commit(root_.get(), finish_func);
-        if(run_context_.work_id == null_id){
-            spdlog::error("Engine commit root process:{} work failed!", root_->iid());
+
+    Procedure::Procedure(const std::string &iid)
+        : iid_(iid),
+          root_(std::make_shared<Process>(iid)) // same iid with procedure's
+    {
+    }
+
+    Procedure::~Procedure()
+    {
+    }
+
+    AgvBytes Procedure::serializeToBytes() const
+    {
+        CombineA ca;
+        ca.proxyA() = iid_;
+        ca.proxyB() = alias_;
+        CombineB cb(ca, *root_);
+        return cb.serializeToBytes();
+    }
+
+    size_t Procedure::loadBytes(ConsAgvBytePtr buffer, size_t size)
+    {
+        CombineA ca;
+        CombineB cb(ca, *root_);
+        auto finish_bytes = cb.loadBytes(buffer, size);
+        if(finish_bytes == 0)
+        {
+            return 0;
         }
-    }else{
-        if(!cur_engine->syncRunProcess(root_.get())){
-            spdlog::error("Engine syncRunProcess root process:{} work failed!", root_->iid());
+        iid_ = ca.proxyA().stdStr();
+        alias_ = ca.proxyB().stdStr();
+        return finish_bytes;
+    }
+
+    void Procedure::setAlias(const AgvString &str)
+    {
+        alias_ = str;
+    }
+
+    void Procedure::run()
+    {
+        if(run_context_.engine ==  nullptr){
+            LOG_ERROR("No engine object attached!");
+            return;
+        }
+        auto cur_engine = run_context_.engine;
+        if(run_context_.async_run){ 
+            auto finish_func = [this](wkid_t w){
+                LOG_TRACE("Procedure:{} root run done!", this->alias_);
+            };
+            run_context_.work_id = cur_engine->commit(root_.get(), finish_func);
+            if(run_context_.work_id == kNullId){
+                LOG_ERROR("Engine commit root process:{} work failed!", root_->iid());
+            }
+        }else{
+            if(!cur_engine->syncRunProcess(root_.get())){
+                LOG_ERROR("Engine syncRunProcess root process:{} work failed!", root_->iid());
+            }
         }
     }
-}
 
-void Procedure::setActiveRun(bool s)
-{
-    active_run_ = s;
-}
+    void Procedure::setActiveRun(bool s)
+    {
+        active_run_ = s;
+    }
 
-AGV_NAMESPACE_END
+}
 

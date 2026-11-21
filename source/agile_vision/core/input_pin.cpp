@@ -28,30 +28,30 @@
 
 #include "input_pin.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-InputPin::InputPin(const DataSpec &ds)
-    :ToolPin(ds)
-{
+    InputPin::InputPin(const DataSpec &ds)
+        :ToolPin(ds)
+    {
+    }
+
+    InputPin::~InputPin()
+    {
+    }
+
+    void InputPin::bindProduceInfo(const ProduceInfo& pi)
+    {
+        produce_info_ = pi;
+    }
+
+    void InputPin::unbind()
+    {
+        produce_info_.pin = nullptr;
+    }
+
+    PinType InputPin::getPinType() const
+    {
+        return PinType::kInput;
+    }
+
 }
-
-InputPin::~InputPin()
-{
-}
-
-void InputPin::bindProduceInfo(const ProduceInfo& pi)
-{
-    produce_info_ = pi;
-}
-
-void InputPin::unbind()
-{
-    produce_info_.pin = nullptr;
-}
-
-PinType InputPin::getPinType() const
-{
-    return PinType::kInput;
-}
-
-AGV_NAMESPACE_END

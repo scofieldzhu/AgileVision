@@ -33,75 +33,84 @@
 #include <string_view>
 #include "agile_vision/basic/image_data.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv {
 
-enum class DataType
-{
-    kUnk,
-    kInt,
-    kFloat,
-    kString,
-    kBytes,
-    kImage
-};
+    // ===== 公共基础类型：位于 agv 根，供各模块子空间直接访问 =====
 
-inline bool IsFundamentalType(DataType t)
-{
-    return t == DataType::kInt || t == DataType::kFloat || t == DataType::kImage;
-}
+    enum class DataType
+    {
+        kUnk,
+        kInt,
+        kFloat,
+        kString,
+        kBytes,
+        kImage
+    };
 
-inline unsigned int GetFundamentalTypeSize(DataType t)
-{
-    if(t == DataType::kInt)
-        return sizeof(int);
-    if(t == DataType::kFloat)
-        return sizeof(float);
-    if(t == DataType::kImage)
-        return sizeof(ImageData);
-    return 0;
-}
+    inline bool isFundamentalType(DataType t)
+    {
+        return t == DataType::kInt || t == DataType::kFloat || t == DataType::kImage;
+    }
 
-enum class PinType
-{
-    kInput,
-    kOutput,
-    kProp
-};
+    inline unsigned int getFundamentalTypeSize(DataType t)
+    {
+        if(t == DataType::kInt)
+        {
+            return sizeof(int);
+        }
+        if(t == DataType::kFloat)
+        {
+            return sizeof(float);
+        }
+        if(t == DataType::kImage)
+        {
+            return sizeof(ImageData);
+        }
+        return 0;
+    }
 
-class DataBuffer;
+    enum class PinType
+    {
+        kInput,
+        kOutput,
+        kProp
+    };
 
-struct DataSpec;
+    using PinKey = std::string_view;
 
-using PinKey = std::string_view;
+    constexpr uint32_t kNullId = 0; // null id for wkid_t\wtid_t
+    using wkid_t = uint32_t; //work id for process in engine
+    using wkid_list = std::vector<wkid_t>;
 
-class Tool;
-using ToolSPtr = std::shared_ptr<Tool>;
-using ToolPtr = Tool*;
-using ConstToolPtr = const Tool*;
+    // ===== core 模块类的前向声明：位于 agv::core 子空间 =====
 
-class Process;
-using ProcessPtr = Process*;
-using ConstProcessPtr = const Process*;
+    namespace core {
 
-class ProcessManager;
+        class DataBuffer;
+        struct DataSpec;
 
-class Procedure;
-using ProcedurePtr = Procedure*;
-using ConstProcedurePtr = const Procedure*;
+        class Tool;
+        using ToolSPtr = std::shared_ptr<Tool>;
+        using ToolPtr = Tool*;
+        using ConstToolPtr = const Tool*;
 
-class OutputPin;
+        class Process;
+        using ProcessPtr = Process*;
+        using ConstProcessPtr = const Process*;
 
-class InputPin;
+        class ProcessManager;
 
-class PropPin;
+        class Procedure;
+        using ProcedurePtr = Procedure*;
+        using ConstProcedurePtr = const Procedure*;
 
-class ToolPin;
+        class OutputPin;
+        class InputPin;
+        class PropPin;
+        class ToolPin;
+        class Engine;
 
-class Engine;
-constexpr uint32_t null_id = 0; // null id for wkid_t\wtid_t
-using wkid_t = uint32_t; //work id for process in engine
-using wkid_list = std::vector<wkid_t>;
-
-AGV_NAMESPACE_END
+    } // namespace core
+} // namespace agv
 
 #endif

@@ -32,40 +32,41 @@
 #include "agile_vision/core/run_context.h"
 #include "agile_vision/core/core_export.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API Solution 
-{
-    using ProcedureUPtr = std::unique_ptr<Procedure>;
-    using ProcedureList = std::vector<ProcedureUPtr>;
-public:
-    using iterator = ProcedureList::iterator;
-    using const_iterator = ProcedureList::const_iterator;
-    iterator begin(){ return procedure_list_.begin(); }
-    const_iterator begin()const{ return procedure_list_.begin(); }
-    iterator end(){ return procedure_list_.end(); }
-    const_iterator end()const{ return procedure_list_.end(); }
-    AgvBytes serializeToBytes()const;
-    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    void run();
-    ProcedurePtr createProcedure(const std::string& iid);
-    ConstProcedurePtr findProcedure(const std::string& iid)const;
-    void removeProcedure(const std::string& iid);
-    void removeProcedure(const_iterator pos);
-    void removeAll();
-    auto numberOfProcedures()const{ return procedure_list_.size(); }
-    Solution& operator=(const Solution&) = delete;
-    explicit Solution(size_t max_run_thread_number);
-    Solution(const Solution&) = delete;
-    ~Solution();
+    class AGV_CORE_API Solution
+    {
+    public:
+        using ProcedureUPtr = std::unique_ptr<Procedure>;
+        using ProcedureList = std::vector<ProcedureUPtr>;
+        using iterator = ProcedureList::iterator;
+        using const_iterator = ProcedureList::const_iterator;
+        iterator begin(){ return procedure_list_.begin(); }
+        const_iterator begin()const{ return procedure_list_.begin(); }
+        iterator end(){ return procedure_list_.end(); }
+        const_iterator end()const{ return procedure_list_.end(); }
+        AgvBytes serializeToBytes()const;
+        size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        void run();
+        ProcedurePtr createProcedure(const std::string& iid);
+        ConstProcedurePtr findProcedure(const std::string& iid)const;
+        void removeProcedure(const std::string& iid);
+        void removeProcedure(const_iterator pos);
+        void removeAll();
+        auto numberOfProcedures()const{ return procedure_list_.size(); }
+        Solution& operator=(const Solution&) = delete;
 
-private:
-    std::unique_ptr<Engine> engine_;
-    RunContext run_context_;    
-    std::vector<ProcedureUPtr> procedure_list_;
-};
+        explicit Solution(size_t max_run_thread_number);
+        Solution(const Solution&) = delete;
+        ~Solution();
 
-AGV_NAMESPACE_END
+    private:
+        std::unique_ptr<Engine> engine_;
+        RunContext run_context_;    
+        std::vector<ProcedureUPtr> procedure_list_;
+    };
+
+}
 
 #endif
 

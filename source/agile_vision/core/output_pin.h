@@ -33,27 +33,27 @@
 #include "agile_vision/core/consume_info.h"
 #include "agile_vision/core/data_buffer.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API OutputPin : public ToolPin
-{
-public:
-    DataBuffer& mutableDataBuffer(){ return data_buffer_; }
-    const DataBuffer& dataBuffer()const{ return data_buffer_; }
-    void addConsumeInfo(const ConsumeInfo& inf);
-    void removeConsumePin(ToolPin* consume_pin);
-    void removeConsumeTool(ToolPtr t);
-    void clear();
-    const auto& consumeInfoList()const{ return consume_info_list_; }
-    PinType getPinType()const override;
-    OutputPin(const DataSpec& ds);
-    ~OutputPin();
+    class AGV_CORE_API OutputPin : public ToolPin
+    {
+    public:
+        DataBuffer& mutableDataBuffer(){ return data_buffer_; }
+        const DataBuffer& dataBuffer()const{ return data_buffer_; }
+        void addConsumeInfo(const ConsumeInfo& inf);
+        void removeConsumePin(ToolPin* consume_pin);
+        void removeConsumeTool(ToolPtr t);
+        void clear();
+        const auto& consumeInfoList()const{ return consume_info_list_; }
+        PinType getPinType()const override;
+        explicit OutputPin(const DataSpec& ds);
+        ~OutputPin();
 
-private:
-    DataBuffer data_buffer_;
-    std::vector<ConsumeInfo> consume_info_list_;
-};
+    private:
+        DataBuffer data_buffer_;
+        std::vector<ConsumeInfo> consume_info_list_;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

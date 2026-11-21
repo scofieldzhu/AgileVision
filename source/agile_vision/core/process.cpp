@@ -29,192 +29,210 @@
 #include "process.h"
 #include "tool.h"
 #include "serialize_policy.h"
-#include "ratel/geometry/geometry.h"
-#include "ratel/basic/dbg_tracker.h"
-using namespace ratel;
+#include "agile_vision/geometry/geometry.h"
+#include "agile_vision/basic/dbg_tracker.h"
+using namespace agv;
 
-AGV_NAMESPACE_BEGIN
-namespace
-{
-#ifdef SERIALIZER_RATEL
-    using StrPcType = ProxyCombine<StringProxy, StringProxy, true>;
-#endif
-}
-
-Process::Process(const std::string &iid)
-    : iid_(iid)
-{
-}
-
-Process::~Process()
-{
-}
-
-void Process::setManager(ProcessManager* t)
-{
-    manager_ = t;
-}
-
-AgvBytes Process::serializeToBytes() const
-{
-#ifdef SERIALIZER_RATEL    
-    StringProxy sp(iid_);
-    StringProxy sp1(alias_);   
-    StrPcType spc(sp, sp1);
-    auto bs = spc.serializeToBytes(); 
-    for(auto& t : tools_){
-        ByteVec mbv = t->serializeToBytes();
-        std::copy(mbv.begin(), mbv.end(), std::back_inserter(bs));
+namespace agv::core {
+    namespace
+    {
+    #ifdef SERIALIZER_RATEL
+        using StrPcType = ProxyCombine<StringProxy, StringProxy, true>;
+    #endif
     }
-    return bs;
-#endif
-}
 
-size_t Process::loadBytes(ConsAgvBytePtr buffer, size_t size)
-{
-#ifdef SERIALIZER_RATEL  
-    StringProxy sp;
-    StringProxy sp1;    
-    StrPcType spc(sp, sp1);
-    auto finish_bytes = spc.loadBytes(buffer, size);
-    if(finish_bytes == 0)
-        return 0;
-    iid_ = sp.stdStr();
-    alias_ = sp1.stdStr();
-    auto cur_data = buffer + finish_bytes;
-    auto left_size = size - finish_bytes;
-    for(auto& t : tools_){
-        finish_bytes = t->loadBytes(cur_data, left_size);
+    Process::Process(const std::string &iid)
+        : iid_(iid)
+    {
+    }
+
+    Process::~Process()
+    {
+    }
+
+    void Process::setManager(ProcessManager* t)
+    {
+        manager_ = t;
+    }
+
+    AgvBytes Process::serializeToBytes() const
+    {
+    #ifdef SERIALIZER_RATEL    
+        StringProxy sp(iid_);
+        StringProxy sp1(alias_);   
+        StrPcType spc(sp, sp1);
+        auto bs = spc.serializeToBytes(); 
+        for(auto& t : tools_){
+            ByteVec mbv = t->serializeToBytes();
+            std::copy(mbv.begin(), mbv.end(), std::back_inserter(bs));
+        }
+        return bs;
+    #endif
+    }
+
+    size_t Process::loadBytes(ConsAgvBytePtr buffer, size_t size)
+    {
+    #ifdef SERIALIZER_RATEL  
+        StringProxy sp;
+        StringProxy sp1;    
+        StrPcType spc(sp, sp1);
+        auto finish_bytes = spc.loadBytes(buffer, size);
         if(finish_bytes == 0)
+        {
             return 0;
-        cur_data += finish_bytes;
-        left_size -= finish_bytes;
+        }
+        iid_ = sp.stdStr();
+        alias_ = sp1.stdStr();
+        auto cur_data = buffer + finish_bytes;
+        auto left_size = size - finish_bytes;
+        for(auto& t : tools_){
+            finish_bytes = t->loadBytes(cur_data, left_size);
+            if(finish_bytes == 0)
+            {
+                return 0;
+            }
+            cur_data += finish_bytes;
+            left_size -= finish_bytes;
+        }
+        return size - left_size;
+    #endif
     }
-    return size - left_size;
-#endif
-}
 
-bool Process::run()
-{
-    std::lock_guard __auto_lock(run_mutex_);
-    bool s = true;
-    run_context_.is_running = true;
-    for(auto& t : tools_){
-        if(interrupt_)
-            break;
-        s = s && t->run();
-    }        
-    run_context_.is_running = false;
-    interrupt_ = false;
-    return s;
-}
-
-void Process::appendTool(ToolSPtr t)
-{
-    if(t && !existsTool(t.get())){
-        tools_.push_back(t);
-        t->setJoinedProcess(this);
+    bool Process::run()
+    {
+        std::lock_guard __auto_lock(run_mutex_);
+        bool s = true;
+        run_context_.is_running = true;
+        for(auto& t : tools_){
+            if(interrupt_)
+            {
+                break;
+            }
+            s = s && t->run();
+        }        
+        run_context_.is_running = false;
+        interrupt_ = false;
+        return s;
     }
-}
 
-void Process::insertTool(const_iterator pos, ToolSPtr t)
-{
-    if(t && !existsTool(t.get())){
-        tools_.insert(pos, t);
-        t->setJoinedProcess(this);
-    }
-}
-
-ToolPtr Process::findTool(const AgvString& name, bool recursive) const
-{
-    if(!tools_.empty()){
-        auto it = std::find_if(tools_.begin(), tools_.end(), [name](const auto& item){ return item->name() == name; });
-        if(it != tools_.end())
-            return (*it).get();
-    }
-    return nullptr;
-}
-
-Process::const_iterator Process::findTool(Tool *t) const
-{
-    if(t && !tools_.empty())
-        return std::find_if(tools_.begin(), tools_.end(), [t](const auto& item){ return item.get() == t; });
-    return end();
-}
-
-bool Process::existsTool(Tool *t) const
-{
-    return t && !tools_.empty() && std::find_if(tools_.begin(), tools_.end(), [t](const auto& item){ return item.get() == t; }) != tools_.end();
-}
-
-void Process::removeTool(ToolPtr t)
-{
-    auto it = findTool(t);
-    if(it != end()){
-        t->setJoinedProcess(nullptr);
-        tools_.erase(it);
-    }        
-}
-
-void Process::removeTool(const_iterator pos)
-{
-    if(pos != end()){
-        auto t = *pos;
-        t->setJoinedProcess(nullptr);
-        tools_.erase(pos);
-    }
-}
-
-void Process::removeTool(iterator pos)
-{
-    if(pos != end()){
-        auto t = *pos;
-        t->setJoinedProcess(nullptr);
-        tools_.erase(pos);
-    }
-}
-
-void Process::setInterrupt(bool s)
-{
-    interrupt_ = s;
-}
-
-ProcessPtr Process::findMutableChildProcess(const std::string& iid, bool recursive)
-{
-    return const_cast<ProcessPtr>(const_cast<const Process*>(this)->findChildProcess(iid, recursive));
-}
-
-ConstProcessPtr Process::findChildProcess(const std::string &iid, bool recursive) const
-{
-    if(!recursive)
-        return this->iid() == iid ? this : nullptr;
-    for(auto t : tools_){
-        auto mgr = t->getMutableProcessManager();
-        if(mgr){
-            auto target_proc = mgr->findProcess(iid, recursive);
-            if(target_proc)
-                return target_proc;
+    void Process::appendTool(ToolSPtr t)
+    {
+        if(t && !existsTool(t.get())){
+            tools_.push_back(t);
+            t->setJoinedProcess(this);
         }
     }
-    return nullptr;
-}
 
-Process *Process::getMutableRootProcess()
-{
-    return const_cast<Process*>(const_cast<const Process*>(this)->getRootProcess());
-}
-
-const Process* Process::getRootProcess() const
-{
-    if(manager_ == nullptr)
-        return this;
-    auto parent = manager_->owner()->joinedProcess();
-    while(parent){
-        if(parent->manager_ == nullptr)
-            return parent;
-        parent = parent->manager_->owner()->joinedProcess();
+    void Process::insertTool(const_iterator pos, ToolSPtr t)
+    {
+        if(t && !existsTool(t.get())){
+            tools_.insert(pos, t);
+            t->setJoinedProcess(this);
+        }
     }
-    return nullptr;
-}
 
-AGV_NAMESPACE_END
+    ToolPtr Process::findTool(const AgvString& name, bool recursive) const
+    {
+        if(!tools_.empty()){
+            auto it = std::find_if(tools_.begin(), tools_.end(), [name](const auto& item){ return item->name() == name; });
+            if(it != tools_.end())
+            {
+                return (*it).get();
+            }
+        }
+        return nullptr;
+    }
+
+    Process::const_iterator Process::findTool(Tool *t) const
+    {
+        if(t && !tools_.empty())
+        {
+            return std::find_if(tools_.begin(), tools_.end(), [t](const auto& item){ return item.get() == t; });
+        }
+        return end();
+    }
+
+    bool Process::existsTool(Tool *t) const
+    {
+        return t && !tools_.empty() && std::find_if(tools_.begin(), tools_.end(), [t](const auto& item){ return item.get() == t; }) != tools_.end();
+    }
+
+    void Process::removeTool(ToolPtr t)
+    {
+        auto it = findTool(t);
+        if(it != end()){
+            t->setJoinedProcess(nullptr);
+            tools_.erase(it);
+        }        
+    }
+
+    void Process::removeTool(const_iterator pos)
+    {
+        if(pos != end()){
+            auto t = *pos;
+            t->setJoinedProcess(nullptr);
+            tools_.erase(pos);
+        }
+    }
+
+    void Process::removeTool(iterator pos)
+    {
+        if(pos != end()){
+            auto t = *pos;
+            t->setJoinedProcess(nullptr);
+            tools_.erase(pos);
+        }
+    }
+
+    void Process::setInterrupt(bool s)
+    {
+        interrupt_ = s;
+    }
+
+    ProcessPtr Process::findMutableChildProcess(const std::string& iid, bool recursive)
+    {
+        return const_cast<ProcessPtr>(const_cast<const Process*>(this)->findChildProcess(iid, recursive));
+    }
+
+    ConstProcessPtr Process::findChildProcess(const std::string &iid, bool recursive) const
+    {
+        if(!recursive)
+        {
+            return this->iid() == iid ? this : nullptr;
+        }
+        for(auto t : tools_){
+            auto mgr = t->getMutableProcessManager();
+            if(mgr){
+                auto target_proc = mgr->findProcess(iid, recursive);
+                if(target_proc)
+                {
+                    return target_proc;
+                }
+            }
+        }
+        return nullptr;
+    }
+
+    Process *Process::getMutableRootProcess()
+    {
+        return const_cast<Process*>(const_cast<const Process*>(this)->getRootProcess());
+    }
+
+    const Process* Process::getRootProcess() const
+    {
+        if(manager_ == nullptr)
+        {
+            return this;
+        }
+        auto parent = manager_->owner()->joinedProcess();
+        while(parent){
+            if(parent->manager_ == nullptr)
+            {
+                return parent;
+            }
+            parent = parent->manager_->owner()->joinedProcess();
+        }
+        return nullptr;
+    }
+
+}

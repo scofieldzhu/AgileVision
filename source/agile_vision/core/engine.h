@@ -31,52 +31,52 @@
 
 #include <map>
 #include <future>
-#include "ratel/basic/id_seed.hpp"
-#include "ratel/basic/thread_pool.h"
+#include "agile_vision/basic/id_seed.hpp"
+#include "agile_vision/basic/thread_pool.h"
 #include "agile_vision/core/core_base_def.h"
 #include "agile_vision/core/core_export.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API Engine 
-{
-public:        
-    using finish_callback = std::function<void(wkid_t)>;
-    wkid_t get(ProcessPtr p)const;
-    wkid_t commit(ProcessPtr p, finish_callback cb);
-    void cancel(wkid_t w, bool wait_infinite);
-    enum class WaitResult{
-        kOk, //result waited or already done!
-        kTimeout,
-        kUnk
-    };
-    WaitResult wait(wkid_t w, std::chrono::milliseconds timeout);
-    bool exist(wkid_t w)const;
-    bool syncRunProcess(ProcessPtr p);
-    explicit Engine(size_t max_thread_number);
-    ~Engine();
-
-private:
-    friend struct RunThreadTask;
-    ratel::ThreadPool thread_pool_;
-    struct Work
+    class AGV_CORE_API Engine 
     {
-        ProcessPtr process = nullptr;
-        finish_callback callback; //for async notify
-        std::promise<wkid_t> prm;
-        std::future<wkid_t> fut;
-    };
-    using WorkPtr = std::shared_ptr<Work>;
-    using WorkTableType = std::map<wkid_t, WorkPtr>;
-    WorkTableType running_work_table_;
-    std::mutex running_work_table_mutex_;
-    ratel::IdSeed<wkid_t> work_id_seed_{0};
-    std::condition_variable rem_work_cv_;
-    std::mutex rem_work_mutex_;
-    wkid_t rem_work_id_ = null_id;
-    bool exit_rem_task_ = false;
-};
+    public:        
+        using FinishCallback = std::function<void(wkid_t)>;
+        wkid_t get(ProcessPtr p)const;
+        wkid_t commit(ProcessPtr p, FinishCallback cb);
+        void cancel(wkid_t w, bool wait_infinite);
+        enum class WaitResult{
+            kOk, //result waited or already done!
+            kTimeout,
+            kUnk
+        };
+        WaitResult wait(wkid_t w, std::chrono::milliseconds timeout);
+        bool exist(wkid_t w)const;
+        bool syncRunProcess(ProcessPtr p);
+        explicit Engine(size_t max_thread_number);
+        ~Engine();
 
-AGV_NAMESPACE_END
+    private:
+        friend struct RunThreadTask;
+        agv::ThreadPool thread_pool_;
+        struct Work
+        {
+            ProcessPtr process = nullptr;
+            FinishCallback callback; //for async notify
+            std::promise<wkid_t> prm;
+            std::future<wkid_t> fut;
+        };
+        using WorkSPtr = std::shared_ptr<Work>;
+        using WorkTableType = std::map<wkid_t, WorkSPtr>;
+        WorkTableType running_work_table_;
+        std::mutex running_work_table_mutex_;
+        agv::IdSeed<wkid_t> work_id_seed_{0};
+        std::condition_variable rem_work_cv_;
+        std::mutex rem_work_mutex_;
+        wkid_t rem_work_id_ = kNullId;
+        bool exit_rem_task_ = false;
+    };
+
+}
 
 #endif

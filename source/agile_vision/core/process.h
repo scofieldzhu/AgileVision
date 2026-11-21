@@ -32,61 +32,61 @@
 #include <mutex>
 #include "agile_vision/core/run_context.h"
 #include "agile_vision/core/core_export.h"
-#include "ratel/basic/timestamp.h"
+#include "agile_vision/basic/timestamp.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API Process
-{
-public:
-    using ToolList = std::vector<ToolSPtr>;
-    using iterator = ToolList::iterator;
-    using const_iterator = ToolList::const_iterator;
-    iterator begin(){ return tools_.begin(); }
-    const_iterator begin()const{ return tools_.begin(); }
-    iterator end(){ return tools_.end(); }
-    const_iterator end()const{ return tools_.end(); }
-    AgvBytes serializeToBytes()const;
-    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    bool run();
-    RunContext& runContext(){ return run_context_; }
-    const RunContext& runContext()const{ return run_context_; }    
-    void appendTool(ToolSPtr t);
-    void insertTool(const_iterator pos, ToolSPtr t);
-    ToolPtr findTool(const AgvString& name, bool recursive)const;
-    const_iterator findTool(ToolPtr t)const;
-    bool existsTool(ToolPtr t)const;
-    void removeTool(ToolPtr t);
-    void removeTool(const_iterator pos);
-    void removeTool(iterator pos);
-    auto sizeOfTools()const{ return tools_.size(); }
-    void setInterrupt(bool s);
-    void setAlias(const AgvString& s);
-    const AgvString& alias()const{ return alias_; }
-    const std::string& iid()const{ return iid_; }
-    ProcessManager* manager(){ return manager_; }
-    const ProcessManager* manager()const{ return manager_; }
-    ProcessPtr findMutableChildProcess(const std::string& iid, bool recursive);
-    ConstProcessPtr findChildProcess(const std::string& iid, bool recursive)const;
-    Process* getMutableRootProcess();
-    const Process* getRootProcess()const;
-    Process(const std::string& iid);
-    ~Process();
+    class AGV_CORE_API Process
+    {
+    public:
+        using ToolList = std::vector<ToolSPtr>;
+        using iterator = ToolList::iterator;
+        using const_iterator = ToolList::const_iterator;
+        iterator begin(){ return tools_.begin(); }
+        const_iterator begin()const{ return tools_.begin(); }
+        iterator end(){ return tools_.end(); }
+        const_iterator end()const{ return tools_.end(); }
+        AgvBytes serializeToBytes()const;
+        size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        bool run();
+        RunContext& runContext(){ return run_context_; }
+        const RunContext& runContext()const{ return run_context_; }    
+        void appendTool(ToolSPtr t);
+        void insertTool(const_iterator pos, ToolSPtr t);
+        ToolPtr findTool(const AgvString& name, bool recursive)const;
+        const_iterator findTool(ToolPtr t)const;
+        bool existsTool(ToolPtr t)const;
+        void removeTool(ToolPtr t);
+        void removeTool(const_iterator pos);
+        void removeTool(iterator pos);
+        auto sizeOfTools()const{ return tools_.size(); }
+        void setInterrupt(bool s);
+        void setAlias(const AgvString& s);
+        const AgvString& alias()const{ return alias_; }
+        const std::string& iid()const{ return iid_; }
+        ProcessManager* manager(){ return manager_; }
+        const ProcessManager* manager()const{ return manager_; }
+        ProcessPtr findMutableChildProcess(const std::string& iid, bool recursive);
+        ConstProcessPtr findChildProcess(const std::string& iid, bool recursive)const;
+        Process* getMutableRootProcess();
+        const Process* getRootProcess()const;
+        explicit Process(const std::string& iid);
+        ~Process();
 
-private:        
-    friend class ProcessManager;
-    void setManager(ProcessManager* t);
-    ProcessManager* manager_ = nullptr;
-    std::string iid_;
-    AgvString alias_{"null"};
-    ToolList tools_;
-    RunContext run_context_;
-    ratel::Timestamp timestamp_ = {0};
-    bool interrupt_ = false;
-    std::mutex run_mutex_;
-};
+    private:        
+        friend class ProcessManager;
+        void setManager(ProcessManager* t);
+        ProcessManager* manager_ = nullptr;
+        std::string iid_;
+        AgvString alias_{"null"};
+        ToolList tools_;
+        RunContext run_context_;
+        agv::Timestamp timestamp_ = {0};
+        bool interrupt_ = false;
+        std::mutex run_mutex_;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif
 

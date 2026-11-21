@@ -30,75 +30,76 @@
 #include "agile_vision/core/process.h"
 #include "agile_vision/core/process_manager.h"
 #include "agile_vision/core/engine.h"
-#include "spdlog/spdlog.h"
+#include "agile_vision/basic/log.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::stdtool {
+    using namespace agv::core;
 
-StringProcessTool::StringProcessTool(const std::string& iid)
-    :Tool(iid)
-{
-    autoCreateProcesManager();
-    auto new_input_pin = std::make_shared<InputPin>(DataSpec::SingleString());
-    addPin("ReferenceString", new_input_pin);
-    auto prop_process_iid_list = std::make_shared<PropPin>(DataSpec::DynamicArray(DataType::kString));
-    addPin(PK_P_ProcessIIDList, prop_process_iid_list);
-    auto prop_trigger_string_list = std::make_shared<PropPin>(DataSpec::DynamicArray(DataType::kString));
-    addPin(PK_P_TriggerStringList, prop_trigger_string_list);
-    auto prop_trigger_mode_list = std::make_shared<PropPin>(DataSpec::DynamicArray(DataType::kInt));
-    addPin(PK_P_TriggerModeList, prop_trigger_mode_list);
-}
-
-StringProcessTool::~StringProcessTool()
-{
-}
-
-std::string StringProcessTool::getClsGuid() const
-{
-    return "6A571A8E-4C5B-4500-A5E7-6CB506DB1BDF";
-}
-
-bool StringProcessTool::requestOutputData()
-{
-    auto referenced_string_pin = getInputPin("ReferenceString")->produceInfo().pin;
-    auto process_iid_list_pin = getPropPin(PK_P_ProcessIIDList);
-    auto trigger_string_list_pin = getPropPin(PK_P_TriggerStringList);
-    auto trigger_mode_list_pin = getPropPin(PK_P_TriggerModeList);
-    if(process_iid_list_pin->dataBuffer().valueSize() != trigger_string_list_pin->dataBuffer().valueSize() && 
-       trigger_string_list_pin->dataBuffer().valueSize() != trigger_mode_list_pin->dataBuffer().valueSize()){
-        spdlog::error("The sizes of process iid list, trigger string list and trigger mode list are not equal with each other:[{},{},{}]!", 
-            process_iid_list_pin->dataBuffer().valueSize(), 
-            trigger_string_list_pin->dataBuffer().valueSize(),
-            trigger_mode_list_pin->dataBuffer().valueSize());
-        return false;
+    StringProcessTool::StringProcessTool(const std::string& iid)
+        :Tool(iid)
+    {
+        autoCreateProcesManager();
+        auto new_input_pin = std::make_shared<InputPin>(DataSpec::SingleString());
+        addPin("ReferenceString", new_input_pin);
+        auto prop_process_iid_list = std::make_shared<PropPin>(DataSpec::DynamicArray(DataType::kString));
+        addPin(PK_P_ProcessIIDList, prop_process_iid_list);
+        auto prop_trigger_string_list = std::make_shared<PropPin>(DataSpec::DynamicArray(DataType::kString));
+        addPin(PK_P_TriggerStringList, prop_trigger_string_list);
+        auto prop_trigger_mode_list = std::make_shared<PropPin>(DataSpec::DynamicArray(DataType::kInt));
+        addPin(PK_P_TriggerModeList, prop_trigger_mode_list);
     }
-    AgvString cur_trigger_string = referenced_string_pin->dataBuffer().getStringValue();
-    for(unsigned int i = 0; i < trigger_string_list_pin->dataBuffer().valueSize(); ++i){
-        std::string cur_string = trigger_string_list_pin->dataBuffer().getStringValue(i);
-        auto trigger_mode = trigger_mode_list_pin->dataBuffer().getIntValue(i).value();
-        if(cur_string == cur_trigger_string){
-            const std::string process_iid =  process_iid_list_pin->dataBuffer().getStringValue(i);
-            auto process = getMutableProcessManager()->findProcess(process_iid, false);
-            if(process == nullptr){
-                spdlog::error("No process object exists with iid:{}", process_iid);
-                return false;
-            }
-            auto proc_engine = joinedProcess()->runContext().engine;
-            if(trigger_mode){ //sync mode;
-                proc_engine->syncRunProcess(process); 
-            }else{ //async mode
-                auto proc_ctx = process->runContext();
-                proc_ctx.work_id = proc_engine->commit(process, Engine::finish_callback());
-                if(proc_ctx.work_id == null_id){
-                    spdlog::error("Commit process:{} work failed!", process->alias());
+
+    StringProcessTool::~StringProcessTool()
+    {
+    }
+
+    std::string StringProcessTool::getClsGuid() const
+    {
+        return "6A571A8E-4C5B-4500-A5E7-6CB506DB1BDF";
+    }
+
+    bool StringProcessTool::requestOutputData()
+    {
+        auto referenced_string_pin = getInputPin("ReferenceString")->produceInfo().pin;
+        auto process_iid_list_pin = getPropPin(PK_P_ProcessIIDList);
+        auto trigger_string_list_pin = getPropPin(PK_P_TriggerStringList);
+        auto trigger_mode_list_pin = getPropPin(PK_P_TriggerModeList);
+        if(process_iid_list_pin->dataBuffer().valueSize() != trigger_string_list_pin->dataBuffer().valueSize() && 
+           trigger_string_list_pin->dataBuffer().valueSize() != trigger_mode_list_pin->dataBuffer().valueSize()){
+            LOG_ERROR("The sizes of process iid list, trigger string list and trigger mode list are not equal with each other:[{},{},{}]!", 
+                process_iid_list_pin->dataBuffer().valueSize(), 
+                trigger_string_list_pin->dataBuffer().valueSize(),
+                trigger_mode_list_pin->dataBuffer().valueSize());
+            return false;
+        }
+        AgvString cur_trigger_string = referenced_string_pin->dataBuffer().getStringValue();
+        for(unsigned int i = 0; i < trigger_string_list_pin->dataBuffer().valueSize(); ++i){
+            std::string cur_string = trigger_string_list_pin->dataBuffer().getStringValue(i);
+            auto trigger_mode = trigger_mode_list_pin->dataBuffer().getIntValue(i).value();
+            if(cur_string == cur_trigger_string){
+                const std::string process_iid =  process_iid_list_pin->dataBuffer().getStringValue(i);
+                auto process = getMutableProcessManager()->findProcess(process_iid, false);
+                if(process == nullptr){
+                    LOG_ERROR("No process object exists with iid:{}", process_iid);
                     return false;
                 }
+                auto proc_engine = joinedProcess()->runContext().engine;
+                if(trigger_mode){ //sync mode;
+                    proc_engine->syncRunProcess(process); 
+                }else{ //async mode
+                    auto proc_ctx = process->runContext();
+                    proc_ctx.work_id = proc_engine->commit(process, Engine::FinishCallback());
+                    if(proc_ctx.work_id == kNullId){
+                        LOG_ERROR("Commit process:{} work failed!", process->alias());
+                        return false;
+                    }
+                }
+                return true;
             }
-            return true;
         }
+        LOG_ERROR("No trigger string matched with input string:{}", cur_trigger_string);
+        return false;
     }
-    spdlog::error("No trigger string matched with input string:{}", cur_trigger_string);
-    return false;
-}
 
-AGV_NAMESPACE_END
+}
 

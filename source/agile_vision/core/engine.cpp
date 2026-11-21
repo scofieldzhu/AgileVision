@@ -29,119 +29,127 @@
 #include "engine.h"
 #include <algorithm>
 #include "process.h"
-#include "spdlog/spdlog.h"
-#include "ratel/basic/dbg_tracker.h"
+#include "agile_vision/basic/log.h"
+#include "agile_vision/basic/dbg_tracker.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-#define AUTO_LOCK_RUNNING_WORK_TABLE std::lock_guard __auto_lk__(running_work_table_mutex_);
+    #define AUTO_LOCK_RUNNING_WORK_TABLE std::lock_guard __auto_lk__(running_work_table_mutex_);
 
-Engine::Engine(size_t max_thread_number)
-    :thread_pool_(max_thread_number)
-{
-    assert(max_thread_number); // 1 at least!
-}
-
-Engine::~Engine()
-{
-}
-
-struct RunThreadTask
-{
-    void operator()()
+    Engine::Engine(size_t max_thread_number)
+        :thread_pool_(max_thread_number)
     {
-        _AUTO_FUNC_TRACK_
-        this_engine->running_work_table_[wk_id]->process->runContext().engine = this_engine;
-        this_engine->running_work_table_[wk_id]->process->run(); //sync running...
+        assert(max_thread_number); // 1 at least!
+    }
+
+    Engine::~Engine()
+    {
+    }
+
+    struct RunThreadTask
+    {
+        void operator()()
         {
-            std::lock_guard __auto_lk__(this_engine->running_work_table_mutex_);
-            if(this_engine->running_work_table_[wk_id]->callback)
-                this_engine->running_work_table_[wk_id]->callback(wk_id);
-            this_engine->running_work_table_[wk_id]->prm.set_value(wk_id);
-            this_engine->running_work_table_.erase(wk_id);
+            _AUTO_FUNC_TRACK_
+            this_engine->running_work_table_[wk_id]->process->runContext().engine = this_engine;
+            this_engine->running_work_table_[wk_id]->process->run(); //sync running...
+            {
+                std::lock_guard __auto_lk__(this_engine->running_work_table_mutex_);
+                if(this_engine->running_work_table_[wk_id]->callback)
+                {
+                    this_engine->running_work_table_[wk_id]->callback(wk_id);
+                }
+                this_engine->running_work_table_[wk_id]->prm.set_value(wk_id);
+                this_engine->running_work_table_.erase(wk_id);
+            }
         }
-    }
-    Engine* this_engine = nullptr;
-    wkid_t wk_id = null_id;
-};
+        Engine* this_engine = nullptr;
+        wkid_t wk_id = kNullId;
+    };
 
-wkid_t Engine::get(ProcessPtr proc) const
-{
-    if(proc){
-        auto it = std::find_if(running_work_table_.begin(), 
-                               running_work_table_.end(),
-                               [proc](const auto& pair){
-                                 return pair.second->process == proc;
-                               });
-        if(it != running_work_table_.end()){
-            return (*it).first;
-        }
-    }
-    return null_id;
-}
-
-wkid_t Engine::commit(ProcessPtr p, finish_callback cb)
-{    
-    if(p == nullptr || get(p) != null_id){
-        spdlog::error("Null process pointer or already running!");
-        return null_id;
-    } 
-    auto new_wid = work_id_seed_.next();
-    auto work = std::make_shared<Work>();
-    work->process = p;
-    work->callback = cb;
-    work->fut = work->prm.get_future();
+    wkid_t Engine::get(ProcessPtr proc) const
     {
-        AUTO_LOCK_RUNNING_WORK_TABLE
-        running_work_table_.insert({new_wid, work});   
-    }    
-    //push to thread pool!
-    RunThreadTask rtt{this, new_wid};
-    ratel::ThreadPool::task_func task_func = rtt;
-    thread_pool_.enqueue(std::move(task_func));
-    return new_wid;
-}
-
-void Engine::cancel(wkid_t w, bool wait_infinite)
-{
-    if(!exist(w)){
-        spdlog::error("No running work:{} exists!", w);
-        return;
+        if(proc){
+            auto it = std::find_if(running_work_table_.begin(), 
+                                   running_work_table_.end(),
+                                   [proc](const auto& pair){
+                                     return pair.second->process == proc;
+                                   });
+            if(it != running_work_table_.end()){
+                return (*it).first;
+            }
+        }
+        return kNullId;
     }
-    running_work_table_[w]->process->setInterrupt(true);
-    if(wait_infinite)
-        running_work_table_[w]->fut.wait();
-}
 
-Engine::WaitResult Engine::wait(wkid_t w, std::chrono::milliseconds timeout)
-{
-    if(!exist(w)){
-        spdlog::error("Aleady done:{}", w);
-        return WaitResult::kOk;
+    wkid_t Engine::commit(ProcessPtr p, FinishCallback cb)
+    {    
+        if(p == nullptr || get(p) != kNullId){
+            LOG_ERROR("Null process pointer or already running!");
+            return kNullId;
+        } 
+        auto new_wid = work_id_seed_.next();
+        auto work = std::make_shared<Work>();
+        work->process = p;
+        work->callback = cb;
+        work->fut = work->prm.get_future();
+        {
+            AUTO_LOCK_RUNNING_WORK_TABLE
+            running_work_table_.insert({new_wid, work});   
+        }    
+        //push to thread pool!
+        RunThreadTask rtt{this, new_wid};
+        agv::ThreadPool::task_func task_func = rtt;
+        thread_pool_.enqueue(std::move(task_func));
+        return new_wid;
     }
-    auto fut_status = running_work_table_[w]->fut.wait_for(timeout);
-    if(fut_status == std::future_status::ready)
-        return WaitResult::kOk;
-    if(fut_status == std::future_status::timeout)
-        return WaitResult::kTimeout;
-    return WaitResult::kUnk;
-}
 
-bool Engine::exist(wkid_t w) const
-{
-    return running_work_table_.find(w) != running_work_table_.end();
-}
-
-bool Engine::syncRunProcess(ProcessPtr p)
-{
-    if(p == nullptr || get(p) != null_id){
-        spdlog::error("This process:{} is null or in runnning state!", p->alias());
-        return false;
+    void Engine::cancel(wkid_t w, bool wait_infinite)
+    {
+        if(!exist(w)){
+            LOG_ERROR("No running work:{} exists!", w);
+            return;
+        }
+        running_work_table_[w]->process->setInterrupt(true);
+        if(wait_infinite)
+        {
+            running_work_table_[w]->fut.wait();
+        }
     }
-    p->runContext().work_id = null_id;
-    p->runContext().async_run = false;
-    p->run();
-    return true;
-}
 
-AGV_NAMESPACE_END
+    Engine::WaitResult Engine::wait(wkid_t w, std::chrono::milliseconds timeout)
+    {
+        if(!exist(w)){
+            LOG_ERROR("Aleady done:{}", w);
+            return WaitResult::kOk;
+        }
+        auto fut_status = running_work_table_[w]->fut.wait_for(timeout);
+        if(fut_status == std::future_status::ready)
+        {
+            return WaitResult::kOk;
+        }
+        if(fut_status == std::future_status::timeout)
+        {
+            return WaitResult::kTimeout;
+        }
+        return WaitResult::kUnk;
+    }
+
+    bool Engine::exist(wkid_t w) const
+    {
+        return running_work_table_.find(w) != running_work_table_.end();
+    }
+
+    bool Engine::syncRunProcess(ProcessPtr p)
+    {
+        if(p == nullptr || get(p) != kNullId){
+            LOG_ERROR("This process:{} is null or in runnning state!", p->alias());
+            return false;
+        }
+        p->runContext().work_id = kNullId;
+        p->runContext().async_run = false;
+        p->run();
+        return true;
+    }
+
+}

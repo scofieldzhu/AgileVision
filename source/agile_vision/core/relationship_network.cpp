@@ -29,79 +29,85 @@
 #include "relationship_network.h"
 #include "tool.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-RelationshipNetwork::RelationshipNetwork()
-{
-}
-
-RelationshipNetwork::~RelationshipNetwork()
-{
-}
-
-bool RelationshipNetwork::checkCycle() const
-{
-    return dg_.checkCycle();
-}
-
-void RelationshipNetwork::addTool(ConstToolPtr t)
-{
-    if(t == nullptr)
-        return;    
-    VertexData vd;
-    vd.t = t;
-    dg_.addVertex(t->iid(), vd);
-}
-
-bool RelationshipNetwork::existTool(ConstToolPtr t) const
-{
-    return dg_.existVertex(t->iid());
-}
-
-void RelationshipNetwork::makeRelationship(const ToolLinkage& linkage)
-{
-    if(!linkage.isValid())
-        return;
-    ArcData ad;
-    ad.produce_pin_key = linkage.produce_pin_key;
-    ad.data_location = linkage.data_location;
-    ad.consume_pin_key = linkage.consume_pin_key;
-    dg_.addArc(linkage.producer->iid(), linkage.consumer->iid(), ad);
-}
-
-bool RelationshipNetwork::getToolRelationships(ConstToolPtr t, ToolLinkageList* produce_linkages, ToolLinkageList* consume_linkages) const
-{
-    if(t == nullptr || !dg_.existVertex(t->iid()))
-        return false;
-    DGType::ArcInfoList out_arc_infos, in_arc_infos;
-    dg_.getVertexArcs(t->iid(), out_arc_infos, in_arc_infos);
-    if(produce_linkages){
-        for(const auto& out_arc_info : out_arc_infos){
-            ToolLinkage tl;
-            tl.producer = t;
-            tl.produce_pin_key = out_arc_info.data.produce_pin_key;
-            tl.data_location = out_arc_info.data.data_location;
-            VertexData vd;
-            dg_.getVertexData(out_arc_info.target_vertex, vd);
-            tl.consumer = vd.t;
-            tl.consume_pin_key = out_arc_info.data.consume_pin_key;
-            produce_linkages->push_back(std::move(tl));
-        }
+    RelationshipNetwork::RelationshipNetwork()
+    {
     }
-    if(consume_linkages){
-        for(const auto& in_arc_info : in_arc_infos){
-            ToolLinkage tl;
-            VertexData vd;
-            dg_.getVertexData(in_arc_info.source_vertex, vd);
-            tl.producer = vd.t;
-            tl.produce_pin_key = in_arc_info.data.produce_pin_key;
-            tl.data_location = in_arc_info.data.data_location;
-            tl.consumer = t;
-            tl.consume_pin_key = in_arc_info.data.consume_pin_key;
-            produce_linkages->push_back(std::move(tl));
-        }
-    }
-    return true;
-}
 
-AGV_NAMESPACE_END
+    RelationshipNetwork::~RelationshipNetwork()
+    {
+    }
+
+    bool RelationshipNetwork::checkCycle() const
+    {
+        return dg_.checkCycle();
+    }
+
+    void RelationshipNetwork::addTool(ConstToolPtr t)
+    {
+        if(t == nullptr)
+        {
+            return;    
+        }
+        VertexData vd;
+        vd.t = t;
+        dg_.addVertex(t->iid(), vd);
+    }
+
+    bool RelationshipNetwork::existTool(ConstToolPtr t) const
+    {
+        return dg_.existVertex(t->iid());
+    }
+
+    void RelationshipNetwork::makeRelationship(const ToolLinkage& linkage)
+    {
+        if(!linkage.isValid())
+        {
+            return;
+        }
+        ArcData ad;
+        ad.produce_pin_key = linkage.produce_pin_key;
+        ad.data_location = linkage.data_location;
+        ad.consume_pin_key = linkage.consume_pin_key;
+        dg_.addArc(linkage.producer->iid(), linkage.consumer->iid(), ad);
+    }
+
+    bool RelationshipNetwork::getToolRelationships(ConstToolPtr t, ToolLinkageList* produce_linkages, ToolLinkageList* consume_linkages) const
+    {
+        if(t == nullptr || !dg_.existVertex(t->iid()))
+        {
+            return false;
+        }
+        DGType::ArcInfoList out_arc_infos, in_arc_infos;
+        dg_.getVertexArcs(t->iid(), out_arc_infos, in_arc_infos);
+        if(produce_linkages){
+            for(const auto& out_arc_info : out_arc_infos){
+                ToolLinkage tl;
+                tl.producer = t;
+                tl.produce_pin_key = out_arc_info.data.produce_pin_key;
+                tl.data_location = out_arc_info.data.data_location;
+                VertexData vd;
+                dg_.getVertexData(out_arc_info.target_vertex, vd);
+                tl.consumer = vd.t;
+                tl.consume_pin_key = out_arc_info.data.consume_pin_key;
+                produce_linkages->push_back(std::move(tl));
+            }
+        }
+        if(consume_linkages){
+            for(const auto& in_arc_info : in_arc_infos){
+                ToolLinkage tl;
+                VertexData vd;
+                dg_.getVertexData(in_arc_info.source_vertex, vd);
+                tl.producer = vd.t;
+                tl.produce_pin_key = in_arc_info.data.produce_pin_key;
+                tl.data_location = in_arc_info.data.data_location;
+                tl.consumer = t;
+                tl.consume_pin_key = in_arc_info.data.consume_pin_key;
+                consume_linkages->push_back(std::move(tl));
+            }
+        }
+        return true;
+    }
+
+}

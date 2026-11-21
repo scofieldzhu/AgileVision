@@ -27,30 +27,30 @@
  */
 
 #include "data_spec.h"
-#include "ratel/geometry/array_x.hpp"
+#include "agile_vision/geometry/array_x.hpp"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-namespace{
-    using Arry3u = ratel::ArrayX<unsigned int, 3>;
+    namespace{
+        using Arry3u = agv::ArrayX<unsigned int, 3>;
+    }
+
+    AgvBytes DataSpec::serializeToBytes() const
+    {
+        Arry3u arry_d = {(unsigned int)major_type, subtype, arry_size};
+        return arry_d.serializeToBytes();
+    }
+
+    size_t DataSpec::loadBytes(ConsAgvBytePtr buffer, size_t size)
+    {
+        Arry3u arry_d;
+        return arry_d.loadBytes(buffer, size);
+    }
+
+    bool DataSpec::compatibleWith(const DataSpec &ds) const
+    {        
+        return ds.major_type == major_type && ds.subtype == subtype && ds.arry_size == arry_size;
+    }
+
 }
-
-AgvBytes DataSpec::serializeToBytes() const
-{
-    Arry3u arry_d = {(unsigned int)major_type, subtype, arry_size};
-    return arry_d.serializeToBytes();
-}
-
-size_t DataSpec::loadBytes(ConsAgvBytePtr buffer, size_t size)
-{
-    Arry3u arry_d;
-    return arry_d.loadBytes(buffer, size);
-}
-
-bool DataSpec::compatibleWith(const DataSpec &ds) const
-{        
-    return ds.major_type == major_type && ds.subtype == subtype && ds.arry_size == arry_size;
-}
-
-AGV_NAMESPACE_END
 

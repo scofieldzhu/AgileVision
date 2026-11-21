@@ -32,41 +32,41 @@
 #include "agile_vision/core/core_base_def.h"
 #include "agile_vision/core/core_export.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API ProcessManager 
-{
-public:
-    using ProcessSPtr = std::shared_ptr<Process>;
-    using ProcessList = std::vector<ProcessSPtr>;
-    using iterator = ProcessList::iterator;
-    using const_iterator = ProcessList::const_iterator;
-    iterator begin(){ return process_list_.begin(); }
-    const_iterator begin()const{ return process_list_.begin(); }
-    iterator end(){ return process_list_.end(); }
-    const_iterator end()const{ return process_list_.end(); }
-    void insertProcess(const_iterator pos, ProcessSPtr p);
-    ProcessPtr findProcess(const std::string& iid, bool recursive);
-    ConstProcessPtr findProcess(const std::string& iid, bool recursive)const;
-    void appendProcess(ProcessSPtr p);
-    void removeProcess(const std::string& iid);
-    void removeProcess(iterator pos);
-    auto size()const{ return process_list_.size(); }
-    void setActiveProcessIID(const std::string& iid);
-    const auto& activeProcessIID()const{ return active_process_iid_; }
-    ConstProcessPtr getActiveProcess()const;
-    ProcessPtr getActiveProcess();
-    ToolPtr owner(){ return owner_; }
-    ConstToolPtr owner()const{ return owner_; }
-    ProcessManager(ToolPtr owner);
-    ~ProcessManager();
+    class AGV_CORE_API ProcessManager 
+    {
+    public:
+        using ProcessSPtr = std::shared_ptr<Process>;
+        using ProcessList = std::vector<ProcessSPtr>;
+        using iterator = ProcessList::iterator;
+        using const_iterator = ProcessList::const_iterator;
+        iterator begin(){ return process_list_.begin(); }
+        const_iterator begin()const{ return process_list_.begin(); }
+        iterator end(){ return process_list_.end(); }
+        const_iterator end()const{ return process_list_.end(); }
+        void insertProcess(const_iterator pos, ProcessSPtr p);
+        ProcessPtr findProcess(const std::string& iid, bool recursive);
+        ConstProcessPtr findProcess(const std::string& iid, bool recursive)const;
+        void appendProcess(ProcessSPtr p);
+        void removeProcess(const std::string& iid);
+        void removeProcess(iterator pos);
+        auto size()const{ return process_list_.size(); }
+        void setActiveProcessIid(const std::string& iid);
+        const auto& activeProcessIid()const{ return active_process_iid_; }
+        ConstProcessPtr getActiveProcess()const;
+        ProcessPtr getActiveProcess();
+        ToolPtr owner(){ return owner_; }
+        ConstToolPtr owner()const{ return owner_; }
+        ProcessManager(ToolPtr owner);
+        ~ProcessManager();
 
-private:    
-    ToolPtr owner_;
-    ProcessList process_list_;
-    std::string active_process_iid_;
-};
+    private:    
+        ToolPtr owner_;
+        ProcessList process_list_;
+        std::string active_process_iid_;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

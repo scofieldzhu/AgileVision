@@ -32,54 +32,54 @@
 #include "agile_vision/core/data_spec.h"
 #include "agile_vision/core/core_export.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API DataBuffer
-{
-public:
-    AgvBytes serializeToBytes()const;
-    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    auto dataSpec()const{ return ds_; }
-    size_t valueSize()const;
-    bool isFixedSize()const{ return ds_.isStaticArray(); }
-    bool isDynamicSize()const{ return !isFixedSize(); }
-    bool resize(size_t number);
-    void erase(size_t idx);
-    void setIntValue(int v, size_t idx = 0);
-    void setIntValue(const int* vp, size_t size);
-    std::optional<int> getIntValue(size_t idx = 0)const;
-    int* getIntPointer();
-    const int* getIntPointer()const;
-    void setFloatValue(float v, size_t idx = 0);
-    void setFloatValue(const float* v, size_t size);
-    std::optional<float> getFloatValue(size_t idx = 0)const;
-    float* getFloatPointer();
-    const float* getFloatPointer()const;
-    void setImageValue(const ImageData& v, size_t idx = 0);
-    std::optional<ImageData> getImageValue(size_t idx = 0)const;
-    ImageData* getImagePointer();
-    const ImageData* getImagePointer()const;
-    void setStringValue(const char* s, size_t idx = 0);
-    void setStringValue(const AgvMultiString& strs);
-    const char* getStringValue(size_t idx = 0)const;    
-    AgvMultiString getAllStringValues()const;    
-    void setBytesValue(const agv_byte* bytes, size_t byte_size, size_t idx = 0);
-    std::optional<AgvBytes> getBytesValue(size_t idx = 0)const;
-    const AgvMultiBytes& getAllBytesValues()const;
-    void updateModifyTime(agv_time_t t);
-    agv_time_t lastModifyTime()const{ return last_modify_time_; }
-    explicit DataBuffer(const DataSpec& data_spec);
-    ~DataBuffer();
+    class AGV_CORE_API DataBuffer
+    {
+    public:
+        AgvBytes serializeToBytes()const;
+        size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        auto dataSpec()const{ return ds_; }
+        size_t valueSize()const;
+        bool isFixedSize()const{ return ds_.isStaticArray(); }
+        bool isDynamicSize()const{ return !isFixedSize(); }
+        bool resize(size_t number);
+        void erase(size_t idx);
+        void setIntValue(int v, size_t idx = 0);
+        void setIntValue(const int* vp, size_t size);
+        std::optional<int> getIntValue(size_t idx = 0)const;
+        int* getIntPointer();
+        const int* getIntPointer()const;
+        void setFloatValue(float v, size_t idx = 0);
+        void setFloatValue(const float* v, size_t size);
+        std::optional<float> getFloatValue(size_t idx = 0)const;
+        float* getFloatPointer();
+        const float* getFloatPointer()const;
+        void setImageValue(const ImageData& v, size_t idx = 0);
+        std::optional<ImageData> getImageValue(size_t idx = 0)const;
+        ImageData* getImagePointer();
+        const ImageData* getImagePointer()const;
+        void setStringValue(const char* s, size_t idx = 0);
+        void setStringValue(const AgvMultiString& strs);
+        const char* getStringValue(size_t idx = 0)const;    
+        AgvMultiString getAllStringValues()const;    
+        void setBytesValue(const agile_vision_byte* bytes, size_t byte_size, size_t idx = 0);
+        std::optional<AgvBytes> getBytesValue(size_t idx = 0)const;
+        const AgvMultiBytes& getAllBytesValues()const;
+        void updateModifyTime(agile_vision_time_t t);
+        agile_vision_time_t lastModifyTime()const{ return last_modify_time_; }
+        explicit DataBuffer(const DataSpec& data_spec);
+        ~DataBuffer();
 
-private:
-    size_t getSize()const;
-    DataSpec ds_;
-    AgvBytes fundamental_bytes_;
-    AgvMultiBytes bytes_table_;
-    size_t value_size_ = 0;
-    agv_time_t last_modify_time_ = 0;
-};
+    private:
+        size_t getSize()const;
+        DataSpec ds_;
+        AgvBytes fundamental_bytes_;
+        AgvMultiBytes bytes_table_;
+        size_t value_size_ = 0;
+        agile_vision_time_t last_modify_time_ = 0;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

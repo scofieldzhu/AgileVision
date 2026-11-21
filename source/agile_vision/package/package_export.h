@@ -26,10 +26,10 @@
  *   SOFTWARE.
  */
 
-#include "ratel/basic/export_macro.h"
+#include "agile_vision/basic/export_macro.h"
 
 #ifdef PLATFORM_WIN
-    #ifdef AGILE_VISION_PACKAGE_EXPORT
+    #ifdef AGV_PACKAGE_EXPORT
         #define AGV_PACKAGE_API RATEL_WIN_DLL_EXPORT
     #else
         #define AGV_PACKAGE_API RATEL_WIN_DLL_IMPORT

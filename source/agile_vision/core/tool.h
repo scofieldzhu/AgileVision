@@ -35,57 +35,57 @@
 #include "agile_vision/core/prop_pin.h"
 #include "agile_vision/core/process_manager.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API Tool 
-{
-public:
-    static constexpr PinKey PK_O_Status = "Status";
-    virtual AgvBytes serializeToBytes()const;
-    virtual size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    bool setPinConnection(const PinKey& consume_key, const ProduceInfo& pi);
-    bool run();
-    const OutputPin* getOutputPin(const PinKey& key)const;
-    const InputPin* getInputPin(const PinKey& key)const;
-    PropPin* getPropPin(const PinKey& key);
-    const PropPin* getPropPin(const PinKey& key)const;
-    const ToolPin* getToolPin(const PinKey& key)const;
-    const std::string& iid()const{ return iid_; }
-    void setName(const AgvString& str);
-    const auto& name()const{ return name_; }
-    virtual std::string getClsGuid()const = 0;
-    const ProcessManager* getProcessManager()const{ return child_process_manager_.get(); }
-    ProcessManager* getMutableProcessManager(){ return child_process_manager_.get(); }
-    ProcessPtr joinedProcess(){ return joined_process_; }
-    ConstProcessPtr joinedProcess()const { return joined_process_; }
-    virtual Tool* clone()const;
-    Tool& operator=(const Tool&) = delete;
-    Tool(const std::string& iid);
-    Tool(const Tool&) = delete;
-    Tool(Tool&& rhs) = default;
-    virtual ~Tool();
+    class AGV_CORE_API Tool 
+    {
+    public:
+        static constexpr PinKey kStatusPinKey = "Status";
+        virtual AgvBytes serializeToBytes()const;
+        virtual size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        bool setPinConnection(const PinKey& consume_key, const ProduceInfo& pi);
+        bool run();
+        const OutputPin* getOutputPin(const PinKey& key)const;
+        const InputPin* getInputPin(const PinKey& key)const;
+        PropPin* getPropPin(const PinKey& key);
+        const PropPin* getPropPin(const PinKey& key)const;
+        const ToolPin* getToolPin(const PinKey& key)const;
+        const std::string& iid()const{ return iid_; }
+        void setName(const AgvString& str);
+        const auto& name()const{ return name_; }
+        virtual std::string getClsGuid()const = 0;
+        const ProcessManager* getProcessManager()const{ return child_process_manager_.get(); }
+        ProcessManager* getMutableProcessManager(){ return child_process_manager_.get(); }
+        ProcessPtr joinedProcess(){ return joined_process_; }
+        ConstProcessPtr joinedProcess()const { return joined_process_; }
+        virtual Tool* clone()const;
+        Tool& operator=(const Tool&) = delete;
+        explicit Tool(const std::string& iid);
+        Tool(const Tool&) = delete;
+        Tool(Tool&& rhs) = default;
+        virtual ~Tool();
 
-protected:
-    using ToolPinSPtr = std::shared_ptr<ToolPin>;
-    OutputPin* getOutputPin(const PinKey& key);
-    InputPin* getInputPin(const PinKey& key);    
-    ToolPin* getToolPin(const PinKey& key);
-    bool checkPinDataCompatible()const;
-    void addPin(const PinKey& key, ToolPinSPtr pin);
-    void autoCreateProcesManager();    
-    virtual bool requestOutputData() = 0;
+    protected:
+        using ToolPinSPtr = std::shared_ptr<ToolPin>;
+        using ToolPinDict = std::map<PinKey, ToolPinSPtr>;
+        OutputPin* getOutputPin(const PinKey& key);
+        InputPin* getInputPin(const PinKey& key);    
+        ToolPin* getToolPin(const PinKey& key);
+        bool checkPinDataCompatible()const;
+        void addPin(const PinKey& key, ToolPinSPtr pin);
+        void autoCreateProcesManager();    
+        virtual bool requestOutputData() = 0;
 
-private:
-    friend class Process;
-    void setJoinedProcess(ProcessPtr p);
-    std::unique_ptr<ProcessManager> child_process_manager_;
-    std::string iid_;
-    AgvString name_ = "unnamed";
-    using ToolPinDict = std::map<PinKey, ToolPinSPtr>;
-    ToolPinDict tool_pin_dict_;
-    ProcessPtr joined_process_ = nullptr;
-};
+    private:
+        friend class Process;
+        void setJoinedProcess(ProcessPtr p);
+        std::unique_ptr<ProcessManager> child_process_manager_;
+        std::string iid_;
+        AgvString name_ = "unnamed";
+        ToolPinDict tool_pin_dict_;
+        ProcessPtr joined_process_ = nullptr;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

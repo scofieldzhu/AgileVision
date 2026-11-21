@@ -1,0 +1,46 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "qvtk",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "D:/Qt68/6.8.3/msvc2022_64/lib/cmake/Qt6"
+      },
+      "warnings": {
+        "dev": false
+      }
+    },
+    {
+      "name": "local-vcpkg",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "E:/Code/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "X_VCPKG_APPLOCAL_DEPS_INSTALL": "ON"
+      }
+    },
+    {
+      "name": "vs2022-local",
+      "inherits": [
+        "vs2022",
+        "qvtk",
+        "local-vcpkg"
+      ],
+      "binaryDir": "${sourceDir}/build/vs2022-local",
+      "installDir": "${sourceDir}/install"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "build-debug-local",
+      "configurePreset": "vs2022-local",
+      "configuration": "Debug"
+    },
+    {
+      "name": "build-release-local",
+      "configurePreset": "vs2022-local",
+      "configuration": "Release"
+    }
+  ]
+}

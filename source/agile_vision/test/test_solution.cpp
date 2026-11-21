@@ -30,12 +30,12 @@
 #include "agile_vision/core/procedure.h"
 #include "agile_vision/core/solution.h"
 #include "agile_vision/core/tool.h"
-#include "ratel/basic/string_proxy.h"
-#include "ratel/basic/dbg_tracker.h"
+#include "agile_vision/basic/string_proxy.h"
+#include "agile_vision/basic/dbg_tracker.h"
 #include "agile_vision/core/tool_factory.h"
-#include "spdlog/spdlog.h"
-using namespace agile_vision;
-using namespace ratel;
+#include "agile_vision/basic/log.h"
+using namespace agv;
+using namespace agv::core;
 using namespace std::filesystem;
 
 using UIDGen = StringProxy;
@@ -57,7 +57,7 @@ void InitToolFactory()
         auto cur_path = it.path();
         if(is_regular_file(cur_path) && cur_path.extension() == ".agvt"){
             auto load_status = sToolFactory.loadToolFile(cur_path);
-            spdlog::trace("Load tool:[{}] {}!", cur_path.filename().string(), load_status ? "Successfully" : "Failed");
+            LOG_TRACE("Load tool:[{}] {}!", cur_path.filename().string(), load_status ? "Successfully" : "Failed");
         }
     }
 }

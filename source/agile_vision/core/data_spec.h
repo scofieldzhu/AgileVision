@@ -33,33 +33,33 @@
 #include "agile_vision/core/core_export.h"
 #include "agile_vision/core/core_base_def.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-struct AGV_CORE_API DataSpec
-{
-    AgvBytes serializeToBytes()const;
-    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    static DataSpec Single(DataType type){ return {type}; }
-    static DataSpec SingleInt(){ return StaticArray(DataType::kInt); }
-    static DataSpec SingleFloat(){ return StaticArray(DataType::kFloat); }
-    static DataSpec SingleString(){ return StaticArray(DataType::kString); }
-    static DataSpec SingleBytes(){ return StaticArray(DataType::kBytes); }
-    static DataSpec SingleImage(){ return StaticArray(DataType::kImage); }
-    static DataSpec StaticArray(DataType type, unsigned int fixed_size = 1)
-    { 
-        assert(fixed_size);
-        return {type, 0, fixed_size}; 
-    }
-    static DataSpec DynamicArray(DataType type){ return {type, 0, 0}; }
-    bool isStaticArray()const{ return arry_size > 0; }
-    bool isDynamicArray()const{ return arry_size == 0; }    
-    bool compatibleWith(const DataSpec& ds)const;
-    DataType major_type = DataType::kUnk;
-    unsigned int subtype = 0;
-    unsigned int arry_size = 1; // 0 means: size dynamic, other value means fix size
-};
+    struct AGV_CORE_API DataSpec
+    {
+        AgvBytes serializeToBytes()const;
+        size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        static DataSpec Single(DataType type){ return {type}; }
+        static DataSpec SingleInt(){ return StaticArray(DataType::kInt); }
+        static DataSpec SingleFloat(){ return StaticArray(DataType::kFloat); }
+        static DataSpec SingleString(){ return StaticArray(DataType::kString); }
+        static DataSpec SingleBytes(){ return StaticArray(DataType::kBytes); }
+        static DataSpec SingleImage(){ return StaticArray(DataType::kImage); }
+        static DataSpec StaticArray(DataType type, unsigned int fixed_size = 1)
+        { 
+            assert(fixed_size);
+            return {type, 0, fixed_size}; 
+        }
+        static DataSpec DynamicArray(DataType type){ return {type, 0, 0}; }
+        bool isStaticArray()const{ return arry_size > 0; }
+        bool isDynamicArray()const{ return arry_size == 0; }    
+        bool compatibleWith(const DataSpec& ds)const;
+        DataType major_type = DataType::kUnk;
+        unsigned int subtype = 0;
+        unsigned int arry_size = 1; // 0 means: size dynamic, other value means fix size
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif
 

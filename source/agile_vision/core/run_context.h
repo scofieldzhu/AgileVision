@@ -31,21 +31,21 @@
 
 #include "agile_vision/core/core_base_def.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-struct RunContext
-{
-    bool is_running = false;
-    int32_t run_result = 0;
-    uint64_t occur_time = 0;
-    uint64_t elapsed_time = 0;
-    uint32_t thread_priority = 0;
-    uint32_t cpu_id = 0;
-    Engine* engine = nullptr;
-    bool async_run = false;
-    wkid_t work_id = null_id;
-};
+    struct RunContext
+    {
+        bool is_running = false;
+        int32_t run_result = 0;
+        uint64_t occur_time = 0;
+        uint64_t elapsed_time = 0;
+        uint32_t thread_priority = 0;
+        uint32_t cpu_id = 0;
+        Engine* engine = nullptr;
+        bool async_run = false;
+        wkid_t work_id = kNullId;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

@@ -28,41 +28,41 @@
 
 #include "prop_pin.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-PropPin::PropPin(const DataSpec &ds)
-    :ToolPin(ds),
-    data_buffer_(ds)
-{
+    PropPin::PropPin(const DataSpec &ds)
+        :ToolPin(ds),
+        data_buffer_(ds)
+    {
+    }
+
+    PropPin::~PropPin()
+    {
+    }
+
+    AgvBytes PropPin::serializeToBytes() const
+    {
+        return data_buffer_.serializeToBytes();
+    }
+
+    size_t PropPin::loadBytes(ConsAgvBytePtr buffer, size_t size)
+    {
+        return data_buffer_.loadBytes(buffer, size);
+    }
+
+    void PropPin::bindProduceInfo(const ProduceInfo &ci)
+    {
+        produce_info_ = ci;
+    }
+
+    void PropPin::unbind()
+    {
+        produce_info_.pin = nullptr;
+    }
+
+    PinType PropPin::getPinType() const
+    {
+        return PinType::kProp;
+    }
+
 }
-
-PropPin::~PropPin()
-{
-}
-
-AgvBytes PropPin::serializeToBytes() const
-{
-    return data_buffer_.serializeToBytes();
-}
-
-size_t PropPin::loadBytes(ConsAgvBytePtr buffer, size_t size)
-{
-    return data_buffer_.loadBytes(buffer, size);
-}
-
-void PropPin::bindProduceInfo(const ProduceInfo &ci)
-{
-    produce_info_ = ci;
-}
-
-void PropPin::unbind()
-{
-    produce_info_.pin = nullptr;
-}
-
-PinType PropPin::getPinType() const
-{
-    return PinType::kProp;
-}
-
-AGV_NAMESPACE_END

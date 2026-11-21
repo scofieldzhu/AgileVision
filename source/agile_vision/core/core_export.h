@@ -29,10 +29,10 @@
 #ifndef __core_export_h__
 #define __core_export_h__
 
-#include "ratel/basic/export_macro.h"
+#include "agile_vision/basic/export_macro.h"
 
 #ifdef PLATFORM_WIN
-    #ifdef AGILE_VISION_CORE_EXPORT
+    #ifdef AGV_CORE_EXPORT
         #define AGV_CORE_API RATEL_WIN_DLL_EXPORT
     #else
         #define AGV_CORE_API RATEL_WIN_DLL_IMPORT

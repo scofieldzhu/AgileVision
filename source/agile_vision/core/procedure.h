@@ -32,34 +32,34 @@
 #include "agile_vision/core/core_export.h"
 #include "agile_vision/core/process.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API Procedure
-{
-public:
-    AgvBytes serializeToBytes()const;
-    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    ProcessPtr mutableRoot(){ return root_.get(); }
-    ConstProcessPtr root()const{ return root_.get(); }
-    void setAlias(const AgvString& str);
-    const auto& alias()const{ return alias_; }
-    const auto& iid()const{ return iid_; }
-    void run();
-    auto& runContext(){ return run_context_; }
-    const auto& runContext()const{ return run_context_; }
-    void setActiveRun(bool s);
-    bool activeRun()const{ return active_run_; }
-    Procedure(const std::string& iid);
-    ~Procedure();
+    class AGV_CORE_API Procedure
+    {
+    public:
+        AgvBytes serializeToBytes()const;
+        size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        ProcessPtr mutableRoot(){ return root_.get(); }
+        ConstProcessPtr root()const{ return root_.get(); }
+        void setAlias(const AgvString& str);
+        const auto& alias()const{ return alias_; }
+        const auto& iid()const{ return iid_; }
+        void run();
+        auto& runContext(){ return run_context_; }
+        const auto& runContext()const{ return run_context_; }
+        void setActiveRun(bool s);
+        bool activeRun()const{ return active_run_; }
+        explicit Procedure(const std::string& iid);
+        ~Procedure();
 
-private:
-    bool active_run_ = true;
-    RunContext run_context_;
-    std::string iid_;
-    AgvString alias_{"unnamed"};
-    std::shared_ptr<Process> root_;
-};
+    private:
+        bool active_run_ = true;
+        RunContext run_context_;
+        std::string iid_;
+        AgvString alias_{"unnamed"};
+        std::shared_ptr<Process> root_;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

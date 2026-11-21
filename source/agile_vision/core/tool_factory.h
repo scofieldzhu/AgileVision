@@ -33,39 +33,39 @@
 #include <filesystem>
 #include "agile_vision/core/core_export.h"
 #include "agile_vision/core/core_base_def.h"
-#include "ratel/system/dynamic_library_loader.h"
+#include "agile_vision/system/dynamic_library_loader.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API ToolFactory 
-{
-public:
-    bool loadToolFile(const std::filesystem::path& filepath);
-    ToolSPtr createTool(const std::string& clsid, const std::string& iid)const;
-    void unloadToolFile(const std::filesystem::path& filepath);
-    void unloadAll();
-    ToolFactory();
-    ~ToolFactory();
-
-private:
-    using GetToolClsIdFunc = const char*(*)();
-    using CreateToolInstanceFunc = ToolPtr(*)(const char*);
-    using DestroyToolInstanceFunc = void(*)(ToolPtr);
-    using DllLoaderPtr = std::shared_ptr<ratel::DynamicLibraryLoader>;
-    struct DllInfo
+    class AGV_CORE_API ToolFactory 
     {
-        DllLoaderPtr loader = nullptr;
-        std::string cls_iid;
-        GetToolClsIdFunc get_tool_clsid_func = nullptr;
-        CreateToolInstanceFunc create_tool_func = nullptr;
-        DestroyToolInstanceFunc destroy_tool_func = nullptr;
-        operator bool()const{
-            return loader && get_tool_clsid_func && create_tool_func && destroy_tool_func;
-        }
-    };
-    std::map<std::filesystem::path, DllInfo> loader_dict_;
-};
+    public:
+        bool loadToolFile(const std::filesystem::path& filepath);
+        ToolSPtr createTool(const std::string& clsid, const std::string& iid)const;
+        void unloadToolFile(const std::filesystem::path& filepath);
+        void unloadAll();
+        ToolFactory();
+        ~ToolFactory();
 
-AGV_NAMESPACE_END
+    private:
+        using GetToolClsIdFunc = const char*(*)();
+        using CreateToolInstanceFunc = ToolPtr(*)(const char*);
+        using DestroyToolInstanceFunc = void(*)(ToolPtr);
+        using DllLoaderPtr = std::shared_ptr<agv::DynamicLibraryLoader>;
+        struct DllInfo
+        {
+            DllLoaderPtr loader = nullptr;
+            std::string cls_iid;
+            GetToolClsIdFunc get_tool_clsid_func = nullptr;
+            CreateToolInstanceFunc create_tool_func = nullptr;
+            DestroyToolInstanceFunc destroy_tool_func = nullptr;
+            operator bool()const{
+                return loader && get_tool_clsid_func && create_tool_func && destroy_tool_func;
+            }
+        };
+        std::map<std::filesystem::path, DllInfo> loader_dict_;
+    };
+
+}
 
 #endif

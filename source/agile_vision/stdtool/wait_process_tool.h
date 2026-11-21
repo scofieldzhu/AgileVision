@@ -32,23 +32,23 @@
 #include "agile_vision/core/tool.h"
 #include "agile_vision/stdtool/stdtool_export.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::stdtool {
 
-/// @brief Block current thread to wait target asynchronous process execution finish!
-class AGV_STDTOOL_API WaitProcessTool : public Tool 
-{
-public:
-    static constexpr PinKey PK_P_ProcessIIDList = "ProcessIIDList";
-    static constexpr PinKey PK_P_MaxWaitTimeSeconds = "MaxWaitTimeSeconds";
-    std::string getClsGuid() const override;
-    WaitProcessTool(const std::string& iid);
-    ~WaitProcessTool();
+    /// @brief Block current thread to wait target asynchronous process execution finish!
+    class AGV_STDTOOL_API WaitProcessTool : public agv::core::Tool 
+    {
+    public:
+        static constexpr agv::PinKey PK_P_ProcessIIDList = "ProcessIIDList";
+        static constexpr agv::PinKey PK_P_MaxWaitTimeSeconds = "MaxWaitTimeSeconds";
+        std::string getClsGuid() const override;
+        WaitProcessTool(const std::string& iid);
+        ~WaitProcessTool();
 
-private:
-    bool requestOutputData() override;
+    private:
+        bool requestOutputData() override;
 
-};
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

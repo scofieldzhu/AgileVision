@@ -26,6 +26,9 @@
  *   SOFTWARE.
  */
 
-#pragma once
+#ifndef __test_solution_h__
+#define __test_solution_h__
 
 void Test_Solution();
+
+#endif

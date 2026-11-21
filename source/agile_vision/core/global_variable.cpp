@@ -27,80 +27,88 @@
  */
 
 #include "global_variable.h"
-#include "ratel/geometry/element_proxy.hpp"
-#include "ratel/geometry/proxy_combine.hpp"
-#include "ratel/basic/string_proxy.h"
-using namespace ratel;
+#include "agile_vision/geometry/element_proxy.hpp"
+#include "agile_vision/geometry/proxy_combine.hpp"
+#include "agile_vision/basic/string_proxy.h"
+using namespace agv;
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-namespace{
-    using IntProxy = ElementProxy<int>;
-}
+    namespace{
+        using IntProxy = ElementProxy<int>;
+    }
 
-GlobalVariable::GlobalVariable(DataType type)
-    :data_type_(type)
-{
-}
+    GlobalVariable::GlobalVariable(DataType type)
+        :data_type_(type)
+    {
+    }
 
-GlobalVariable::~GlobalVariable()
-{
-}
+    GlobalVariable::~GlobalVariable()
+    {
+    }
 
-AgvBytes GlobalVariable::serializeToBytes() const
-{
+    AgvBytes GlobalVariable::serializeToBytes() const
+    {
     
     
-    return AgvBytes();
-}
+        return AgvBytes();
+    }
 
-size_t GlobalVariable::loadBytes(ConsAgvBytePtr buffer, size_t size)
-{
-    return size_t();
-}
+    size_t GlobalVariable::loadBytes(ConsAgvBytePtr buffer, size_t size)
+    {
+        return size_t();
+    }
 
-void GlobalVariable::setBool(bool s)
-{
-    if(data_type_ == DT_BOOLEAN)
-        value_ = std::make_any<bool>(s);
-}
+    void GlobalVariable::setBool(bool s)
+    {
+        if(data_type_ == DT_BOOLEAN)
+        {
+            value_ = std::make_any<bool>(s);
+        }
+    }
 
-std::optional<bool> GlobalVariable::getBoolValue() const
-{
-    return data_type_ == DT_BOOLEAN ? std::optional<bool>(std::any_cast<bool>(value_)) : std::nullopt;
-}
+    std::optional<bool> GlobalVariable::getBoolValue() const
+    {
+        return data_type_ == DT_BOOLEAN ? std::optional<bool>(std::any_cast<bool>(value_)) : std::nullopt;
+    }
 
-void GlobalVariable::setInt(int a)
-{
-    if(data_type_ == DT_INT)
-        value_ = std::make_any<int>(a);
-}
+    void GlobalVariable::setInt(int a)
+    {
+        if(data_type_ == DT_INT)
+        {
+            value_ = std::make_any<int>(a);
+        }
+    }
 
-std::optional<int> GlobalVariable::getIntValue() const
-{
-    return data_type_ == DT_INT ? std::optional<int>(std::any_cast<int>(value_)) : std::nullopt;
-}
+    std::optional<int> GlobalVariable::getIntValue() const
+    {
+        return data_type_ == DT_INT ? std::optional<int>(std::any_cast<int>(value_)) : std::nullopt;
+    }
 
-void GlobalVariable::setFloat(float f)
-{
-    if(data_type_ == DT_FLOAT)
-        value_ = std::make_any<float>(f);
-}
+    void GlobalVariable::setFloat(float f)
+    {
+        if(data_type_ == DT_FLOAT)
+        {
+            value_ = std::make_any<float>(f);
+        }
+    }
 
-std::optional<float> GlobalVariable::getFloatValue() const
-{
-    return data_type_ == DT_FLOAT ? std::optional<float>(std::any_cast<float>(value_)) : std::nullopt;
-}
+    std::optional<float> GlobalVariable::getFloatValue() const
+    {
+        return data_type_ == DT_FLOAT ? std::optional<float>(std::any_cast<float>(value_)) : std::nullopt;
+    }
 
-void GlobalVariable::setString(const std::string& s)
-{
-    if(data_type_ == DT_STRING)
-        value_ = std::make_any<std::string>(s);
-}
+    void GlobalVariable::setString(const std::string& s)
+    {
+        if(data_type_ == DT_STRING)
+        {
+            value_ = std::make_any<std::string>(s);
+        }
+    }
 
-std::optional<std::string> GlobalVariable::getStringValue() const
-{
-    return data_type_ == DT_STRING ? std::optional<std::string>(std::any_cast<std::string>(value_)) : std::nullopt;
-}
+    std::optional<std::string> GlobalVariable::getStringValue() const
+    {
+        return data_type_ == DT_STRING ? std::optional<std::string>(std::any_cast<std::string>(value_)) : std::nullopt;
+    }
 
-AGV_NAMESPACE_END
+}

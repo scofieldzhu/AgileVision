@@ -29,44 +29,30 @@
 #ifndef __image_data_h__
 #define __image_data_h__
 
-#include "agile_vision/basic/base_type_def.h"
+#include "agile_vision/basic/basic_typedef.h"
+#include "agile_vision/basic/cross_platform.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv {
 
-#ifdef _MSC_VER
-    #pragma pack(push, 1)
-#endif
-
-#ifdef __GNUC__
-    #define PRE_PACKED __attribute__ ((__packed__))
-#else 
-    #define PRE_PACKED
-    #pragma pack(1) // For other compilers like MSVC
-#endif
-
-struct PRE_PACKED ImageData
-{
-    enum DataType
+    struct AGV_PACKED ImageData
     {
-        DT_UNK,
-        DT_UCHAR,
-        DT_USHORT,
-        DT_INT,
-        DT_FLOAT
+        enum DataType
+        {
+            DT_UNK,
+            DT_UCHAR,
+            DT_USHORT,
+            DT_INT,
+            DT_FLOAT
+        };
+        uint8_t type = DT_UNK; 
+        uint8_t channel = 1;
+        uint8_t bits = 8;
+        uint32_t width = 0;
+        uint32_t height = 0;
+        uint32_t size = 0;
+        void* data = nullptr;
     };
-    uint8_t type = DT_UNK; 
-    uint8_t channel = 1;
-    uint8_t bits = 8;
-    uint32_t width = 0;
-    uint32_t height = 0;
-    uint32_t size = 0;
-    void* data = nullptr;
-};
 
-#ifdef _MSC_VER
-    #pragma pack(pop)
-#endif
-
-AGV_NAMESPACE_END
+}
 
 #endif

@@ -33,27 +33,27 @@
 #include "agile_vision/core/produce_info.h"
 #include "agile_vision/core/data_buffer.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API PropPin : public ToolPin
-{
-public:
-    AgvBytes serializeToBytes()const;
-    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    void bindProduceInfo(const ProduceInfo& pi);
-    void unbind();
-    const auto& produceInfo()const{ return produce_info_; }
-    DataBuffer& mutableDataBuffer(){ return data_buffer_; }
-    const DataBuffer& dataBuffer()const{ return data_buffer_; }
-    PinType getPinType()const override;
-    PropPin(const DataSpec& ds);
-    ~PropPin();
+    class AGV_CORE_API PropPin : public ToolPin
+    {
+    public:
+        AgvBytes serializeToBytes()const;
+        size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        void bindProduceInfo(const ProduceInfo& pi);
+        void unbind();
+        const auto& produceInfo()const{ return produce_info_; }
+        DataBuffer& mutableDataBuffer(){ return data_buffer_; }
+        const DataBuffer& dataBuffer()const{ return data_buffer_; }
+        PinType getPinType()const override;
+        explicit PropPin(const DataSpec& ds);
+        ~PropPin();
 
-private:
-    DataBuffer data_buffer_;
-    ProduceInfo produce_info_;
-};
+    private:
+        DataBuffer data_buffer_;
+        ProduceInfo produce_info_;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

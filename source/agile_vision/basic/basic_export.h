@@ -29,13 +29,23 @@
 #ifndef __basic_export_h__
 #define __basic_export_h__
 
-#include "ratel/basic/export_macro.h"
+#include "agile_vision/basic/export_macro.h"
 
+// AgileVision 基础模块导出宏
 #ifdef PLATFORM_WIN
-    #ifdef AGILE_VISION_BASIC_EXPORT
+    #ifdef AGV_BASIC_EXPORT
         #define AGV_BASIC_API RATEL_WIN_DLL_EXPORT
     #else
         #define AGV_BASIC_API RATEL_WIN_DLL_IMPORT
+    #endif
+#endif
+
+// 内嵌 Ratel 基础工具导出宏（RATEL_BASIC_EXPORTS 由 basic 目标定义）
+#ifdef PLATFORM_WIN
+    #ifdef RATEL_BASIC_EXPORTS
+        #define RATEL_BASIC_API RATEL_WIN_DLL_EXPORT
+    #else
+        #define RATEL_BASIC_API RATEL_WIN_DLL_IMPORT
     #endif
 #endif
 

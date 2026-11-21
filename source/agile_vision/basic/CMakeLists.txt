@@ -1,44 +1,29 @@
-set(proj_name "agile_vision.basic")
-
-project(${proj_name})
-
-file(GLOB
-	 SOURCE_FILES 
-	 "*.cpp"
-	 "*.h"
-	 "*.hpp"
-)
-add_library(${proj_name} SHARED ${SOURCE_FILES})
-
-set_target_properties(${proj_name} PROPERTIES
-    DEBUG_POSTFIX _d
+# 基础模块：公共类型 + 内嵌工具实现（system 的动态库加载实现并入本目标编译）。
+agv_add_module(agile_vision.basic
+    "${CMAKE_CURRENT_SOURCE_DIR}/../system/dynamic_library_loader.cpp"
 )
 
-target_compile_definitions(${proj_name} PRIVATE 
-	SPDLOG_COMPILED_LIB
-	SPDLOG_SHARED_LIB
-	SPDLOG_USE_STD_FORMAT
+# 内嵌的 ratel 代码由本目标编译，需定义导出侧宏（其余模块走 dllimport）。
+target_compile_definitions(agile_vision.basic PRIVATE
+    RATEL_BASIC_EXPORTS
+    RATEL_GEOMETRY_EXPORTS
+    RATEL_SYSTEM_EXPORTS
 )
 
 if(WIN32)
-	target_compile_definitions(${proj_name} PRIVATE AGILE_VISION_BASIC_EXPORT)
+    target_compile_definitions(agile_vision.basic PRIVATE AGV_BASIC_EXPORT)
 endif()
 
-set(deplibs_dbg spdlogd)
-set(deplibs_opt spdlog)
-target_link_libraries(${proj_name} debug ${deplibs_dbg} optimized ${deplibs_opt})
+# geometry / system 为纯头文件模块，随基础模块安装，使公共头中的
+# "agile_vision/geometry/..."、"agile_vision/system/..." 可被外部消费者解析。
+file(GLOB geometry_headers CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/../geometry/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../geometry/*.hpp"
+)
+install(FILES ${geometry_headers} DESTINATION "${AGV_INSTALL_INCLUDEDIR}/geometry")
 
-# if(WIN32)
-# 	set_target_properties(${PROJECT_NAME} PROPERTIES
-# 		PREFIX "agile_vision."
-# 		SUFFIX ".dll"
-# 	)
-# endif()
-
-install(TARGETS ${proj_name} RUNTIME DESTINATION ${CMAKE_INSTALL_BIN})
-install(TARGETS ${proj_name} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIB})
-file(GLOB HEADERS "*.h" "*.hpp")
-install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDE}/basic)
-
-
-
+file(GLOB system_headers CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/../system/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../system/*.hpp"
+)
+install(FILES ${system_headers} DESTINATION "${AGV_INSTALL_INCLUDEDIR}/system")

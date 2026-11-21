@@ -29,38 +29,38 @@
 #ifndef __relationship_network_h__
 #define __relationship_network_h__
 
-#include "ratel/basic/directed_graph.hpp"
+#include "agile_vision/basic/directed_graph.hpp"
 #include "agile_vision/core/tool_linkage.h"
 #include "agile_vision/core/core_export.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API RelationshipNetwork
-{
-public:
-    bool checkCycle()const;
-    void addTool(ConstToolPtr t);
-    bool existTool(ConstToolPtr t)const;
-    void makeRelationship(const ToolLinkage& linkage);
-    void breakRelationship();
-    bool getToolRelationships(ConstToolPtr t, ToolLinkageList* produce_linkages, ToolLinkageList* consume_linkages)const;
-    RelationshipNetwork();
-    ~RelationshipNetwork();
+    class AGV_CORE_API RelationshipNetwork
+    {
+    public:
+        bool checkCycle()const;
+        void addTool(ConstToolPtr t);
+        bool existTool(ConstToolPtr t)const;
+        void makeRelationship(const ToolLinkage& linkage);
+        void breakRelationship();
+        bool getToolRelationships(ConstToolPtr t, ToolLinkageList* produce_linkages, ToolLinkageList* consume_linkages)const;
+        RelationshipNetwork();
+        ~RelationshipNetwork();
 
-private:
-    struct VertexData{
-        ConstToolPtr t = nullptr;
+    private:
+        struct VertexData{
+            ConstToolPtr t = nullptr;
+        };
+        struct ArcData{
+            AgvString produce_pin_key;
+            unsigned int data_location = 0;
+            AgvString consume_pin_key;
+        };
+        using DGType = agv::DirectedGraph<VertexData, ArcData, std::string>;
+        DGType dg_;
     };
-    struct ArcData{
-        AgvString produce_pin_key;
-        unsigned int data_location = 0;
-        AgvString consume_pin_key;
-    };
-    using DGType = ratel::DirectedGraph<VertexData, ArcData, std::string>;
-    DGType dg_;
-};
 
-AGV_NAMESPACE_END
+}
 
 #endif
 

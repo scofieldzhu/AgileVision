@@ -32,22 +32,22 @@
 #include "agile_vision/core/tool.h"
 #include "agile_vision/stdtool/stdtool_export.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::stdtool {
 
-class AGV_STDTOOL_API StringProcessTool : public Tool
-{
-public:
-    static constexpr PinKey PK_P_ProcessIIDList = "ProcessIIDList";
-    static constexpr PinKey PK_P_TriggerStringList = "TriggerStringList";
-    static constexpr PinKey PK_P_TriggerModeList = "TriggerModeList";
-    std::string getClsGuid()const override;
-    StringProcessTool(const std::string& iid);
-    virtual ~StringProcessTool();
+    class AGV_STDTOOL_API StringProcessTool : public agv::core::Tool
+    {
+    public:
+        static constexpr agv::PinKey PK_P_ProcessIIDList = "ProcessIIDList";
+        static constexpr agv::PinKey PK_P_TriggerStringList = "TriggerStringList";
+        static constexpr agv::PinKey PK_P_TriggerModeList = "TriggerModeList";
+        std::string getClsGuid()const override;
+        StringProcessTool(const std::string& iid);
+        virtual ~StringProcessTool();
 
-private:
-    bool requestOutputData() override;
-};
+    private:
+        bool requestOutputData() override;
+    };
 
-AGV_NAMESPACE_END
+}
 
 #endif

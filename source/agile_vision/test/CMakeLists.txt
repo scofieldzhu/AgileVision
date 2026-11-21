@@ -1,37 +1,18 @@
-
-set(proj_name "test")
-
-project(${proj_name})
-
-#set(OpenCV_DIR "${trd_root}/x64/vc16/lib")
-set(OpenCV_DIR "${VCPKG_INSTALLED_DIR}/x64-windows/share/opencv4")
-find_package(OpenCV REQUIRED)
-
-file(GLOB SOURCE_FILES "${PROJECT_SOURCE_DIR}/*.h" "${PROJECT_SOURCE_DIR}/*.cpp")
-add_executable(${proj_name} ${SOURCE_FILES})
-
-set_target_properties(${proj_name} PROPERTIES
-    DEBUG_POSTFIX _d
+# 测试程序（当前未使用 OpenCV，保留为后续视觉测试的扩展入口）。
+file(GLOB test_sources CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
 )
 
-target_compile_definitions(${proj_name} PRIVATE 
-	SPDLOG_COMPILED_LIB
-	SPDLOG_SHARED_LIB
-	SPDLOG_USE_STD_FORMAT
+add_executable(test ${test_sources})
+target_link_libraries(test PRIVATE
+    agv_build_config
+    agile_vision.basic
+    agile_vision.core
+    agile_vision.stdtool
 )
-target_include_directories(${proj_name} PRIVATE ${OpenCV_INCLUDE_DIRS}) # Not needed for CMake >= 2.8.11
 
-target_link_libraries(${proj_name} agile_vision.basic agile_vision.core agile_vision.stdtool ${OpenCV_LIBS})
+# 多配置下由 DEBUG_POSTFIX 自动区分 test_d.exe / test.exe。
+set_target_properties(test PROPERTIES DEBUG_POSTFIX "_d")
 
-set(deplibs_dbg spdlogd ratel.basic_d)
-set(deplibs_opt spdlog  ratel.basic)
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
- 	target_link_libraries(${proj_name} ${deplibs_dbg})
-else()
- 	target_link_libraries(${proj_name} ${deplibs_opt})
-endif()
-
-#target_link_libraries(${proj_name} debug ${deplibs_dbg} optimized ${deplibs_opt})
-
-install(TARGETS ${proj_name} DESTINATION ${CMAKE_INSTALL_BIN})
+install(TARGETS test RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")

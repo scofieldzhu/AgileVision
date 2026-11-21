@@ -33,39 +33,39 @@
 #include <string>
 #include <optional>
 #include "agile_vision/core/core_export.h"
-#include "agile_vision/basic/base_type_def.h"
+#include "agile_vision/basic/basic_typedef.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-class AGV_CORE_API GlobalVariable final
-{
-public:
-    enum DataType
+    class AGV_CORE_API GlobalVariable final
     {
-        DT_BOOLEAN,
-        DT_INT,
-        DT_FLOAT,
-        DT_STRING
+    public:
+        enum DataType
+        {
+            DT_BOOLEAN,
+            DT_INT,
+            DT_FLOAT,
+            DT_STRING
+        };
+        AgvBytes serializeToBytes()const;
+        size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        void setBool(bool s);
+        std::optional<bool> getBoolValue()const;
+        void setInt(int a);
+        std::optional<int> getIntValue()const;
+        void setFloat(float f);
+        std::optional<float> getFloatValue()const;
+        void setString(const std::string& s);
+        std::optional<std::string> getStringValue()const;
+        auto dataType()const{ return data_type_; }
+        explicit GlobalVariable(DataType type);
+        ~GlobalVariable();
+
+    private:
+        DataType data_type_;
+        std::any value_;
     };
-    AgvBytes serializeToBytes()const;
-    size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-    void setBool(bool s);
-    std::optional<bool> getBoolValue()const;
-    void setInt(int a);
-    std::optional<int> getIntValue()const;
-    void setFloat(float f);
-    std::optional<float> getFloatValue()const;
-    void setString(const std::string& s);
-    std::optional<std::string> getStringValue()const;
-    auto dataType()const{ return data_type_; }
-    explicit GlobalVariable(DataType type);
-    ~GlobalVariable();
 
-private:
-    DataType data_type_;
-    std::any value_;
-};
-
-AGV_NAMESPACE_END
+}
 
 #endif

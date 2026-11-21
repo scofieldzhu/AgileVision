@@ -31,21 +31,21 @@
 
 #include "agile_vision/core/core_base_def.h"
 
-AGV_NAMESPACE_BEGIN
+namespace agv::core {
 
-struct ToolLinkage 
-{
-    bool isValid()const{ return producer && !produce_pin_key.empty() && consumer && !consume_pin_key.empty(); }
-    ConstToolPtr producer = nullptr;
-    PinKey produce_pin_key;
-    unsigned int data_location = 0;
-    ConstToolPtr consumer = nullptr;
-    PinKey consume_pin_key;
-};
+    struct ToolLinkage 
+    {
+        bool isValid()const{ return producer && !produce_pin_key.empty() && consumer && !consume_pin_key.empty(); }
+        ConstToolPtr producer = nullptr;
+        PinKey produce_pin_key;
+        unsigned int data_location = 0;
+        ConstToolPtr consumer = nullptr;
+        PinKey consume_pin_key;
+    };
 
-using ToolLinkageList = std::vector<ToolLinkage>;
+    using ToolLinkageList = std::vector<ToolLinkage>;
 
-AGV_NAMESPACE_END
+}
 
 #endif
 

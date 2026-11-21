@@ -31,8 +31,8 @@
 #define SERIALIZER_RATEL
 
 #ifdef SERIALIZER_RATEL
-    #include "ratel/geometry/geometry.h"
-    using SerializeDict = ratel::DictProxy<std::string, std::string>;
+    #include "agile_vision/geometry/geometry.h"
+    using SerializeDict = agv::DictProxy<std::string, std::string>;
 #elif defined(SERIALIZER_PB)
 #else 
 #endif
