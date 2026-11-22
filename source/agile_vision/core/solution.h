@@ -30,7 +30,7 @@
 #define __solution_h__
 
 #include "agile_vision/core/run_context.h"
-#include "agile_vision/core/module_export.h"
+#include "agile_vision/core/core_export.h"
 
 namespace agv::core {
 

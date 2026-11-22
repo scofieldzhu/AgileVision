@@ -37,8 +37,8 @@
 #include "agile_vision/geometry/rect.hpp"
 #include "agile_vision/geometry/circle.hpp"
 #include "agile_vision/geometry/line.hpp"
-#include "agile_vision/geometry/module_typedef.h"
-#include "agile_vision/geometry/module_export.h"
+#include "agile_vision/geometry/geometry_typedef.h"
+#include "agile_vision/geometry/geometry_export.h"
 
 AGV_GEOMETRY_API void test();
 

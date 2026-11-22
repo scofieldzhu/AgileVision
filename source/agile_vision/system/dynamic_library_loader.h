@@ -30,8 +30,8 @@
 #define __dynamic_library_loader_h__
 
 #include <string>
-#include "agile_vision/system/module_export.h"
-#include "agile_vision/system/module_typedef.h"
+#include "agile_vision/system/system_export.h"
+#include "agile_vision/system/system_typedef.h"
 
 #ifdef PLATFORM_WIN
     #include "agile_vision/basic/win_header.h"

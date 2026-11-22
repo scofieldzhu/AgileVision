@@ -2,7 +2,7 @@
  *  Ratel is a application framework, which provides some convenient librarys
  *  for for those c++ developers pursuing fast-developement.
  *  
- *  File: module_typedef.h  
+ *  File: geometry_export.h  
  *  Copyright (c) 2024-2024 scofieldzhu
  *  
  *  MIT License
@@ -26,18 +26,17 @@
  *  SOFTWARE.
  */
 
-#ifndef __system_module_typedef_h__
-#define __system_module_typedef_h__
+#ifndef __geometry_export_h__
+#define __geometry_export_h__
 
-#include "agile_vision/basic/cross_platform.h"
+#include "agile_vision/basic/export_macro.h"
 
 #ifdef PLATFORM_WIN
-    #include "agile_vision/basic/win_header.h"
-    using DLL_HANDLE = HMODULE;
-#elif PLATFORM_LINUX
-    using DLL_HANDLE = void*;
-#else 
-    static_assert(false, "Error: DynamicLibraryLoader implementation not found in unsupport platform!");
+    #ifdef AGV_GEOMETRY_EXPORT
+        #define AGV_GEOMETRY_API AGV_WIN_DLL_EXPORT
+    #else
+        #define AGV_GEOMETRY_API AGV_WIN_DLL_IMPORT
+    #endif
 #endif
 
-#endif // system_typedef_h
+#endif

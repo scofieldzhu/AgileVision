@@ -2,7 +2,7 @@
  *  Ratel is a application framework, which provides some convenient librarys
  *  for for those c++ developers pursuing fast-developement.
  *  
- *  File: module_export.h  
+ *  File: geometry_typedef.h  
  *  Copyright (c) 2024-2024 scofieldzhu
  *  
  *  MIT License
@@ -26,17 +26,20 @@
  *  SOFTWARE.
  */
 
-#ifndef __geometry_module_export_h__
-#define __geometry_module_export_h__
+#ifndef __geometry_typedef_h__
+#define __geometry_typedef_h__
 
-#include "agile_vision/basic/export_macro.h"
+#include "agile_vision/geometry/array_x.hpp"
+#include "agile_vision/basic/basic_typedef.h"
+#include "agile_vision/geometry/geometry_export.h"
 
-#ifdef PLATFORM_WIN
-    #ifdef AGV_GEOMETRY_EXPORT
-        #define AGV_GEOMETRY_API AGV_WIN_DLL_EXPORT
-    #else
-        #define AGV_GEOMETRY_API AGV_WIN_DLL_IMPORT
-    #endif
-#endif
+namespace agv {
 
-#endif
+    using Point2 = ArrayX<int, 2>;
+    using Point2f = ArrayX<float, 2>;
+    using Point3 = ArrayX<int, 3>;
+    using Point3f = ArrayX<float, 3>;
+
+}
+
+#endif // geometry_typedef_h

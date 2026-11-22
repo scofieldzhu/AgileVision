@@ -32,8 +32,8 @@
 #include <cstdint>
 #include <initializer_list>
 #include <string>
-#include "agile_vision/basic/module_typedef.h"
-#include "agile_vision/basic/module_export.h"
+#include "agile_vision/basic/basic_typedef.h"
+#include "agile_vision/basic/basic_export.h"
 
 namespace agv {
 

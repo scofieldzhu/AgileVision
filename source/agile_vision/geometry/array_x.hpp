@@ -34,7 +34,7 @@
 #include <array>
 #include <stdexcept>
 #include <initializer_list>
-#include "agile_vision/basic/module_typedef.h"
+#include "agile_vision/basic/basic_typedef.h"
 
 namespace agv {
 

@@ -2,8 +2,8 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: module_export.h  
- *   Copyright (c) 2023-2024 scofieldzhu
+ *   File: package_export.h  
+ *   Copyright (c) 2024-2024 scofieldzhu
  *  
  *   MIT License
  *  
@@ -26,17 +26,13 @@
  *   SOFTWARE.
  */
 
-#ifndef __stdtool_module_export_h__
-#define __stdtool_module_export_h__
-
 #include "agile_vision/basic/export_macro.h"
 
 #ifdef PLATFORM_WIN
-    #ifdef AGV_STDTOOL_EXPORT
-        #define AGV_STDTOOL_API AGV_WIN_DLL_EXPORT
+    #ifdef AGV_PACKAGE_EXPORT
+        #define AGV_PACKAGE_API AGV_WIN_DLL_EXPORT
     #else
-        #define AGV_STDTOOL_API AGV_WIN_DLL_IMPORT
+        #define AGV_PACKAGE_API AGV_WIN_DLL_IMPORT
     #endif
 #endif
 
-#endif

@@ -29,7 +29,7 @@
 #ifndef __consume_info_h__
 #define __consume_info_h__
 
-#include "agile_vision/core/module_typedef.h"
+#include "agile_vision/core/core_base_def.h"
 
 namespace agv::core {
 

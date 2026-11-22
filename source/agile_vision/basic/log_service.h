@@ -14,7 +14,7 @@
 // 六个 AGV_LOG_* 宏经 agv::GetLogger() 记录，自动附带文件、行号与函数名；
 // 日志消息一律使用英文。业务代码禁止直接调用 spdlog::xxx。
 #include "spdlog/spdlog.h"
-#include "agile_vision/basic/module_export.h"
+#include "agile_vision/basic/basic_export.h"
 
 namespace agv{    
     namespace details{

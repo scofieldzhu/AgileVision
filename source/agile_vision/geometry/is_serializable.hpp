@@ -30,7 +30,7 @@
 #define __is_serializable_hpp__
 
 #include <concepts>
-#include "agile_vision/basic/module_typedef.h"
+#include "agile_vision/basic/basic_typedef.h"
 
 namespace agv {
 

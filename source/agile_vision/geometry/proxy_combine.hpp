@@ -30,7 +30,7 @@
 
 #include <iterator>
 #include <algorithm>
-#include "agile_vision/basic/module_typedef.h"
+#include "agile_vision/basic/basic_typedef.h"
 #include "agile_vision/geometry/is_serializable.hpp"
 
 namespace agv {

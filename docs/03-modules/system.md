@@ -6,8 +6,8 @@
 
 | 文件 | 内容 |
 | --- | --- |
-| `module_typedef.h` | `DLL_HANDLE` 平台别名（Windows=`HMODULE`，Linux=`void*`，其他平台 `static_assert` 阻断） |
-| `module_export.h` | `AGV_SYSTEM_API` 导出宏 |
+| `system_typedef.h` | `DLL_HANDLE` 平台别名（Windows=`HMODULE`，Linux=`void*`，其他平台 `static_assert` 阻断） |
+| `system_export.h` | `AGV_SYSTEM_API` 导出宏 |
 | `dynamic_library_loader.h` | `DynamicLibraryLoader` 类声明与模板 `getFunction` |
 | `dynamic_library_loader.cpp` | 平台相关的 `load/unload` 实现 |
 

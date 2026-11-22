@@ -2,7 +2,7 @@
  *  Ratel is a application framework, which provides some convenient librarys
  *  for for those c++ developers pursuing fast-developement.
  *  
- *  File: module_typedef.h  
+ *  File: basic_typedef.h  
  *  Copyright (c) 2024-2024 scofieldzhu
  *  
  *  MIT License
@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __basic_module_typedef_h__
-#define __basic_module_typedef_h__
+#ifndef __basic_typedef_h__
+#define __basic_typedef_h__
 
 #include <cstdint>
 #include <cassert>

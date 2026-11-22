@@ -30,7 +30,7 @@
 #define __data_buffer_h__
 
 #include "agile_vision/core/data_spec.h"
-#include "agile_vision/core/module_export.h"
+#include "agile_vision/core/core_export.h"
 
 namespace agv::core {
 

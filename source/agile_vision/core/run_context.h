@@ -29,7 +29,7 @@
 #ifndef __run_context_h__
 #define __run_context_h__
 
-#include "agile_vision/core/module_typedef.h"
+#include "agile_vision/core/core_base_def.h"
 
 namespace agv::core {
 

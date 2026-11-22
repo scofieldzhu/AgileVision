@@ -34,7 +34,7 @@
 #include <thread>
 #include <mutex>
 #include <queue>
-#include "agile_vision/basic/module_export.h"
+#include "agile_vision/basic/basic_export.h"
 
 namespace agv {
 

@@ -6,11 +6,11 @@
 
 | 文件 | 核心类型 | 职责 |
 | --- | --- | --- |
-| `module_typedef.h` | `Byte`、`ByteVec`、`AgvBytes`、`AgvString` 等 | 字节/字符串类型底座 |
+| `basic_typedef.h` | `Byte`、`ByteVec`、`AgvBytes`、`AgvString` 等 | 字节/字符串类型底座 |
 | `image_data.h` | `ImageData`（`AGV_PACKED`） | 通用图像描述结构 |
 | `cross_platform.h` | 平台宏、打包宏 | 平台检测与字节对齐统一收口 |
 | `export_macro.h` | `AGV_WIN_DLL_*`、`AGV_EXTERN_C_*` | 基础导出/C 接口宏 |
-| `module_export.h` | `AGV_BASIC_API` | 基础模块 API 宏（含内嵌基础工具） |
+| `basic_export.h` | `AGV_BASIC_API` | 基础模块 API 宏（含内嵌基础工具） |
 | `log_service.h` | `AGV_LOG_*`、`GetLogger()`/`SetLogger()` | 全项目统一日志门面 |
 | `string_proxy.h/.cpp` | `StringProxy` | UTF-8 字符串、序列化、UID、数值转换、编码转换 |
 | `timestamp.h/.cpp` | `Timestamp` | 线程安全原子计数器 |
@@ -23,7 +23,7 @@
 
 ## 类型体系
 
-`module_typedef.h` 定义（均在 `namespace agv`）：
+`basic_typedef.h` 定义（均在 `namespace agv`）：
 
 - 字节原语：`Byte = char`、`BytePtr`、`ConsBytePtr`、`ByteVec = std::vector<Byte>`。
 - 尺寸常量：`kIntSize`、`kUIntSize`、`kFloatSize`。

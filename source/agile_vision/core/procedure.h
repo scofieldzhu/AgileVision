@@ -29,7 +29,7 @@
 #ifndef __procedure_h__
 #define __procedure_h__
 
-#include "agile_vision/core/module_export.h"
+#include "agile_vision/core/core_export.h"
 #include "agile_vision/core/process.h"
 
 namespace agv::core {
