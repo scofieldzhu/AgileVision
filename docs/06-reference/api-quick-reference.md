@@ -46,17 +46,17 @@
 
 | 类型 | 头文件 | 说明 |
 | --- | --- | --- |
-| `DataType` | `core/core_base_def.h` | `kUnk/kInt/kFloat/kString/kBytes/kImage` |
+| `DataType` | `core/module_typedef.h` | `kUnk/kInt/kFloat/kString/kBytes/kImage` |
 | `PinType` | 同上 | `kInput/kOutput/kProp` |
 | `PinKey` | 同上 | `std::string_view` |
 | `wkid_t` / `kNullId` | 同上 | 工作 ID 类型与空值 |
-| `AgvBytes` / `AgvString` | `basic/basic_typedef.h` | 字节向量 / 字符串 |
+| `AgvBytes` / `AgvString` | `basic/module_typedef.h` | 字节向量 / 字符串 |
 | `ImageData` | `basic/image_data.h` | 图像描述（packed） |
 | `StringProxy` | `basic/string_proxy.h` | 字符串封装、序列化、UID、转换 |
 | `Timestamp` / `TimeTracker` | `basic/timestamp.h`、`time_util.h` | 原子计数 / 计时器 |
 | `IdSeed<T>` | `basic/id_seed.hpp` | ID 生成器（非线程安全） |
 | `DirectedGraph<V,A,K>` | `basic/directed_graph.hpp` | 有向图，支持判环 |
-| `LOG_*` 宏 | `basic/log.h` | 统一日志门面 |
+| `AGV_LOG_*` 宏 / `GetLogger()` | `basic/log_service.h` | 统一日志门面 |
 | `DynamicLibraryLoader` | `system/dynamic_library_loader.h` | 跨平台动态库加载 |
 
 ## 序列化代理（`namespace agv`，geometry）

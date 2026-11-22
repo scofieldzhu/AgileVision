@@ -27,7 +27,7 @@
  */
 
 #include "tool_factory.h"
-#include "agile_vision/basic/log.h"
+#include "agile_vision/basic/log_service.h"
 
 using namespace agv;
 using std::filesystem::path;
@@ -46,12 +46,12 @@ namespace agv::core {
     bool ToolFactory::loadToolFile(const path& filepath)
     {
         if(loader_dict_.contains(filepath)){
-            LOG_WARN("The tool file:{} already loaded!", filepath.string());
+            AGV_LOG_WARN("The tool file:{} already loaded!", filepath.string());
             return true;
         }
         auto loader = std::make_unique<DynamicLibraryLoader>();
         if(!loader->load(filepath.string())){
-            LOG_ERROR("Load tool file:{} failed!", filepath.string());
+            AGV_LOG_ERROR("Load tool file:{} failed!", filepath.string());
             return false;
         }
         DllInfo di;    
@@ -64,7 +64,7 @@ namespace agv::core {
             loader_dict_[filepath] = std::move(di);
             return true;
         }
-        LOG_ERROR("Invalid tool file:{} failed!", filepath.string());
+        AGV_LOG_ERROR("Invalid tool file:{} failed!", filepath.string());
         return false;
     }
 

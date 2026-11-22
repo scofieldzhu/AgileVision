@@ -30,7 +30,7 @@
 #include "agile_vision/core/process.h"
 #include "agile_vision/core/process_manager.h"
 #include "agile_vision/core/engine.h"
-#include "agile_vision/basic/log.h"
+#include "agile_vision/basic/log_service.h"
 
 namespace agv::stdtool {
     using namespace agv::core;
@@ -66,7 +66,7 @@ namespace agv::stdtool {
         auto trigger_mode_list_pin = getPropPin(PK_P_TriggerModeList);
         if(process_iid_list_pin->dataBuffer().valueSize() != trigger_string_list_pin->dataBuffer().valueSize() && 
            trigger_string_list_pin->dataBuffer().valueSize() != trigger_mode_list_pin->dataBuffer().valueSize()){
-            LOG_ERROR("The sizes of process iid list, trigger string list and trigger mode list are not equal with each other:[{},{},{}]!", 
+            AGV_LOG_ERROR("The sizes of process iid list, trigger string list and trigger mode list are not equal with each other:[{},{},{}]!", 
                 process_iid_list_pin->dataBuffer().valueSize(), 
                 trigger_string_list_pin->dataBuffer().valueSize(),
                 trigger_mode_list_pin->dataBuffer().valueSize());
@@ -80,7 +80,7 @@ namespace agv::stdtool {
                 const std::string process_iid =  process_iid_list_pin->dataBuffer().getStringValue(i);
                 auto process = getMutableProcessManager()->findProcess(process_iid, false);
                 if(process == nullptr){
-                    LOG_ERROR("No process object exists with iid:{}", process_iid);
+                    AGV_LOG_ERROR("No process object exists with iid:{}", process_iid);
                     return false;
                 }
                 auto proc_engine = joinedProcess()->runContext().engine;
@@ -90,14 +90,14 @@ namespace agv::stdtool {
                     auto proc_ctx = process->runContext();
                     proc_ctx.work_id = proc_engine->commit(process, Engine::FinishCallback());
                     if(proc_ctx.work_id == kNullId){
-                        LOG_ERROR("Commit process:{} work failed!", process->alias());
+                        AGV_LOG_ERROR("Commit process:{} work failed!", process->alias());
                         return false;
                     }
                 }
                 return true;
             }
         }
-        LOG_ERROR("No trigger string matched with input string:{}", cur_trigger_string);
+        AGV_LOG_ERROR("No trigger string matched with input string:{}", cur_trigger_string);
         return false;
     }
 

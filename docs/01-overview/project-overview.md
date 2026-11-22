@@ -14,7 +14,7 @@ AgileVision 是一个基于 C++20 的通用机器视觉流程框架，目标是�
 | 构建系统 | CMake 3.21+，Visual Studio 17 2022 多配置生成器（x64） |
 | 预设 | `CMakePresets.json` + `CMakeUserPresets.json`（version 6） |
 | 第三方包管理 | vcpkg（`E:/Code/vcpkg`，triplet `x64-windows`） |
-| 日志 | spdlog（vcpkg 提供，统一经 `basic/log.h` 的 `LOG_*` 宏使用） |
+| 日志 | spdlog（vcpkg 提供，统一经 `basic/log_service.h` 的 `AGV_LOG_*` 宏使用） |
 | Qt | 6.8.3（本机预设仅配置 `CMAKE_PREFIX_PATH`，当前源码未实际引用 Qt） |
 | 序列化 | 自研二进制协议（geometry Proxy 系列）为主；Protobuf 契约已定义、代码未接入构建 |
 | 产物形态 | 各模块 SHARED 库（DLL），Debug 版本加 `_d` 后缀；`test` 为可执行演示程序 |

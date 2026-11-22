@@ -28,7 +28,7 @@
 
 #include "data_buffer.h"
 #include "agile_vision/geometry/vec_proxy.hpp"
-#include "agile_vision/basic/log.h"
+#include "agile_vision/basic/log_service.h"
 
 namespace agv::core {
 
@@ -164,11 +164,11 @@ namespace agv::core {
     void DataBuffer::erase(size_t idx)
     {
         if(isFixedSize()){
-            LOG_ERROR("Fixed data buffer cannot execute erase operation!");
+            AGV_LOG_ERROR("Fixed data buffer cannot execute erase operation!");
             return;
         }
         if(idx >= value_size_){
-            LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+            AGV_LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
             return;
         }
         if(isFundamentalType(ds_.major_type)){
@@ -185,11 +185,11 @@ namespace agv::core {
     void DataBuffer::setIntValue(int v, size_t idx)
     {
         if(ds_.major_type != DataType::kInt){
-            LOG_ERROR("Data buffer is not interger type!");
+            AGV_LOG_ERROR("Data buffer is not interger type!");
             return;
         }
         if(idx >= value_size_){
-            LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+            AGV_LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
             return;
         }
         int* pvalue = reinterpret_cast<int*>(fundamental_bytes_.data());
@@ -199,11 +199,11 @@ namespace agv::core {
     void DataBuffer::setIntValue(const int* vp, size_t size)
     {
         if(ds_.major_type != DataType::kInt){
-            LOG_ERROR("Data buffer is not interger type!");
+            AGV_LOG_ERROR("Data buffer is not interger type!");
             return;
         }
         if(vp == nullptr || size == 0){
-            LOG_ERROR("Invalid param 'vp' or 'size'!");
+            AGV_LOG_ERROR("Invalid param 'vp' or 'size'!");
             return;
         }
         auto safe_size = std::min<size_t>(size, value_size_);    
@@ -213,11 +213,11 @@ namespace agv::core {
     std::optional<int> DataBuffer::getIntValue(size_t idx) const
     {
         if(ds_.major_type != DataType::kInt){
-            LOG_ERROR("Data buffer is not integer type!");
+            AGV_LOG_ERROR("Data buffer is not integer type!");
             return std::nullopt;
         }
         if(idx >= value_size_){
-            LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+            AGV_LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
             return std::nullopt;
         }
         const int* pvalue = reinterpret_cast<const int*>(fundamental_bytes_.data());
@@ -233,7 +233,7 @@ namespace agv::core {
     const int *DataBuffer::getIntPointer() const
     {
         if(ds_.major_type != DataType::kInt){
-            LOG_ERROR("Data buffer is not integer type!");
+            AGV_LOG_ERROR("Data buffer is not integer type!");
             return nullptr;
         }
         if(fundamental_bytes_.empty())
@@ -246,11 +246,11 @@ namespace agv::core {
     void DataBuffer::setFloatValue(float v, size_t idx)
     {
         if(ds_.major_type != DataType::kFloat){
-            LOG_ERROR("Data buffer is not float type!");
+            AGV_LOG_ERROR("Data buffer is not float type!");
             return;
         }
         if(idx >= value_size_){
-            LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+            AGV_LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
             return;
         }
         float* pvalue = reinterpret_cast<float*>(fundamental_bytes_.data());
@@ -260,11 +260,11 @@ namespace agv::core {
     void DataBuffer::setFloatValue(const float* vp, size_t size)
     {
         if(ds_.major_type != DataType::kFloat){
-            LOG_ERROR("Data buffer is not float type!");
+            AGV_LOG_ERROR("Data buffer is not float type!");
             return;
         }
         if(vp == nullptr || size == 0){
-            LOG_ERROR("Invalid param 'vp' or 'size'!");
+            AGV_LOG_ERROR("Invalid param 'vp' or 'size'!");
             return;
         }
         auto safe_size = std::min<size_t>(size, value_size_);    
@@ -274,11 +274,11 @@ namespace agv::core {
     std::optional<float> DataBuffer::getFloatValue(size_t idx) const
     {
         if(ds_.major_type != DataType::kFloat){
-            LOG_ERROR("Data buffer is not float type!");
+            AGV_LOG_ERROR("Data buffer is not float type!");
             return std::nullopt;
         }
         if(idx >= value_size_){
-            LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+            AGV_LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
             return std::nullopt;
         }
         const float* pvalue = reinterpret_cast<const float*>(fundamental_bytes_.data());
@@ -294,7 +294,7 @@ namespace agv::core {
     const float *DataBuffer::getFloatPointer() const
     {
         if(ds_.major_type != DataType::kFloat){
-            LOG_ERROR("Data buffer is not float type!");
+            AGV_LOG_ERROR("Data buffer is not float type!");
             return nullptr;
         }
         if(fundamental_bytes_.empty())
@@ -307,11 +307,11 @@ namespace agv::core {
     void DataBuffer::setImageValue(const ImageData& v, size_t idx)
     {
         if(ds_.major_type != DataType::kImage){
-            LOG_ERROR("Data buffer is not image type!");
+            AGV_LOG_ERROR("Data buffer is not image type!");
             return;
         }
         if(idx >= value_size_){
-            LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+            AGV_LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
             return;
         }
         ImageData* pvalue = reinterpret_cast<ImageData*>(fundamental_bytes_.data());
@@ -321,11 +321,11 @@ namespace agv::core {
     std::optional<ImageData> DataBuffer::getImageValue(size_t idx) const
     {
         if(ds_.major_type != DataType::kImage){
-            LOG_ERROR("Data buffer is not image type!");
+            AGV_LOG_ERROR("Data buffer is not image type!");
             return std::nullopt;
         }
         if(idx >= value_size_){
-            LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+            AGV_LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
             return std::nullopt;
         }
         const ImageData* pvalue = reinterpret_cast<const ImageData*>(fundamental_bytes_.data());
@@ -341,7 +341,7 @@ namespace agv::core {
     const ImageData* DataBuffer::getImagePointer() const
     {
         if(ds_.major_type != DataType::kImage){
-            LOG_ERROR("Data buffer is not image type!");
+            AGV_LOG_ERROR("Data buffer is not image type!");
             return nullptr;
         }
         if(fundamental_bytes_.empty())
@@ -354,11 +354,11 @@ namespace agv::core {
     void DataBuffer::setStringValue(const char* source, size_t idx)
     {
         if(ds_.major_type != DataType::kString){
-            LOG_ERROR("Data buffer is not 'string' type!");
+            AGV_LOG_ERROR("Data buffer is not 'string' type!");
             return;
         }
         if(idx >= value_size_){
-            LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+            AGV_LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
             return;
         }
         if(source == nullptr){
@@ -374,7 +374,7 @@ namespace agv::core {
     void DataBuffer::setStringValue(const AgvMultiString& strs)
     {
         if(ds_.major_type != DataType::kString){
-            LOG_ERROR("Data buffer is not 'string' type!");
+            AGV_LOG_ERROR("Data buffer is not 'string' type!");
             return;
         }
         if(strs.empty()){
@@ -393,11 +393,11 @@ namespace agv::core {
     const char* DataBuffer::getStringValue(size_t idx) const
     {
         if(ds_.major_type != DataType::kString){
-            LOG_ERROR("Data buffer is not 'string' type!");
+            AGV_LOG_ERROR("Data buffer is not 'string' type!");
             return nullptr;
         }
         if(idx >= value_size_){
-            LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+            AGV_LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
             return nullptr;
         }
         return (const char*)bytes_table_[idx].data();
@@ -406,7 +406,7 @@ namespace agv::core {
     AgvMultiString DataBuffer::getAllStringValues() const
     {
         if(ds_.major_type != DataType::kString){
-            LOG_ERROR("Data buffer is not 'string' type!");
+            AGV_LOG_ERROR("Data buffer is not 'string' type!");
             return {};
         }
         AgvMultiString strs;
@@ -419,11 +419,11 @@ namespace agv::core {
     void DataBuffer::setBytesValue(const agile_vision_byte* source, size_t byte_size, size_t idx)
     {
         if(ds_.major_type != DataType::kBytes){
-            LOG_ERROR("Data buffer is not 'bytes' type!");
+            AGV_LOG_ERROR("Data buffer is not 'bytes' type!");
             return;
         }
         if(idx >= value_size_){
-            LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+            AGV_LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
             return;
         }
         if(source == nullptr || byte_size == 0){
@@ -438,11 +438,11 @@ namespace agv::core {
     std::optional<AgvBytes> DataBuffer::getBytesValue(size_t idx) const
     {
         if(ds_.major_type != DataType::kBytes){
-            LOG_ERROR("Data buffer is not 'bytes' type!");
+            AGV_LOG_ERROR("Data buffer is not 'bytes' type!");
             return std::nullopt;
         }
         if(idx >= value_size_){
-            LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
+            AGV_LOG_ERROR("Index:{} out of range! size:{}", idx, value_size_);
             return std::nullopt;
         }
         return std::optional<AgvBytes>(bytes_table_[idx]);

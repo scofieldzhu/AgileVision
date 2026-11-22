@@ -62,3 +62,5 @@ python tools/style_fix_braces.py [源码根目录，默认 source/agile_vision]
 ## 整改历史
 
 项目曾对 `source/` 下 98 个 `.h/.hpp/.cpp` 执行全量整改：66 文件 68 个 namespace 块统一缩进、10 文件 41 处控制流补大括号、13 文件 67 处日志调用改为 `LOG_*`、头文件 `using namespace` 清理、`#pragma once` 改 guard 等。整改后检查器零违规，且 configure/build/install 全通过。整改前源码备份在 `C:/Users/cheng/WorkBuddy/spaces/2026_11_21_16-38-59/style_backup_20261121`。
+
+注：以上为当时整改结果；日志门面现已统一为 `basic/log_service.h` 的 `AGV_LOG_*`（见 §12 与 `03-modules/basic.md`）。

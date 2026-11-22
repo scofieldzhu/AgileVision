@@ -30,7 +30,7 @@
 #include "agile_vision/core/process.h"
 #include "agile_vision/core/procedure.h"
 #include "agile_vision/core/engine.h"
-#include "agile_vision/basic/log.h"
+#include "agile_vision/basic/log_service.h"
 
 namespace agv::stdtool {
     using namespace agv::core;
@@ -53,23 +53,23 @@ namespace agv::stdtool {
     {
         auto iid_str_list = getPropPin(PK_P_ProcessIIDList)->dataBuffer().getAllStringValues();
         if(iid_str_list.empty()){
-            LOG_WARN("No any process iid list bind!");
+            AGV_LOG_WARN("No any process iid list bind!");
             return true;
         }
         auto joined_process = joinedProcess();
         if(joined_process == nullptr){
-            LOG_ERROR("This tool doesn't join any process at all!");
+            AGV_LOG_ERROR("This tool doesn't join any process at all!");
             return false;
         }
         if(std::find(iid_str_list.begin(), iid_str_list.end(), joined_process->iid()) != iid_str_list.end()){
-            LOG_ERROR("Process iid list contain self!");
+            AGV_LOG_ERROR("Process iid list contain self!");
             return false;
         }
         auto cur_engine = joined_process->runContext().engine;
         for(const auto& iid_str : iid_str_list){
             auto cur_process = joined_process->getMutableRootProcess()->findMutableChildProcess(iid_str, true);
             if(cur_process == nullptr){
-                LOG_ERROR("Invalid process iid:{}", iid_str);
+                AGV_LOG_ERROR("Invalid process iid:{}", iid_str);
                 return false;
             }
             wkid_t wid = cur_engine->get(cur_process);
@@ -79,7 +79,7 @@ namespace agv::stdtool {
             float timeout = getPropPin(PK_P_MaxWaitTimeSeconds)->mutableDataBuffer().getFloatValue().value();
             auto wait_result = cur_engine->wait(wid, std::chrono::milliseconds((int)(timeout * 1000)));
             if(wait_result != Engine::WaitResult::kOk){
-                LOG_ERROR("Wait process[{}] time out!", iid_str);
+                AGV_LOG_ERROR("Wait process[{}] time out!", iid_str);
                 return false;
             }
         }

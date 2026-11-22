@@ -33,7 +33,7 @@
 - `Procedure` / `Process` / `Tool` 的层级操作
 - `PropPin::mutableDataBuffer().setStringValue` / `setIntValue`
 - `StringProxy::NewUID()` 生成 UID（别名 `UIDGen`）
-- `_AUTO_FUNC_TRACK_` 与 `LOG_TRACE`
+- `_AUTO_FUNC_TRACK_` 与 `AGV_LOG_TRACE`
 
 ## 运行前提
 

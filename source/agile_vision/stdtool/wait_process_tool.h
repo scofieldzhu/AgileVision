@@ -30,7 +30,7 @@
 #define __wait_process_tool_h__
 
 #include "agile_vision/core/tool.h"
-#include "agile_vision/stdtool/stdtool_export.h"
+#include "agile_vision/stdtool/module_export.h"
 
 namespace agv::stdtool {
 

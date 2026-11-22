@@ -30,8 +30,8 @@
 #define __time_util_h__
 
 #include <chrono>
-#include "agile_vision/basic/basic_typedef.h"
-#include "agile_vision/basic/basic_export.h"
+#include "agile_vision/basic/module_typedef.h"
+#include "agile_vision/basic/module_export.h"
 
 namespace agv {
 

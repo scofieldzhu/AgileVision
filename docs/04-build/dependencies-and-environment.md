@@ -4,7 +4,7 @@
 
 | 依赖 | 用途 | 来源 | 必需性 |
 | --- | --- | --- | --- |
-| spdlog | 日志（经 `basic/log.h` 封装） | vcpkg `x64-windows` | 必需（根 CMake `find_package(... REQUIRED)`） |
+| spdlog | 日志（经 `basic/log_service.h` 封装） | vcpkg `x64-windows` | 必需（根 CMake `find_package(... REQUIRED)`） |
 | fmt | spdlog 后端依赖 | vcpkg 自动带入 | 必需（运行时 DLL 随安装拷贝） |
 | Qt 6.8.3 | 本机预设配置了 `CMAKE_PREFIX_PATH` | `D:/Qt68/6.8.3/msvc2022_64` | 当前源码未实际引用，仅路径预留 |
 | Protobuf | 第二序列化后端（规划中） | 系统/vcpkg | 可选，`AGV_REQUIRE_PROTOBUF` 控制 |

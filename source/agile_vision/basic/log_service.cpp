@@ -1,9 +1,10 @@
+
 /* 
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: package_export.h  
- *   Copyright (c) 2024-2024 scofieldzhu
+ *   File: log_service.cpp  
+ *   Copyright (c) 2023-2026 scofieldzhu
  *  
  *   MIT License
  *  
@@ -25,14 +26,31 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+#include "agile_vision/basic/log_service.h"        
 
-#include "agile_vision/basic/export_macro.h"
+namespace agv{    
+    namespace{
+        // 默认 logger 输出附带源码位置：%s:%# 为短文件名与行号，%! 为函数名。
+        std::shared_ptr<spdlog::logger> createDefaultLogger()
+        {
+            auto logger = spdlog::default_logger();
+            logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] [%s:%#] [%!] %v");
+            return logger;
+        }
+    }
 
-#ifdef PLATFORM_WIN
-    #ifdef AGV_PACKAGE_EXPORT
-        #define AGV_PACKAGE_API AGV_WIN_DLL_EXPORT
-    #else
-        #define AGV_PACKAGE_API AGV_WIN_DLL_IMPORT
-    #endif
-#endif
+    namespace details{
+        // 默认使用 spdlog 的默认 logger，保证外部通过 SetLogger 注入之前
+        // GetLogger() 也能返回有效对象，避免日志宏空指针解引用。
+        std::shared_ptr<spdlog::logger> gLogger_ = createDefaultLogger();
+        void SetLogger(std::shared_ptr<spdlog::logger> logger)
+        {
+            gLogger_ = logger;
+        }
+    }
 
+    spdlog::logger* GetLogger()
+    {
+        return details::gLogger_.get();
+    }
+}

@@ -2,7 +2,7 @@
  *  Ratel is a application framework, which provides some convenient librarys
  *  for for those c++ developers pursuing fast-developement.
  *  
- *  File: system_export.h  
+ *  File: module_export.h  
  *  Copyright (c) 2024-2024 scofieldzhu
  *  
  *  MIT License
@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __system_export_h__
-#define __system_export_h__
+#ifndef __system_module_export_h__
+#define __system_module_export_h__
 
 #include "agile_vision/basic/export_macro.h"
     

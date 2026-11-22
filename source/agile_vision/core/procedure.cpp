@@ -29,7 +29,7 @@
 #include "procedure.h"
 #include "engine.h"
 #include "agile_vision/geometry/geometry.h"
-#include "agile_vision/basic/log.h"
+#include "agile_vision/basic/log_service.h"
 
 using namespace agv;
 
@@ -82,21 +82,21 @@ namespace agv::core {
     void Procedure::run()
     {
         if(run_context_.engine ==  nullptr){
-            LOG_ERROR("No engine object attached!");
+            AGV_LOG_ERROR("No engine object attached!");
             return;
         }
         auto cur_engine = run_context_.engine;
         if(run_context_.async_run){ 
             auto finish_func = [this](wkid_t w){
-                LOG_TRACE("Procedure:{} root run done!", this->alias_);
+                AGV_LOG_TRACE("Procedure:{} root run done!", this->alias_);
             };
             run_context_.work_id = cur_engine->commit(root_.get(), finish_func);
             if(run_context_.work_id == kNullId){
-                LOG_ERROR("Engine commit root process:{} work failed!", root_->iid());
+                AGV_LOG_ERROR("Engine commit root process:{} work failed!", root_->iid());
             }
         }else{
             if(!cur_engine->syncRunProcess(root_.get())){
-                LOG_ERROR("Engine syncRunProcess root process:{} work failed!", root_->iid());
+                AGV_LOG_ERROR("Engine syncRunProcess root process:{} work failed!", root_->iid());
             }
         }
     }

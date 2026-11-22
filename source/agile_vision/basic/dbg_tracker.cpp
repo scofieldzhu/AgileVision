@@ -29,7 +29,7 @@
 #include "dbg_tracker.h"
 #include "time_util.h"
 #include <filesystem>
-#include "agile_vision/basic/log.h"
+#include "agile_vision/basic/log_service.h"
 
 namespace agv {
 
@@ -38,12 +38,12 @@ namespace agv {
         lineno_(line_no)
     {
         filename_ = std::filesystem::path(fn).filename().string();
-        LOG_TRACE("[{}][{}]->Enter {}!", filename_, lineno_, funcname_);
+        AGV_LOG_TRACE("[{}][{}]->Enter {}!", filename_, lineno_, funcname_);
     }
 
     DbgTracker::~DbgTracker()
     {
-        LOG_TRACE("[{}][{}]->Leave {}! costtime:{}ms", filename_, lineno_, funcname_, time_tracker_.elapsed());
+        AGV_LOG_TRACE("[{}][{}]->Leave {}! costtime:{}ms", filename_, lineno_, funcname_, time_tracker_.elapsed());
     }
 
 }

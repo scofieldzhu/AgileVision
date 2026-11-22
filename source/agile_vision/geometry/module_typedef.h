@@ -2,7 +2,7 @@
  *  Ratel is a application framework, which provides some convenient librarys
  *  for for those c++ developers pursuing fast-developement.
  *  
- *  File: system_typedef.h  
+ *  File: module_typedef.h  
  *  Copyright (c) 2024-2024 scofieldzhu
  *  
  *  MIT License
@@ -26,18 +26,20 @@
  *  SOFTWARE.
  */
 
-#ifndef __system_typedef_h__
-#define __system_typedef_h__
+#ifndef __geometry_module_typedef_h__
+#define __geometry_module_typedef_h__
 
-#include "agile_vision/basic/cross_platform.h"
+#include "agile_vision/geometry/array_x.hpp"
+#include "agile_vision/basic/module_typedef.h"
+#include "agile_vision/geometry/module_export.h"
 
-#ifdef PLATFORM_WIN
-    #include "agile_vision/basic/win_header.h"
-    using DLL_HANDLE = HMODULE;
-#elif PLATFORM_LINUX
-    using DLL_HANDLE = void*;
-#else 
-    static_assert(false, "Error: DynamicLibraryLoader implementation not found in unsupport platform!");
-#endif
+namespace agv {
 
-#endif // system_typedef_h
+    using Point2 = ArrayX<int, 2>;
+    using Point2f = ArrayX<float, 2>;
+    using Point3 = ArrayX<int, 3>;
+    using Point3f = ArrayX<float, 3>;
+
+}
+
+#endif // geometry_typedef_h

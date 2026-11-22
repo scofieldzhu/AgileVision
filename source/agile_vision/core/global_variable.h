@@ -32,8 +32,8 @@
 #include <any>
 #include <string>
 #include <optional>
-#include "agile_vision/core/core_export.h"
-#include "agile_vision/basic/basic_typedef.h"
+#include "agile_vision/core/module_export.h"
+#include "agile_vision/basic/module_typedef.h"
 
 namespace agv::core {
 

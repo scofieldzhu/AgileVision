@@ -31,7 +31,7 @@
 #include "procedure.h"
 #include "engine.h"
 #include "serialize_policy.h"
-#include "agile_vision/basic/log.h"
+#include "agile_vision/basic/log_service.h"
 
 namespace agv {
     using Procedure = agv::core::Procedure;
@@ -110,7 +110,7 @@ namespace agv::core {
     Procedure *Solution::createProcedure(const std::string &iid)
     {
         if(findProcedure(iid)){
-            LOG_WARN("Procedure with iid:{} already exists!", iid);
+            AGV_LOG_WARN("Procedure with iid:{} already exists!", iid);
             return nullptr;
         }
         auto procedure = std::make_unique<Procedure>(iid);

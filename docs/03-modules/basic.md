@@ -6,12 +6,12 @@
 
 | 文件 | 核心类型 | 职责 |
 | --- | --- | --- |
-| `basic_typedef.h` | `Byte`、`ByteVec`、`AgvBytes`、`AgvString` 等 | 字节/字符串类型底座 |
+| `module_typedef.h` | `Byte`、`ByteVec`、`AgvBytes`、`AgvString` 等 | 字节/字符串类型底座 |
 | `image_data.h` | `ImageData`（`AGV_PACKED`） | 通用图像描述结构 |
 | `cross_platform.h` | 平台宏、打包宏 | 平台检测与字节对齐统一收口 |
 | `export_macro.h` | `AGV_WIN_DLL_*`、`AGV_EXTERN_C_*` | 基础导出/C 接口宏 |
-| `basic_export.h` | `AGV_BASIC_API` | 基础模块 API 宏（含内嵌基础工具） |
-| `log.h` | `LOG_TRACE/DEBUG/INFO/WARN/ERROR/CRITICAL` | 全项目统一日志门面 |
+| `module_export.h` | `AGV_BASIC_API` | 基础模块 API 宏（含内嵌基础工具） |
+| `log_service.h` | `AGV_LOG_*`、`GetLogger()`/`SetLogger()` | 全项目统一日志门面 |
 | `string_proxy.h/.cpp` | `StringProxy` | UTF-8 字符串、序列化、UID、数值转换、编码转换 |
 | `timestamp.h/.cpp` | `Timestamp` | 线程安全原子计数器 |
 | `time_util.h/.cpp` | `TimeTracker` | 毫秒级计时器 |
@@ -23,7 +23,7 @@
 
 ## 类型体系
 
-`basic_typedef.h` 定义（均在 `namespace agv`）：
+`module_typedef.h` 定义（均在 `namespace agv`）：
 
 - 字节原语：`Byte = char`、`BytePtr`、`ConsBytePtr`、`ByteVec = std::vector<Byte>`。
 - 尺寸常量：`kIntSize`、`kUIntSize`、`kFloatSize`。
@@ -42,7 +42,7 @@
 
 ## 日志
 
-`log.h` 基于 spdlog 定义六个宏，一一映射 `SPDLOG_*` 并自动附带文件/行号/函数名上下文。规范 §12 要求：业务代码禁止直接调用 `spdlog::xxx`，日志消息用英文。
+`log_service.h` 提供 `AGV_LOG_TRACE/DEBUG/INFO/WARN/ERROR/CRITICAL` 六个宏，统一经 `agv::GetLogger()` 记录；`details::SetLogger()` 可注入自定义 logger，未注入时使用 spdlog 默认 logger。规范 §12 要求：业务代码禁止直接调用 `spdlog::xxx`，日志消息用英文。
 
 ## StringProxy
 
@@ -53,14 +53,14 @@
 | 序列化 | `serializeToBytes()` → `[uint32 长度][UTF-8 字节]`；`loadBytes()` 反向解析 |
 | UID | 静态 `NewUID()`：Windows 用 `CoCreateGuid`，Linux 用 `uuid_generate_random` |
 | 数值转换 | `FromInt/FromUInt/FromLargeInt/FromLargeUInt/FromDouble` 与 `toXxx()` |
-| 编码转换 | `toLower/toUpper`；`decodeToWString/encodeFromWString`；`decodeToLocale/encodeFromLocale`（Windows 在 UTF-8/ACP 间转换，其他平台记 LOG_ERROR 返回空） |
+| 编码转换 | `toLower/toUpper`；`decodeToWString/encodeFromWString`；`decodeToLocale/encodeFromLocale`（Windows 在 UTF-8/ACP 间转换，其他平台记 AGV_LOG_ERROR 返回空） |
 
 ## 并发与 ID
 
 - `ThreadPool`：构造启动固定数量 worker，`enqueue(task_func&&)` 投递 `std::function<void()>`，析构停止并 join。
 - `IdSeed<T>`：模板参数限无符号整型，`next()` 递增、溢出回绕到初始值；**非线程安全**。
 - `Timestamp`：`std::atomic_uint64_t value_`，`next()/force()/value()` 原子操作，**线程安全**。
-- `DbgTracker`：RAII，构造 `LOG_TRACE` 记录 Enter，析构记录 Leave 与耗时；`_AUTO_FUNC_TRACK_` 宏一行启用。
+- `DbgTracker`：RAII，构造 `AGV_LOG_TRACE` 记录 Enter，析构记录 Leave 与耗时；`_AUTO_FUNC_TRACK_` 宏一行启用。
 
 ## DirectedGraph
 

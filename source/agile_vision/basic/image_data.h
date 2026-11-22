@@ -29,7 +29,7 @@
 #ifndef __image_data_h__
 #define __image_data_h__
 
-#include "agile_vision/basic/basic_typedef.h"
+#include "agile_vision/basic/module_typedef.h"
 #include "agile_vision/basic/cross_platform.h"
 
 namespace agv {

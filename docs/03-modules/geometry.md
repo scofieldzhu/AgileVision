@@ -13,13 +13,13 @@
 | `dict_proxy.hpp` | `DictProxy<K,V,Ref>` | 拥有/引用 `std::map<K,V>` 的序列化 |
 | `proxy_combine.hpp` | `ProxyCombine<A,B,Ref>` | 两个可序列化代理的顺序拼接 |
 | `array_x.hpp` | `ArrayX<T,S>` | 定长原生数组，直接 memcpy |
-| `geometry_typedef.h` | `Point2/Point2f/Point3/Point3f` | `ArrayX<int/float,2/3>` 的别名 |
+| `module_typedef.h` | `Point2/Point2f/Point3/Point3f` | `ArrayX<int/float,2/3>` 的别名 |
 | `point.h` | — | 聚合头 |
 | `line.hpp` | `Line<PointType>` | 线段，两端点 |
 | `rect.hpp` | `Rect<T>` | 矩形：左上角、尺寸、旋转角 |
 | `circle.hpp` | `Circle<T>` | 圆：圆心、半径 |
 | `geometry.h` | — | 总聚合头，include 全部代理与实体 |
-| `geometry_export.h` | `AGV_GEOMETRY_API` | 导出宏 |
+| `module_export.h` | `AGV_GEOMETRY_API` | 导出宏 |
 
 ## Proxy 机制
 

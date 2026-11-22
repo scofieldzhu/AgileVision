@@ -59,6 +59,6 @@
 | 头文件写 `using namespace` | 规范禁止，会被检查器拦截；改用显式限定 |
 | PinKey 误限定 | `PinKey` 在 `agv` 根，不在 `agv::core` |
 | 导出宏与命名空间错配 | 类在 `agv::core` 但公共类型在 `agv` 根；特化需放在模板所在空间 |
-| 直接调用 spdlog | 应使用 `LOG_*` 宏（级别配置例外） |
+| 直接调用 spdlog | 应使用 `AGV_LOG_*` 宏（级别配置例外） |
 | 多配置用 `CMAKE_BUILD_TYPE` | 应使用 `$<CONFIG>` 生成器表达式 |
 | vcpkg spdlog 与 `SPDLOG_USE_STD_FORMAT` 混用 | 会导致 LNK2001，vcpkg spdlog 用 fmt 后端，勿手定义该宏 |

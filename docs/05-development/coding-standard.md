@@ -17,7 +17,7 @@
 | 9 | 内存与指针管理 | 拥有用 `shared_ptr/unique_ptr`，非拥有用裸指针，禁裸 new/delete，成员声明处初始化 |
 | 10 | 导出宏与平台宏 | 平台头统一定义导出宏；`PLATFORM_WIN/LINUX/UNKNOWN`；C 接口用 `PROJECT_EXTERN_C_BEGIN/END` |
 | 11 | 序列化约定 | `loadBytes` 返回已消费字节数（失败 0）；按协议顺序编码；不直接序列化结构体内存 |
-| 12 | 错误处理与日志 | bool/指针/0 返回码约定；不用异常做流程控制；日志用 `LOG_*` 且英文带上下文 |
+| 12 | 错误处理与日志 | bool/指针/0 返回码约定；不用异常做流程控制；日志用 `AGV_LOG_*` 且英文带上下文 |
 | 13 | 并发 | mutex + lock_guard 保护共享状态；跨线程 ID 用原子 |
 | 14 | 构建与模块 | 根 CMake 统一管理；Debug 带 `_d` 后缀；多配置生成器不靠 `CMAKE_BUILD_TYPE` |
 | 15 | 代码示例 | 头文件声明与实现文件示例 |
@@ -37,7 +37,7 @@
 - **语句结构**：一行一语句；`if/while/for` 体必加 `{}`；`}` 与 `else if` 同行；类访问域各只出现一次；构造/析构置于所在访问域末尾；初始化列表逗号后置；参数 ≤5 且无 lambda 可单行。
 - **行宽**：≤160 列（全角按 2 列）；二元操作符与 `?:` 不跨行，超长靠具名中间量/辅助函数改写。
 - **内存**：拥有关系 `shared_ptr/unique_ptr`，非拥有裸指针；禁裸 new/delete；成员声明处初始化。
-- **日志**：统一 `LOG_TRACE/LOG_WARN/LOG_ERROR` 等（定义于 `basic/log.h`），业务代码禁直调 `spdlog::xxx`（级别配置例外）。
+- **日志**：统一 `AGV_LOG_TRACE/AGV_LOG_WARN/AGV_LOG_ERROR` 等（定义于 `basic/log_service.h`），业务代码禁直调 `spdlog::xxx`（级别配置例外）。
 
 ## 落地方式
 

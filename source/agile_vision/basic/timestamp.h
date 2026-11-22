@@ -30,7 +30,7 @@
 #define __timestamp_h__
 
 #include <atomic>
-#include "agile_vision/basic/basic_export.h"
+#include "agile_vision/basic/module_export.h"
 
 namespace agv {
 

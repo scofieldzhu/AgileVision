@@ -122,7 +122,7 @@ namespace {
 | 结构体成员变量 | snake_case（无尾下划线） | `use_timer`、`on_complete`、`count` |
 | 全局/局部变量 | snake_case | `file_path`、`total_size` |
 | 编译期常量、静态 constexpr | `k` 前缀 + PascalCase | `kDefaultSize`、`kZeroValue` |
-| 宏 / 预处理 | 全大写下划线 | `LOG_INFO`、`PLATFORM_WIN` |
+| 宏 / 预处理 | 全大写下划线 | `AGV_LOG_INFO`、`PLATFORM_WIN` |
 | 模板形参 | 单大写字母或 Pascal | `T`、`K`、`V`、`Functor` |
 
 ### 6.2 命名细节
@@ -432,10 +432,10 @@ std::size_t loadBytes(const std::uint8_t* buffer, std::size_t size); // 返回�
 
 - 失败返回约定：返回 `bool` 的函数 `true=成功`；返回指针的失败返回 `nullptr`；序列化返回 `0`。
 - **禁止吞异常**：本仓库风格不使用异常做流程控制，错误以返回码 + 日志呈现。
-- 日志统一使用项目日志头（如 `log.h`）中的封装宏，按严重级别选择：
-  - `LOG_TRACE(...)` — 调试跟踪
-  - `LOG_WARN(...)` — 可恢复异常情况
-  - `LOG_ERROR(...)` — 失败并带有具体上下文（传入参数值）
+- 日志统一使用项目日志头 `basic/log_service.h` 中的封装宏，按严重级别选择：
+  - `AGV_LOG_TRACE(...)` — 调试跟踪
+  - `AGV_LOG_WARN(...)` — 可恢复异常情况
+  - `AGV_LOG_ERROR(...)` — 失败并带有具体上下文（传入参数值）
 - 日志消息一律使用英文。
 - 日志消息要带**上下文信息**（如：`"Load item:[{}] {}!"`），便于定位。
 
@@ -500,7 +500,7 @@ private:
 
 ```cpp
 #include "sample_config.h"
-#include "log.h"
+#include "agile_vision/basic/log_service.h"
 
 SampleConfig::SampleConfig(const std::string& name)
     :name_(name)
@@ -509,7 +509,7 @@ SampleConfig::SampleConfig(const std::string& name)
 bool SampleConfig::validate()const
 {
     if(name_.empty()){
-        LOG_ERROR("Configuration validation failed: name is empty, length={}", name_.size());
+        AGV_LOG_ERROR("Configuration validation failed: name is empty, length={}", name_.size());
         return false;
     }
     return true;
@@ -538,6 +538,6 @@ bool SampleConfig::validate()const
 - [ ] 异步任务使用 `QtConcurrent::run` / `QFutureWatcher` 统一模式（§13）
 - [ ] 平台宏复用平台头，仅在实际 DLL 导出边界使用导出宏
 - [ ] 序列化遵循既有协议；示例 `loadBytes` 返回消费字节数
-- [ ] 日志用 `LOG_*`、英文且带上下文；失败返回码约定统一
+- [ ] 日志用 `AGV_LOG_*`、英文且带上下文；失败返回码约定统一
 - [ ] 跨模块引用使用相对 `src/` 的完整路径
 - [ ] 新增模块按 §14 接入根 CMakeLists

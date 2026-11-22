@@ -25,7 +25,7 @@
 | --- | --- |
 | GUID | `70eec671-9f3c-4b15-ad7a-c38b44c4c7da` |
 | 构造 | 属性 Pin `PK_P_ProcessIIDList`（string 动态数组）、`PK_P_MaxWaitTimeSeconds`（SingleFloat，默认 2.0 秒） |
-| 功能 | 校验列表非空且不含自身 iid；对每个 iid 经 `findMutableChildProcess` 定位进程，`Engine::get` 取 work_id（`kNullId` 视为已完成跳过），`Engine::wait(wid, 毫秒超时)` 等待；超时记 `LOG_ERROR` 并返回 false |
+| 功能 | 校验列表非空且不含自身 iid；对每个 iid 经 `findMutableChildProcess` 定位进程，`Engine::get` 取 work_id（`kNullId` 视为已完成跳过），`Engine::wait(wid, 毫秒超时)` 等待；超时记 `AGV_LOG_ERROR` 并返回 false |
 
 ## 占位类（未实现）
 
@@ -46,7 +46,7 @@
 - `getClsGuid()` — 返回类 GUID，供 `ToolFactory` 按 clsid 创建。
 - `requestOutputData()` — 实现算法，经 Pin 读写数据。
 
-基类提供的关键接口：`addPin`、`autoCreateProcesManager`、`checkPinDataCompatible`、`getInputPin/getOutputPin/getPropPin`、`getMutableProcessManager`。工具类依赖 core 的 `DataSpec/DataBuffer/InputPin/PropPin/ProcessManager/Process/Engine` 与 basic 的 `LOG_*` 日志。
+基类提供的关键接口：`addPin`、`autoCreateProcesManager`、`checkPinDataCompatible`、`getInputPin/getOutputPin/getPropPin`、`getMutableProcessManager`。工具类依赖 core 的 `DataSpec/DataBuffer/InputPin/PropPin/ProcessManager/Process/Engine` 与 basic 的 `AGV_LOG_*` 日志。
 
 ## 扩展示例
 

@@ -107,7 +107,7 @@ Solution  ──unique_ptr──> Engine
 - `AgvBytes fundamental_bytes_`：连续存储 `kInt/kFloat/kImage`。
 - `AgvMultiBytes bytes_table_`：逐元素存储 `kString/kBytes`。
 - 类型化 API：`setIntValue/getIntValue/getIntPointer`、`setFloatValue/...`、`setImageValue/...`、`setStringValue/...`、`setBytesValue/...`、`resize`（仅动态数组）、`erase`、`valueSize`。
-- 所有读写先校验类型与索引，失败记 `LOG_ERROR` 并返回空/`nullopt`。
+- 所有读写先校验类型与索引，失败记 `AGV_LOG_ERROR` 并返回空/`nullopt`。
 
 注意区分：`agv::DataType`（Pin 数据主类型）与 `GlobalVariable::DataType`（`DT_BOOLEAN/DT_INT/DT_FLOAT/DT_STRING`）是两个不同枚举。
 

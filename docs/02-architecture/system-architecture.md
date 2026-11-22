@@ -39,7 +39,7 @@ CMake 层面：`agv_build_config`（INTERFACE）统一提供 C++20、include 根
 | `agv` | 公共根空间 | 基础类型（`DataSpec` 之外的 `DataType`、`PinType`、`PinKey`、`wkid_t`、`kNullId`）、basic/geometry/system 全部类型、core 类的前向声明 |
 | `agv::core` | 框架层 | `Solution`、`Procedure`、`Process`、`Tool`、`ToolPin` 及派生 Pin、`DataSpec`、`DataBuffer`、`GlobalVariable`、`Engine`、`ProcessManager`、`RelationshipNetwork`、`RunContext` 等 |
 | `agv::stdtool` | 工具层 | `StringProcessTool`、`WaitProcessTool` 等标准工具 |
-| 全局 | 特殊 | `system_typedef.h` 的 `DLL_HANDLE`；`test.cpp` 的 `main` |
+| 全局 | 特殊 | `module_typedef.h` 的 `DLL_HANDLE`；`test.cpp` 的 `main` |
 
 约定：业务类归入模块子空间，公共数据类型留在 `agv` 根。`solution.cpp` 中 `DefaultCreator<Procedure*>` 的特化保留在 `agv` 根，与序列化模板所在空间一致。
 
@@ -49,12 +49,12 @@ CMake 层面：`agv_build_config`（INTERFACE）统一提供 C++20、include 根
 
 | 宏 | 定义文件 | 判定开关 | 使用者 |
 | --- | --- | --- | --- |
-| `AGV_BASIC_API` | `basic/basic_export.h` | `AGV_BASIC_EXPORT` | basic 模块公共类与内嵌基础工具 |
-| `AGV_GEOMETRY_API` | `geometry/geometry_export.h` | `AGV_GEOMETRY_EXPORT` | geometry 导出声明 |
-| `AGV_SYSTEM_API` | `system/system_export.h` | `AGV_SYSTEM_EXPORT` | 动态库加载器 |
-| `AGV_CORE_API` | `core/core_export.h` | `AGV_CORE_EXPORT` | core 全部公共类 |
-| `AGV_STDTOOL_API` | `stdtool/stdtool_export.h` | `AGV_STDTOOL_EXPORT` | 标准工具类 |
-| `AGV_PACKAGE_API` | `package/package_export.h` | `AGV_PACKAGE_EXPORT` | 打包模块 |
+| `AGV_BASIC_API` | `basic/module_export.h` | `AGV_BASIC_EXPORT` | basic 模块公共类与内嵌基础工具 |
+| `AGV_GEOMETRY_API` | `geometry/module_export.h` | `AGV_GEOMETRY_EXPORT` | geometry 导出声明 |
+| `AGV_SYSTEM_API` | `system/module_export.h` | `AGV_SYSTEM_EXPORT` | 动态库加载器 |
+| `AGV_CORE_API` | `core/module_export.h` | `AGV_CORE_EXPORT` | core 全部公共类 |
+| `AGV_STDTOOL_API` | `stdtool/module_export.h` | `AGV_STDTOOL_EXPORT` | 标准工具类 |
+| `AGV_PACKAGE_API` | `package/module_export.h` | `AGV_PACKAGE_EXPORT` | 打包模块 |
 
 构建侧：basic 目标在 `if(WIN32)` 中 `PRIVATE` 定义 `AGV_BASIC_EXPORT`、`AGV_GEOMETRY_EXPORT`、`AGV_SYSTEM_EXPORT`，使 system 实现与 geometry 内联代码随 basic 库导出；core/stdtool/package 在消费侧走 `dllimport`。其余模块同样用 `if(WIN32)` 定义各自的 `AGV_*_EXPORT` 开关。
 

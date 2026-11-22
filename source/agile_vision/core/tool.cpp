@@ -31,7 +31,7 @@
 #include "relationship_network.h"
 #include "serialize_policy.h"
 #include "agile_vision/basic/dbg_tracker.h"
-#include "agile_vision/basic/log.h"
+#include "agile_vision/basic/log_service.h"
 using namespace agv;
 
 namespace agv::core {
@@ -71,17 +71,17 @@ namespace agv::core {
     // {
     //     auto procedure = belongedProcedure();
     //     if(procedure == nullptr){
-    //         LOG_WARN("Connection will break with consume key:{}", consume_key);
+    //         AGV_LOG_WARN("Connection will break with consume key:{}", consume_key);
     //         //??? how to do?
     //         return true;
     //     }       
     //     auto consume_pin = this->getToolPin(consume_key);
     //     if(consume_pin == nullptr){
-    //         LOG_ERROR("No such pin exists with name:{}!", consume_key);
+    //         AGV_LOG_ERROR("No such pin exists with name:{}!", consume_key);
     //         return false;
     //     }
     //     if(consume_pin->canReferenceData()){
-    //         LOG_ERROR("This pin type:{} cannot consume any data!", (int)consume_pin->getPinType());
+    //         AGV_LOG_ERROR("This pin type:{} cannot consume any data!", (int)consume_pin->getPinType());
     //         return false;
     //     }
     //     auto rsn = belongedProcedure()->tool_relationships_;
@@ -140,7 +140,7 @@ namespace agv::core {
             const auto& bv = kv.second.data();
             auto ppin = getPropPin(key);
             if(ppin == nullptr){
-                LOG_WARN("Prop pin:{} not exists!", key);
+                AGV_LOG_WARN("Prop pin:{} not exists!", key);
                 continue;
             }
             if(ppin->loadBytes(bv.data(), bv.size()) == 0){
@@ -155,7 +155,7 @@ namespace agv::core {
     {
         auto consume_pin = getInputPin(consume_key);
         if(consume_pin == nullptr){
-            LOG_ERROR("No such consume key:{} exists!", consume_key);
+            AGV_LOG_ERROR("No such consume key:{} exists!", consume_key);
             return false;
         }
         const auto& old_info = consume_pin->produceInfo();
@@ -176,12 +176,12 @@ namespace agv::core {
         auto status_pin = getOutputPin(kStatusPinKey);
         status_pin->mutableDataBuffer().setIntValue(0);
         if(!checkPinDataCompatible()){
-            LOG_ERROR("CheckPinDataCompatible failed!");
+            AGV_LOG_ERROR("CheckPinDataCompatible failed!");
             status_pin->mutableDataBuffer().setIntValue(1);
             return false;
         }
         if(!requestOutputData()){
-            LOG_ERROR("RequestOutputData failed!");
+            AGV_LOG_ERROR("RequestOutputData failed!");
             status_pin->mutableDataBuffer().setIntValue(2);
             return false;
         }
@@ -248,11 +248,11 @@ namespace agv::core {
     //         auto output_pin = producer->getOutputPin(tl.produce_pin_key);
     //         auto input_pin = tl.consumer->getInputPin(tl.consume_pin_key);
     //         if(output_pin == nullptr || input_pin == nullptr){
-    //             LOG_ERROR("Invalid pin with key:{}", tl.produce_pin_key);
+    //             AGV_LOG_ERROR("Invalid pin with key:{}", tl.produce_pin_key);
     //             return false;
     //         }
     //         if(!output_pin->dataSpec().compatibleWith(input_pin->dataSpec())){
-    //             LOG_ERROR("Output pin:{} data spec is not compatile with input pin:{} data spec!", tl.produce_pin_key, tl.consume_pin_key);
+    //             AGV_LOG_ERROR("Output pin:{} data spec is not compatile with input pin:{} data spec!", tl.produce_pin_key, tl.consume_pin_key);
     //             return false;
     //         }
     //         if(input_pin->optional() || input_pin->deprecated()){
@@ -275,13 +275,13 @@ namespace agv::core {
             auto input_pin = dynamic_cast<InputPin*>(pin.get());
             auto produce_info = input_pin->produceInfo();
             if(produce_info.isNull()){
-                LOG_WARN("No producer bind at input pin:{}", kv.first);
+                AGV_LOG_WARN("No producer bind at input pin:{}", kv.first);
                 return false;
             }
             const auto& output_spec = produce_info.pin->dataSpec();
             const auto& input_spec = input_pin->dataSpec();
             if(!input_spec.compatibleWith(output_spec)){
-                LOG_WARN("Producer pin's data spec is not compatible with consumer pin's:{}", kv.first);
+                AGV_LOG_WARN("Producer pin's data spec is not compatible with consumer pin's:{}", kv.first);
                 return false;
             }
             //other stuffs

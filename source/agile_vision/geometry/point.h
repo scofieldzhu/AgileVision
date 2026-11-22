@@ -29,6 +29,6 @@
 #ifndef __point_h__
 #define __point_h__
 
-#include "agile_vision/geometry/geometry_typedef.h"
+#include "agile_vision/geometry/module_typedef.h"
 
 #endif // point_h

@@ -30,7 +30,7 @@
 #include <cctype>
 #include <codecvt>
 #include <sstream>
-#include "agile_vision/basic/log.h"
+#include "agile_vision/basic/log_service.h"
 #ifdef PLATFORM_WIN
 #include "win_header.h"
 #include <objbase.h>
@@ -249,7 +249,7 @@ namespace agv {
         std::wstring ustr = multiBytesToUnicode<CP_UTF8>(stdstr_);
         return unicodeToMultiBytes<CP_ACP>(ustr);
     #else
-        LOG_ERROR("decodeToLocale failed: unsupported platform!");
+        AGV_LOG_ERROR("decodeToLocale failed: unsupported platform!");
         return "";
     #endif
     }
@@ -276,7 +276,7 @@ namespace agv {
             stdstr_ = unicodeToMultiBytes<CP_UTF8>(ustr);
         }
     #else
-        LOG_ERROR("encodeFromLocale failed: unsupported platform!");
+        AGV_LOG_ERROR("encodeFromLocale failed: unsupported platform!");
     #endif
     }
 

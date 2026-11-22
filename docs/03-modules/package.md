@@ -6,7 +6,7 @@
 
 > `bytes_writer.h/.cpp`、`compressor.h/.cpp`、`package.h/.cpp` 六个文件**均只有 MIT 许可证头，无任何类定义**，属于设计占位。按命名推断预期职责分别为字节写入器、压缩器、打包器，但不可视为可用接口。
 
-唯一有效的基础设施是 `package_export.h`（定义 `AGV_PACKAGE_API`）。
+唯一有效的基础设施是 `module_export.h`（定义 `AGV_PACKAGE_API`）。
 
 ## Protobuf 消息契约
 

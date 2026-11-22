@@ -6,7 +6,7 @@
 
 | 分类 | 文件 |
 | --- | --- |
-| 基础定义 | `core_base_def.h`、`core_export.h`、`serialize_policy.h`、`run_context.h`、`consume_info.h`、`produce_info.h`、`tool_linkage.h` |
+| 基础定义 | `module_typedef.h`、`module_export.h`、`serialize_policy.h`、`run_context.h`、`consume_info.h`、`produce_info.h`、`tool_linkage.h` |
 | 数据层 | `data_spec.h/.cpp`、`data_buffer.h/.cpp`、`global_variable.h/.cpp` |
 | Pin 层 | `tool_pin.h/.cpp`、`input_pin.h/.cpp`、`output_pin.h/.cpp`、`prop_pin.h/.cpp` |
 | 工具层 | `tool.h/.cpp`、`tool_factory.h/.cpp` |
@@ -32,7 +32,7 @@
 
 ## 复合结构与工具函数
 
-`core_base_def.h`（`namespace agv` 根）定义：
+`module_typedef.h`（`namespace agv` 根）定义：
 
 - `enum class DataType`：`kUnk/kInt/kFloat/kString/kBytes/kImage`。
 - `enum class PinType`：`kInput/kOutput/kProp`。

@@ -29,7 +29,7 @@
 #include "engine.h"
 #include <algorithm>
 #include "process.h"
-#include "agile_vision/basic/log.h"
+#include "agile_vision/basic/log_service.h"
 #include "agile_vision/basic/dbg_tracker.h"
 
 namespace agv::core {
@@ -85,7 +85,7 @@ namespace agv::core {
     wkid_t Engine::commit(ProcessPtr p, FinishCallback cb)
     {    
         if(p == nullptr || get(p) != kNullId){
-            LOG_ERROR("Null process pointer or already running!");
+            AGV_LOG_ERROR("Null process pointer or already running!");
             return kNullId;
         } 
         auto new_wid = work_id_seed_.next();
@@ -107,7 +107,7 @@ namespace agv::core {
     void Engine::cancel(wkid_t w, bool wait_infinite)
     {
         if(!exist(w)){
-            LOG_ERROR("No running work:{} exists!", w);
+            AGV_LOG_ERROR("No running work:{} exists!", w);
             return;
         }
         running_work_table_[w]->process->setInterrupt(true);
@@ -120,7 +120,7 @@ namespace agv::core {
     Engine::WaitResult Engine::wait(wkid_t w, std::chrono::milliseconds timeout)
     {
         if(!exist(w)){
-            LOG_ERROR("Aleady done:{}", w);
+            AGV_LOG_ERROR("Aleady done:{}", w);
             return WaitResult::kOk;
         }
         auto fut_status = running_work_table_[w]->fut.wait_for(timeout);
@@ -143,7 +143,7 @@ namespace agv::core {
     bool Engine::syncRunProcess(ProcessPtr p)
     {
         if(p == nullptr || get(p) != kNullId){
-            LOG_ERROR("This process:{} is null or in runnning state!", p->alias());
+            AGV_LOG_ERROR("This process:{} is null or in runnning state!", p->alias());
             return false;
         }
         p->runContext().work_id = kNullId;

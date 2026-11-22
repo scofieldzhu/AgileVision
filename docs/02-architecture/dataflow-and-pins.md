@@ -30,7 +30,7 @@
 
 构造时若为定长数组，按 `arry_size * getFundamentalTypeSize` 预分配 `fundamental_bytes_`，或 `resize` `bytes_table_`。
 
-类型化 API（均先校验类型与索引，失败记 `LOG_ERROR` 并返回空/`nullopt`）：
+类型化 API（均先校验类型与索引，失败记 `AGV_LOG_ERROR` 并返回空/`nullopt`）：
 
 - 整型：`setIntValue / getIntValue / getIntPointer`
 - 浮点：`setFloatValue / getFloatValue / getFloatPointer`
@@ -70,7 +70,7 @@
 `Tool::checkPinDataCompatible()` 遍历 `tool_pin_dict_`：
 
 - 跳过非 Input 类型与 `optional()` 的 Pin。
-- 必选 InputPin 必须 `produceInfo()` 非空，否则 `LOG_WARN` 并返回 false。
+- 必选 InputPin 必须 `produceInfo()` 非空，否则 `AGV_LOG_WARN` 并返回 false。
 - 用 `inputSpec.compatibleWith(outputSpec)` 校验规格一致。
 
 ## 5.6 关系网络（RelationshipNetwork）
