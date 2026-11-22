@@ -30,7 +30,6 @@
 #define __tool_pin_h__
 
 #include "agile_vision/core/data_spec.h"
-#include "agile_vision/core/core_export.h"
 
 namespace agv::core {
 

@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __geometry_typedef_h__
-#define __geometry_typedef_h__
+#ifndef __agile_vision_geometry_typedef_h__
+#define __agile_vision_geometry_typedef_h__
 
 #include "agile_vision/geometry/array_x.hpp"
 #include "agile_vision/basic/basic_typedef.h"
@@ -42,4 +42,4 @@ namespace agv {
 
 }
 
-#endif // geometry_typedef_h
+#endif // __agile_vision_geometry_typedef_h__

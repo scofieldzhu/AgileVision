@@ -31,7 +31,6 @@
 
 #include "agile_vision/basic/directed_graph.hpp"
 #include "agile_vision/core/tool_linkage.h"
-#include "agile_vision/core/core_export.h"
 
 namespace agv::core {
 

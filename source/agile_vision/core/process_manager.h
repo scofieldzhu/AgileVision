@@ -29,8 +29,7 @@
 #ifndef __process_manager_h__
 #define __process_manager_h__
 
-#include "agile_vision/core/core_base_def.h"
-#include "agile_vision/core/core_export.h"
+#include "agile_vision/core/core_typedef.h"
 
 namespace agv::core {
 

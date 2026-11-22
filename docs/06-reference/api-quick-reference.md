@@ -46,7 +46,7 @@
 
 | 类型 | 头文件 | 说明 |
 | --- | --- | --- |
-| `DataType` | `core/core_base_def.h` | `kUnk/kInt/kFloat/kString/kBytes/kImage` |
+| `DataType` | `core/core_typedef.h` | `kUnk/kInt/kFloat/kString/kBytes/kImage` |
 | `PinType` | 同上 | `kInput/kOutput/kProp` |
 | `PinKey` | 同上 | `std::string_view` |
 | `wkid_t` / `kNullId` | 同上 | 工作 ID 类型与空值 |

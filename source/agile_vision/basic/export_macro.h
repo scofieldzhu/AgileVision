@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __export_macro_h__
-#define __export_macro_h__
+#ifndef __agile_vision_basic_export_macro_h__
+#define __agile_vision_basic_export_macro_h__
 
 #include "agile_vision/basic/cross_platform.h"
 

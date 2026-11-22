@@ -30,8 +30,7 @@
 #define __data_spec_h__
 
 #include <cassert>
-#include "agile_vision/core/core_export.h"
-#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/core_typedef.h"
 
 namespace agv::core {
 

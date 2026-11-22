@@ -33,8 +33,7 @@
 #include <future>
 #include "agile_vision/basic/id_seed.hpp"
 #include "agile_vision/basic/thread_pool.h"
-#include "agile_vision/core/core_base_def.h"
-#include "agile_vision/core/core_export.h"
+#include "agile_vision/core/core_typedef.h"
 
 namespace agv::core {
 

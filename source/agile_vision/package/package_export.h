@@ -25,6 +25,8 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+#ifndef __agile_vision_package_export_h__
+#define __agile_vision_package_export_h__
 
 #include "agile_vision/basic/export_macro.h"
 
@@ -34,5 +36,7 @@
     #else
         #define AGV_PACKAGE_API AGV_WIN_DLL_IMPORT
     #endif
+#endif
+
 #endif
 

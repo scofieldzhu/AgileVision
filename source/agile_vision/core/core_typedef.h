@@ -2,7 +2,7 @@
  *   AgileVison is a generic vision framework, which provides some functional modules
  *   to make you more easier to fast construct your project vison solution implementation.
  *  
- *   File: core_base_def.h  
+ *   File: core_typedef.h  
  *   Copyright (c) 2023-2024 scofieldzhu
  *  
  *   MIT License
@@ -26,12 +26,13 @@
  *   SOFTWARE.
  */
 
-#ifndef __core_base_def_h__
-#define __core_base_def_h__
+#ifndef __agile_vision_core_typedef_h__
+#define __agile_vision_core_typedef_h__
 
 #include <memory>
 #include <string_view>
 #include "agile_vision/basic/image_data.h"
+#include "agile_vision/core/core_export.h"
 
 namespace agv {
 

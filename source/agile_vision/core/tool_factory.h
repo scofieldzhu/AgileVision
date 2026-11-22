@@ -31,8 +31,7 @@
 
 #include <map>
 #include <filesystem>
-#include "agile_vision/core/core_export.h"
-#include "agile_vision/core/core_base_def.h"
+#include "agile_vision/core/core_typedef.h"
 #include "agile_vision/system/dynamic_library_loader.h"
 
 namespace agv::core {

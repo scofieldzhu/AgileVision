@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __basic_export_h__
-#define __basic_export_h__
+#ifndef __agile_vision_basic_export_h__
+#define __agile_vision_basic_export_h__
 
 #include "agile_vision/basic/export_macro.h"
 

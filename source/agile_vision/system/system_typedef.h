@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __system_typedef_h__
-#define __system_typedef_h__
+#ifndef __agile_vision_system_typedef_h__
+#define __agile_vision_system_typedef_h__
 
 #include "agile_vision/basic/cross_platform.h"
 

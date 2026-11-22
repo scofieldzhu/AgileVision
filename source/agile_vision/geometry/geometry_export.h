@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __geometry_export_h__
-#define __geometry_export_h__
+#ifndef __agile_vision_geometry_export_h__
+#define __agile_vision_geometry_export_h__
 
 #include "agile_vision/basic/export_macro.h"
 

@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __basic_typedef_h__
-#define __basic_typedef_h__
+#ifndef __agile_vision_basic_typedef_h__
+#define __agile_vision_basic_typedef_h__
 
 #include <cstdint>
 #include <cassert>
@@ -63,4 +63,4 @@ namespace agv {
 
 }
 
-#endif // basic_typedef_h
+#endif // __agile_vision_basic_typedef_h__
