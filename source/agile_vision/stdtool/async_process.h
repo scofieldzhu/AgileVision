@@ -26,3 +26,7 @@
  *   SOFTWARE.
  */
 
+#ifndef __agile_vision_stdtool_async_process_h__
+#define __agile_vision_stdtool_async_process_h__
+
+#endif

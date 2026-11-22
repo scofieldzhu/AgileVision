@@ -25,8 +25,8 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-#ifndef __directed_graph_hpp__
-#define __directed_graph_hpp__
+#ifndef __agile_vision_basic_directed_graph_h__
+#define __agile_vision_basic_directed_graph_h__
 
 #include <map>
 #include <vector>

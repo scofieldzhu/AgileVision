@@ -26,3 +26,7 @@
  *   SOFTWARE.
  */
 
+#ifndef __agile_vision_stdtool_loop_process_tool_h__
+#define __agile_vision_stdtool_loop_process_tool_h__
+
+#endif

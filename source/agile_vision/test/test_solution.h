@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __test_solution_h__
-#define __test_solution_h__
+#ifndef __agile_vision_test_solution_h__
+#define __agile_vision_test_solution_h__
 
 void Test_Solution();
 

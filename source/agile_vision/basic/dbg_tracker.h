@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __dbg_tracker_h__
-#define __dbg_tracker_h__
+#ifndef __agile_vision_basic_dbg_tracker_h__
+#define __agile_vision_basic_dbg_tracker_h__
 
 #include <string>
 #include "time_util.h"

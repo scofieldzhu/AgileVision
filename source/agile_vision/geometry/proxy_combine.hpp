@@ -25,8 +25,8 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-#ifndef __proxy_combine_hpp__
-#define __proxy_combine_hpp__
+#ifndef __agile_vision_geometry_proxy_combine_h__
+#define __agile_vision_geometry_proxy_combine_h__
 
 #include <iterator>
 #include <algorithm>

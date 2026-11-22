@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __process_manager_h__
-#define __process_manager_h__
+#ifndef __agile_vision_core_process_manager_h__
+#define __agile_vision_core_process_manager_h__
 
 #include "agile_vision/core/core_typedef.h"
 

@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __timestamp_h__
-#define __timestamp_h__
+#ifndef __agile_vision_basic_timestamp_h__
+#define __agile_vision_basic_timestamp_h__
 
 #include <atomic>
 #include "agile_vision/basic/basic_export.h"

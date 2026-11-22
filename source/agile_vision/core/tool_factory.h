@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __tool_factory_h__
-#define __tool_factory_h__
+#ifndef __agile_vision_core_tool_factory_h__
+#define __agile_vision_core_tool_factory_h__
 
 #include <map>
 #include <filesystem>

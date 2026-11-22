@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __time_util_h__
-#define __time_util_h__
+#ifndef __agile_vision_basic_time_util_h__
+#define __agile_vision_basic_time_util_h__
 
 #include <chrono>
 #include "agile_vision/basic/basic_typedef.h"

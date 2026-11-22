@@ -25,8 +25,8 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
-#ifndef __serialize_policy_h__
-#define __serialize_policy_h__
+#ifndef __agile_vision_core_serialize_policy_h__
+#define __agile_vision_core_serialize_policy_h__
 
 #define SERIALIZER_RATEL
 

@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __is_serializable_hpp__
-#define __is_serializable_hpp__
+#ifndef __agile_vision_geometry_is_serializable_h__
+#define __agile_vision_geometry_is_serializable_h__
 
 #include <concepts>
 #include "agile_vision/basic/basic_typedef.h"

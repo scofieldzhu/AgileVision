@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __relationship_network_h__
-#define __relationship_network_h__
+#ifndef __agile_vision_core_relationship_network_h__
+#define __agile_vision_core_relationship_network_h__
 
 #include "agile_vision/basic/directed_graph.hpp"
 #include "agile_vision/core/tool_linkage.h"

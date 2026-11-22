@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __dynamic_library_loader_h__
-#define __dynamic_library_loader_h__
+#ifndef __agile_vision_system_dynamic_library_loader_h__
+#define __agile_vision_system_dynamic_library_loader_h__
 
 #include <string>
 #include "agile_vision/system/system_export.h"

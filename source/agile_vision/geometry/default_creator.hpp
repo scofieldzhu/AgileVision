@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __default_creator_hpp__
-#define __default_creator_hpp__
+#ifndef __agile_vision_geometry_default_creator_h__
+#define __agile_vision_geometry_default_creator_h__
 
 #include <functional>
 

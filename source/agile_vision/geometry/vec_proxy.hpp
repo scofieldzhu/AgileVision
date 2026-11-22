@@ -25,8 +25,8 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-#ifndef __vec_proxy_hpp__
-#define __vec_proxy_hpp__
+#ifndef __agile_vision_geometry_vec_proxy_h__
+#define __agile_vision_geometry_vec_proxy_h__
 
 #include <iterator>
 #include <algorithm>
@@ -221,4 +221,4 @@ namespace agv {
 
 }
 
-#endif // __vec_proxy_hpp__
+#endif // __agile_vision_geometry_vec_proxy_h__

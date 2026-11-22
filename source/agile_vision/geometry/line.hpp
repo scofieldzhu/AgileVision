@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __line_hpp__
-#define __line_hpp__
+#ifndef __agile_vision_geometry_line_h__
+#define __agile_vision_geometry_line_h__
 
 #include "agile_vision/geometry/point.h"
 #include "agile_vision/geometry/proxy_combine.hpp"

@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __element_proxy_hpp__
-#define __element_proxy_hpp__
+#ifndef __agile_vision_geometry_element_proxy_h__
+#define __agile_vision_geometry_element_proxy_h__
 
 #include <type_traits>
 #include "agile_vision/basic/string_proxy.h"

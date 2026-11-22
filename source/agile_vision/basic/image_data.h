@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __image_data_h__
-#define __image_data_h__
+#ifndef __agile_vision_basic_image_data_h__
+#define __agile_vision_basic_image_data_h__
 
 #include "agile_vision/basic/basic_typedef.h"
 #include "agile_vision/basic/cross_platform.h"

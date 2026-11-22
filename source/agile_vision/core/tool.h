@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __tool_h__
-#define __tool_h__
+#ifndef __agile_vision_core_tool_h__
+#define __agile_vision_core_tool_h__
 
 #include <map>
 #include "agile_vision/core/input_pin.h"

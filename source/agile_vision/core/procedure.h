@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __procedure_h__
-#define __procedure_h__
+#ifndef __agile_vision_core_procedure_h__
+#define __agile_vision_core_procedure_h__
 
 #include "agile_vision/core/process.h"
 

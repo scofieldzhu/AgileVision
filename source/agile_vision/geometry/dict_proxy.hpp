@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __dict_proxy_hpp__
-#define __dict_proxy_hpp__
+#ifndef __agile_vision_geometry_dict_proxy_h__
+#define __agile_vision_geometry_dict_proxy_h__
 
 #include <map>
 #include <cassert>

@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __global_variable_h__
-#define __global_variable_h__
+#ifndef __agile_vision_core_global_variable_h__
+#define __agile_vision_core_global_variable_h__
 
 #include <any>
 #include <string>

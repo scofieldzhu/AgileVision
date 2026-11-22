@@ -26,3 +26,7 @@
  *   SOFTWARE.
  */
 
+#ifndef __agile_vision_package_compressor_h__
+#define __agile_vision_package_compressor_h__
+
+#endif

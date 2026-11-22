@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __prop_pin_h__
-#define __prop_pin_h__
+#ifndef __agile_vision_core_prop_pin_h__
+#define __agile_vision_core_prop_pin_h__
 
 #include "agile_vision/core/tool_pin.h"
 #include "agile_vision/core/produce_info.h"

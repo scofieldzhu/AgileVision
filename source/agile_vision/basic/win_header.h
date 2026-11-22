@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __win_header_h__
-#define __win_header_h__
+#ifndef __agile_vision_basic_win_header_h__
+#define __agile_vision_basic_win_header_h__
 
 #define WIN32_LEAN_AND_MEAN 
 #include <windows.h>

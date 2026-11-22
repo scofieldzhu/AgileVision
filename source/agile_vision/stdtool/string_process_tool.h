@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __string_process_tool_h__
-#define __string_process_tool_h__
+#ifndef __agile_vision_stdtool_string_process_tool_h__
+#define __agile_vision_stdtool_string_process_tool_h__
 
 #include "agile_vision/core/tool.h"
 #include "agile_vision/stdtool/stdtool_export.h"

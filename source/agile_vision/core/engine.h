@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __engine_h__
-#define __engine_h__
+#ifndef __agile_vision_core_engine_h__
+#define __agile_vision_core_engine_h__
 
 #include <map>
 #include <future>

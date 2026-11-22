@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __solution_h__
-#define __solution_h__
+#ifndef __agile_vision_core_solution_h__
+#define __agile_vision_core_solution_h__
 
 #include "agile_vision/core/run_context.h"
 #include "agile_vision/core/core_export.h"

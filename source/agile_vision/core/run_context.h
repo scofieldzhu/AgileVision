@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __run_context_h__
-#define __run_context_h__
+#ifndef __agile_vision_core_run_context_h__
+#define __agile_vision_core_run_context_h__
 
 #include "agile_vision/core/core_typedef.h"
 

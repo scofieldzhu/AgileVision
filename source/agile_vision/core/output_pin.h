@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __output_pin_h__
-#define __output_pin_h__
+#ifndef __agile_vision_core_output_pin_h__
+#define __agile_vision_core_output_pin_h__
 
 #include "agile_vision/core/tool_pin.h"
 #include "agile_vision/core/consume_info.h"

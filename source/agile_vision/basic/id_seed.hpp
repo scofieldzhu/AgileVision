@@ -25,8 +25,8 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-#ifndef __id_seed_hpp__
-#define __id_seed_hpp__
+#ifndef __agile_vision_basic_id_seed_h__
+#define __agile_vision_basic_id_seed_h__
 
 #include <limits>
 #include <type_traits>

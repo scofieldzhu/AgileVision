@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __point_h__
-#define __point_h__
+#ifndef __agile_vision_geometry_point_h__
+#define __agile_vision_geometry_point_h__
 
 #include "agile_vision/geometry/geometry_typedef.h"
 

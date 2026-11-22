@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __wait_process_tool_h__
-#define __wait_process_tool_h__
+#ifndef __agile_vision_stdtool_wait_process_tool_h__
+#define __agile_vision_stdtool_wait_process_tool_h__
 
 #include "agile_vision/core/tool.h"
 #include "agile_vision/stdtool/stdtool_export.h"

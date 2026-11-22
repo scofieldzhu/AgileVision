@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __consume_info_h__
-#define __consume_info_h__
+#ifndef __agile_vision_core_consume_info_h__
+#define __agile_vision_core_consume_info_h__
 
 #include "agile_vision/core/core_typedef.h"
 

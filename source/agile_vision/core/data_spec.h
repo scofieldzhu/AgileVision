@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __data_spec_h__
-#define __data_spec_h__
+#ifndef __agile_vision_core_data_spec_h__
+#define __agile_vision_core_data_spec_h__
 
 #include <cassert>
 #include "agile_vision/core/core_typedef.h"

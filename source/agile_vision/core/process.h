@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __process_h__
-#define __process_h__
+#ifndef __agile_vision_core_process_h__
+#define __agile_vision_core_process_h__
 
 #include <mutex>
 #include "agile_vision/core/run_context.h"

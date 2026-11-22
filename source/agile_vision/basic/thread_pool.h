@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __thread_pool_h__
-#define __thread_pool_h__
+#ifndef __agile_vision_basic_thread_pool_h__
+#define __agile_vision_basic_thread_pool_h__
 
 #include <condition_variable>
 #include <functional>

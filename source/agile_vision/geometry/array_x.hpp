@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __array_x_hpp__
-#define __array_x_hpp__
+#ifndef __agile_vision_geometry_array_x_h__
+#define __agile_vision_geometry_array_x_h__
 
 #include <type_traits>
 #include <format>

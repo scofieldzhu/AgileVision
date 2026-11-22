@@ -26,8 +26,8 @@
  *   SOFTWARE.
  */
 
-#ifndef __tool_linkage_h__
-#define __tool_linkage_h__
+#ifndef __agile_vision_core_tool_linkage_h__
+#define __agile_vision_core_tool_linkage_h__
 
 #include "agile_vision/core/core_typedef.h"
 

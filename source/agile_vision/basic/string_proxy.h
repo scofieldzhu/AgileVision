@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __string_proxy_h__
-#define __string_proxy_h__
+#ifndef __agile_vision_basic_string_proxy_h__
+#define __agile_vision_basic_string_proxy_h__
 
 #include <cstdint>
 #include <initializer_list>

@@ -26,8 +26,8 @@
  *  SOFTWARE.
  */
 
-#ifndef __geometry_h__
-#define __geometry_h__
+#ifndef __agile_vision_geometry_h__
+#define __agile_vision_geometry_h__
 
 #include "agile_vision/geometry/element_proxy.hpp"
 #include "agile_vision/geometry/array_x.hpp"

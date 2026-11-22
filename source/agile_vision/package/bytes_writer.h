@@ -26,3 +26,7 @@
  *   SOFTWARE.
  */
 
+#ifndef __agile_vision_package_bytes_writer_h__
+#define __agile_vision_package_bytes_writer_h__
+
+#endif

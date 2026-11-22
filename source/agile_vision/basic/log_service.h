@@ -7,8 +7,8 @@
  *   MIT License
  */
 
-#ifndef __log_service_h__
-#define __log_service_h__
+#ifndef __agile_vision_basic_log_service_h__
+#define __agile_vision_basic_log_service_h__
 
 // 项目统一日志封装（CODING_STANDARD.md §12）。
 // 六个 AGV_LOG_* 宏经 agv::GetLogger() 记录，自动附带文件、行号与函数名；

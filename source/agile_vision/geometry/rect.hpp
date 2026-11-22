@@ -25,8 +25,8 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-#ifndef __rect_hpp__
-#define __rect_hpp__
+#ifndef __agile_vision_geometry_rect_h__
+#define __agile_vision_geometry_rect_h__
 
 #include "agile_vision/geometry/array_x.hpp"
 
