@@ -13,12 +13,10 @@
 | `basic_export.h` | `AGV_BASIC_API` | 基础模块 API 宏（含内嵌基础工具） |
 | `log_service.h` | `AGV_LOG_*`、`GetLogger()`/`SetLogger()` | 全项目统一日志门面 |
 | `string_proxy.h/.cpp` | `StringProxy` | UTF-8 字符串、序列化、UID、数值转换、编码转换 |
-| `timestamp.h/.cpp` | `Timestamp` | 线程安全原子计数器 |
-| `time_util.h/.cpp` | `TimeTracker` | 毫秒级计时器 |
+| `time_util.h/.cpp` | `TimeTracker`、`Timestamp` | 毫秒级计时器、线程安全原子计数器 |
 | `dbg_tracker.h/.cpp` | `DbgTracker`、`_AUTO_FUNC_TRACK_` | RAII 函数进入/离开跟踪 |
 | `thread_pool.h/.cpp` | `ThreadPool` | 固定 worker 数任务队列 |
 | `id_seed.hpp` | `IdSeed<T>` | header-only 无符号整型 ID 生成器 |
-| `directed_graph.hpp` | `DirectedGraph<V,A,K>` | header-only 邻接表有向图，支持判环 |
 | `win_header.h` | — | 统一 Windows 头入口 |
 
 ## 类型体系

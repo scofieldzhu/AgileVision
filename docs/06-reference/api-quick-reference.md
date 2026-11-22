@@ -53,9 +53,9 @@
 | `AgvBytes` / `AgvString` | `basic/basic_typedef.h` | 字节向量 / 字符串 |
 | `ImageData` | `basic/image_data.h` | 图像描述（packed） |
 | `StringProxy` | `basic/string_proxy.h` | 字符串封装、序列化、UID、转换 |
-| `Timestamp` / `TimeTracker` | `basic/timestamp.h`、`time_util.h` | 原子计数 / 计时器 |
+| `Timestamp` / `TimeTracker` | `basic/time_util.h` | 原子计数 / 计时器 |
 | `IdSeed<T>` | `basic/id_seed.hpp` | ID 生成器（非线程安全） |
-| `DirectedGraph<V,A,K>` | `basic/directed_graph.hpp` | 有向图，支持判环 |
+| `DirectedGraph<V,A,K>` | `core/directed_graph.hpp` | 有向图，支持判环 |
 | `AGV_LOG_*` 宏 / `GetLogger()` | `basic/log_service.h` | 统一日志门面 |
 | `DynamicLibraryLoader` | `system/dynamic_library_loader.h` | 跨平台动态库加载 |
 

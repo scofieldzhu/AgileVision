@@ -29,6 +29,7 @@
 #ifndef __agile_vision_basic_time_util_h__
 #define __agile_vision_basic_time_util_h__
 
+#include <atomic>
 #include <chrono>
 #include "agile_vision/basic/basic_typedef.h"
 #include "agile_vision/basic/basic_export.h"
@@ -46,6 +47,19 @@ namespace agv {
     private:
         bool auto_start_;
         std::chrono::time_point<std::chrono::high_resolution_clock> start_time_;
+    };
+
+    class AGV_BASIC_API Timestamp
+    {
+    public:
+        void force(uint64_t val);
+        uint64_t next();
+        uint64_t value()const;
+        Timestamp(uint64_t init_val);
+        ~Timestamp(); 
+
+    private:
+        std::atomic_uint64_t value_;
     };
 
 }

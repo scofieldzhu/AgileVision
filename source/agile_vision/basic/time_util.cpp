@@ -54,4 +54,28 @@ namespace agv {
         return diff.count();
     }
 
+    Timestamp::Timestamp(uint64_t init_val)
+        :value_(init_val)
+    {
+    }
+
+    Timestamp::~Timestamp()
+    {
+    }
+
+    void Timestamp::force(uint64_t v)
+    {
+        value_ = v;
+    }
+
+    uint64_t Timestamp::next()
+    {
+        return ++value_;
+    }
+
+    uint64_t Timestamp::value() const
+    {
+        return value_.load();
+    }
+
 }

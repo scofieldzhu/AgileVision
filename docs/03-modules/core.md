@@ -2,7 +2,7 @@
 
 框架核心层，命名空间 `agv::core`（公共类型在 `agv` 根），编译为 `agile_vision.core` SHARED 库，PUBLIC 依赖 basic。
 
-## 文件清单（34 个）
+## 文件清单（35 个）
 
 | 分类 | 文件 |
 | --- | --- |
@@ -11,7 +11,7 @@
 | Pin 层 | `tool_pin.h/.cpp`、`input_pin.h/.cpp`、`output_pin.h/.cpp`、`prop_pin.h/.cpp` |
 | 工具层 | `tool.h/.cpp`、`tool_factory.h/.cpp` |
 | 流程层 | `process.h/.cpp`、`procedure.h/.cpp`、`solution.h/.cpp`、`process_manager.h/.cpp` |
-| 调度层 | `engine.h/.cpp`、`relationship_network.h/.cpp` |
+| 调度层 | `engine.h/.cpp`、`relationship_network.h/.cpp`、`directed_graph.hpp` |
 
 ## 核心类职责速查
 

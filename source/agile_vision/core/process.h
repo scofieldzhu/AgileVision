@@ -31,7 +31,7 @@
 
 #include <mutex>
 #include "agile_vision/core/run_context.h"
-#include "agile_vision/basic/timestamp.h"
+#include "agile_vision/basic/time_util.h"
 
 namespace agv::core {
 
