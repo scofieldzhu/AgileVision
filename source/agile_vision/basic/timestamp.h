@@ -34,7 +34,7 @@
 
 namespace agv {
 
-    class RATEL_BASIC_API Timestamp
+    class AGV_BASIC_API Timestamp
     {
     public:
         void force(uint64_t val);

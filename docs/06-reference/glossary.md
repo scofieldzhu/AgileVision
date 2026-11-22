@@ -39,7 +39,7 @@
 | `agv::stdtool` | 标准工具层命名空间 |
 | `AGV_*_API` | 模块导出宏（如 `AGV_CORE_API`） |
 | `AGV_*_EXPORT` | 导出侧编译开关，构建库时定义 |
-| `RATEL_*` | 历史命名遗留（宏/注释），与外部 Ratel 库无关 |
+| `AGV_*_API` | 模块导出宏统一前缀（如 `AGV_CORE_API`、`AGV_SYSTEM_API`） |
 | `PLATFORM_WIN/LINUX/UNKNOWN` | 平台宏，定义于 `cross_platform.h` |
 | 尾下划线 `_` | 类成员命名约定（`iid_`、`name_`） |
 | `k` 前缀 | 常量与 `enum class` 成员命名约定（`kNullId`、`kInt`） |

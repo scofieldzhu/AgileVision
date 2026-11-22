@@ -9,8 +9,8 @@
 | `basic_typedef.h` | `Byte`、`ByteVec`、`AgvBytes`、`AgvString` 等 | 字节/字符串类型底座 |
 | `image_data.h` | `ImageData`（`AGV_PACKED`） | 通用图像描述结构 |
 | `cross_platform.h` | 平台宏、打包宏 | 平台检测与字节对齐统一收口 |
-| `export_macro.h` | `RATEL_WIN_DLL_*`、`RATEL_EXTERN_C_*` | 基础导出/C 接口宏 |
-| `basic_export.h` | `AGV_BASIC_API`、`RATEL_BASIC_API` | 基础模块 API 宏 |
+| `export_macro.h` | `AGV_WIN_DLL_*`、`AGV_EXTERN_C_*` | 基础导出/C 接口宏 |
+| `basic_export.h` | `AGV_BASIC_API` | 基础模块 API 宏（含内嵌基础工具） |
 | `log.h` | `LOG_TRACE/DEBUG/INFO/WARN/ERROR/CRITICAL` | 全项目统一日志门面 |
 | `string_proxy.h/.cpp` | `StringProxy` | UTF-8 字符串、序列化、UID、数值转换、编码转换 |
 | `timestamp.h/.cpp` | `Timestamp` | 线程安全原子计数器 |
@@ -46,7 +46,7 @@
 
 ## StringProxy
 
-`class RATEL_BASIC_API StringProxy final`，内部持 `std::string stdstr_`（UTF-8）。四组能力：
+`class AGV_BASIC_API StringProxy final`，内部持 `std::string stdstr_`（UTF-8）。四组能力：
 
 | 组 | 接口 |
 | --- | --- |

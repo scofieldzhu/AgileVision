@@ -30,9 +30,9 @@
 
 #ifdef PLATFORM_WIN
     #ifdef AGV_PACKAGE_EXPORT
-        #define AGV_PACKAGE_API RATEL_WIN_DLL_EXPORT
+        #define AGV_PACKAGE_API AGV_WIN_DLL_EXPORT
     #else
-        #define AGV_PACKAGE_API RATEL_WIN_DLL_IMPORT
+        #define AGV_PACKAGE_API AGV_WIN_DLL_IMPORT
     #endif
 #endif
 

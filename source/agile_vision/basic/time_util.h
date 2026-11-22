@@ -35,7 +35,7 @@
 
 namespace agv {
 
-    class RATEL_BASIC_API TimeTracker 
+    class AGV_BASIC_API TimeTracker 
     {
     public:
         void restart();    

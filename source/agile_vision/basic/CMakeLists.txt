@@ -3,15 +3,13 @@ agv_add_module(agile_vision.basic
     "${CMAKE_CURRENT_SOURCE_DIR}/../system/dynamic_library_loader.cpp"
 )
 
-# 内嵌的 ratel 代码由本目标编译，需定义导出侧宏（其余模块走 dllimport）。
-target_compile_definitions(agile_vision.basic PRIVATE
-    RATEL_BASIC_EXPORTS
-    RATEL_GEOMETRY_EXPORTS
-    RATEL_SYSTEM_EXPORTS
-)
-
+# geometry / system 为纯头文件模块，其声明随基础库导出；定义导出侧宏（其余模块走 dllimport）。
 if(WIN32)
-    target_compile_definitions(agile_vision.basic PRIVATE AGV_BASIC_EXPORT)
+    target_compile_definitions(agile_vision.basic PRIVATE
+        AGV_BASIC_EXPORT
+        AGV_GEOMETRY_EXPORT
+        AGV_SYSTEM_EXPORT
+    )
 endif()
 
 # geometry / system 为纯头文件模块，随基础模块安装，使公共头中的

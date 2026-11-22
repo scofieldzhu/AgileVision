@@ -32,10 +32,10 @@
 #include "agile_vision/basic/export_macro.h"
     
 #ifdef PLATFORM_WIN
-    #ifdef RATEL_SYSTEM_EXPORTS
-        #define RATEL_SYSTEM_API RATEL_WIN_DLL_EXPORT
+    #ifdef AGV_SYSTEM_EXPORT
+        #define AGV_SYSTEM_API AGV_WIN_DLL_EXPORT
     #else
-        #define RATEL_SYSTEM_API RATEL_WIN_DLL_IMPORT
+        #define AGV_SYSTEM_API AGV_WIN_DLL_IMPORT
     #endif
 #endif
 

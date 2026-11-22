@@ -37,7 +37,7 @@
 
 namespace agv {
 
-    class RATEL_BASIC_API StringProxy final
+    class AGV_BASIC_API StringProxy final
     {
     public:
         ByteVec serializeToBytes()const;

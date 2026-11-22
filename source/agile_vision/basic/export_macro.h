@@ -32,16 +32,16 @@
 #include "agile_vision/basic/cross_platform.h"
 
 #ifdef __cplusplus
-    #define RATEL_EXTERN_C_BEGIN extern "C"{
-    #define RATEL_EXTERN_C_END }
+    #define AGV_EXTERN_C_BEGIN extern "C"{
+    #define AGV_EXTERN_C_END }
 #else 
-    #define RATEL_EXTERN_C_BEGIN
-    #define RATEL_EXTERN_C_END
+    #define AGV_EXTERN_C_BEGIN
+    #define AGV_EXTERN_C_END
 #endif
 
 #ifdef PLATFORM_WIN
-    #define RATEL_WIN_DLL_EXPORT __declspec(dllexport)
-    #define RATEL_WIN_DLL_IMPORT __declspec(dllimport)
+    #define AGV_WIN_DLL_EXPORT __declspec(dllexport)
+    #define AGV_WIN_DLL_IMPORT __declspec(dllimport)
 #endif
 
 #endif

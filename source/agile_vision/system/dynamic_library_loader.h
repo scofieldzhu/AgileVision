@@ -41,7 +41,7 @@
 
 namespace agv {
 
-    class RATEL_SYSTEM_API DynamicLibraryLoader 
+    class AGV_SYSTEM_API DynamicLibraryLoader 
     {
     public:
         bool load(const std::string& filename, std::string* err_detail = nullptr);

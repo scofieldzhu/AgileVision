@@ -29,7 +29,7 @@
 3. include 路径由 `"ratel/xxx.h"` 统一改为 `"agile_vision/xxx.h"`。
 4. 命名统一：导出宏 `AGV_*_API`、命名空间 `agv` / `agv::core` / `agv::stdtool`。
 
-当前全工程无外部 Ratel 路径或 `ratel.basic/ratel.system` 链接残留。源码中仍保留 `RATEL_*` 宏与注释（历史命名遗留），但与外部库无关。
+当前全工程无外部 Ratel 路径或 `ratel.basic/ratel.system` 链接残留，所有导出宏已统一为 `AGV_` 前缀，无 `RATEL_*` 宏残留。部分文件头的 MIT 授权注释仍保留 Ratel 字样（历史文本，与外部库无关）。
 
 > 授权提示：内嵌代码源自 Ratel 源码副本，若对外分发需自行确认其授权条款。
 

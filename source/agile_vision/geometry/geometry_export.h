@@ -32,10 +32,10 @@
 #include "agile_vision/basic/export_macro.h"
 
 #ifdef PLATFORM_WIN
-    #ifdef RATEL_GEOMETRY_EXPORTS
-        #define RATEL_GEOMETRY_API RATEL_WIN_DLL_EXPORT
+    #ifdef AGV_GEOMETRY_EXPORT
+        #define AGV_GEOMETRY_API AGV_WIN_DLL_EXPORT
     #else
-        #define RATEL_GEOMETRY_API RATEL_WIN_DLL_IMPORT
+        #define AGV_GEOMETRY_API AGV_WIN_DLL_IMPORT
     #endif
 #endif
 

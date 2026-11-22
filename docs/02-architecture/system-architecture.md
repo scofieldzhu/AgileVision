@@ -45,19 +45,18 @@ CMake 层面：`agv_build_config`（INTERFACE）统一提供 C++20、include 根
 
 ## 2.4 导出宏体系
 
-宏定义层级：`cross_platform.h`（平台宏）→ `export_macro.h`（基础宏）→ 各 `*_export.h`（模块 API 宏）。
+宏定义层级：`cross_platform.h`（平台宏）→ `export_macro.h`（基础宏 `AGV_WIN_DLL_*`、`AGV_EXTERN_C_*`）→ 各 `*_export.h`（模块 API 宏）。全部导出宏统一使用 `AGV_` 前缀。
 
 | 宏 | 定义文件 | 判定开关 | 使用者 |
 | --- | --- | --- | --- |
-| `AGV_BASIC_API` | `basic/basic_export.h` | `AGV_BASIC_EXPORT` | basic 模块公共类 |
-| `RATEL_BASIC_API` | `basic/basic_export.h` | `RATEL_BASIC_EXPORTS` | 基础工具（历史命名遗留） |
-| `RATEL_GEOMETRY_API` | `geometry/geometry_export.h` | `RATEL_GEOMETRY_EXPORTS` | geometry 导出声明 |
-| `RATEL_SYSTEM_API` | `system/system_export.h` | `RATEL_SYSTEM_EXPORTS` | 动态库加载器 |
+| `AGV_BASIC_API` | `basic/basic_export.h` | `AGV_BASIC_EXPORT` | basic 模块公共类与内嵌基础工具 |
+| `AGV_GEOMETRY_API` | `geometry/geometry_export.h` | `AGV_GEOMETRY_EXPORT` | geometry 导出声明 |
+| `AGV_SYSTEM_API` | `system/system_export.h` | `AGV_SYSTEM_EXPORT` | 动态库加载器 |
 | `AGV_CORE_API` | `core/core_export.h` | `AGV_CORE_EXPORT` | core 全部公共类 |
 | `AGV_STDTOOL_API` | `stdtool/stdtool_export.h` | `AGV_STDTOOL_EXPORT` | 标准工具类 |
 | `AGV_PACKAGE_API` | `package/package_export.h` | `AGV_PACKAGE_EXPORT` | 打包模块 |
 
-构建侧：basic 目标 `PRIVATE` 定义 `RATEL_BASIC_EXPORTS`、`RATEL_GEOMETRY_EXPORTS`、`RATEL_SYSTEM_EXPORTS`（Windows 另加 `AGV_BASIC_EXPORT`），使 system 实现与 geometry 内联代码随 basic 库导出；core/stdtool/package 在消费侧走 `dllimport`。
+构建侧：basic 目标在 `if(WIN32)` 中 `PRIVATE` 定义 `AGV_BASIC_EXPORT`、`AGV_GEOMETRY_EXPORT`、`AGV_SYSTEM_EXPORT`，使 system 实现与 geometry 内联代码随 basic 库导出；core/stdtool/package 在消费侧走 `dllimport`。其余模块同样用 `if(WIN32)` 定义各自的 `AGV_*_EXPORT` 开关。
 
 > 注意：上述 API 宏目前只在 `#ifdef PLATFORM_WIN` 分支内定义。非 Windows 平台直接编译含这些宏的非模板声明会因宏未定义报错，需构建脚本补充空定义。详见 [已知问题](../06-reference/known-issues.md)。
 

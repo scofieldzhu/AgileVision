@@ -40,6 +40,6 @@
 #include "agile_vision/geometry/geometry_typedef.h"
 #include "agile_vision/geometry/geometry_export.h"
 
-RATEL_GEOMETRY_API void test();
+AGV_GEOMETRY_API void test();
 
 #endif

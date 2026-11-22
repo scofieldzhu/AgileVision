@@ -40,8 +40,8 @@
 | 图网络未联动 | `Tool::setPinConnection` 的启用版本直接在 Pin 层建引用，基于 `RelationshipNetwork` 的旧校验代码被注释；框架正从“图驱动”向“Pin 直接引用驱动”迁移 |
 | Engine 未使用成员 | `rem_work_cv_`、`rem_work_mutex_`、`rem_work_id_`、`exit_rem_task_` 在 `engine.cpp` 中未使用，疑似遗留/待实现 |
 | `_AUTO_FUNC_TRACK_` 宏 | 调试跟踪宏仍在使用，按规范逐步收敛（注释/命名/日志） |
-| `RATEL_*` 命名遗留 | 导出宏与注释仍有 RATEL 前缀，与外部依赖无关，可择机统一为 AGV 前缀 |
-| 非 Windows 导出宏缺口 | 所有 `AGV_*_API` / `RATEL_*_API` 只在 `#ifdef PLATFORM_WIN` 分支定义；非 Windows 编译非模板声明会因宏未定义失败，需构建脚本补空定义 |
+| 非 Windows 导出宏缺口 | 所有 `AGV_*_API` 只在 `#ifdef PLATFORM_WIN` 分支定义；非 Windows 编译非模板声明会因宏未定义失败，需构建脚本补空定义 |
+| 授权头 Ratel 字样 | 部分文件头的 MIT 授权注释仍含 Ratel 字样（历史文本，与外部依赖无关） |
 | `Tool::clone()` 基类实现 | 返回 `nullptr`，依赖派生类 override；未 override 的工具调用 clone 会得到空指针 |
 | 全角文档路径 | 内嵌源码授权条款需对外分发前确认（Ratel 源码副本） |
 
@@ -52,9 +52,10 @@
 - `relationship_network.cpp` 的 `consume_linkages` 分支误写 `produce_linkages->push_back` 已修正。
 - vcpkg spdlog 与手写 `SPDLOG_USE_STD_FORMAT` 冲突导致 LNK2001，已移除相关定义。
 - 头文件 `#pragma once`、命名空间缩进、控制流大括号、日志直调等规范问题已全量整改，检查器零违规。
+- 导出宏命名已统一为 `AGV_` 前缀：`RATEL_BASIC_API`/`RATEL_GEOMETRY_API`/`RATEL_SYSTEM_API` 及底层 `RATEL_WIN_DLL_*`、`RATEL_EXTERN_C_*`、`RATEL_*_EXPORTS` 全部改为对应 `AGV_` 宏，`RATEL_BASIC_API` 与既有 `AGV_BASIC_API` 合并。
 
 ## 11.6 演进优先级建议
 
 1. **高**：核实并修复 `setPinConnection` 消费者登记、补 OutputPin 缺失实现、修复 `DataSpec::loadBytes` 回填。
 2. **中**：接入 Protobuf 后端并补全 package 模块；实现 Pin 连接持久化；处理非 Windows 导出宏。
-3. **低**：清理 Engine 未使用成员、统一 RATEL 遗留命名、补齐 stdtool 占位工具、为几何类型写单元测试。
+3. **低**：清理 Engine 未使用成员、补齐 stdtool 占位工具、为几何类型写单元测试。

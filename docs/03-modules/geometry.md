@@ -19,7 +19,7 @@
 | `rect.hpp` | `Rect<T>` | 矩形：左上角、尺寸、旋转角 |
 | `circle.hpp` | `Circle<T>` | 圆：圆心、半径 |
 | `geometry.h` | — | 总聚合头，include 全部代理与实体 |
-| `geometry_export.h` | `RATEL_GEOMETRY_API` | 导出宏 |
+| `geometry_export.h` | `AGV_GEOMETRY_API` | 导出宏 |
 
 ## Proxy 机制
 

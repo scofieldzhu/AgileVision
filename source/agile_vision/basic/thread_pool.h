@@ -38,7 +38,7 @@
 
 namespace agv {
 
-    class RATEL_BASIC_API ThreadPool
+    class AGV_BASIC_API ThreadPool
     {
     public:
         using task_func = std::function<void()>;

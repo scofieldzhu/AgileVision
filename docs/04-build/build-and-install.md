@@ -74,7 +74,7 @@ Agent shell 注意事项：若环境同时存在 `HTTPS_PROXY/https_proxy` 大�
 
 | 模块 | 差异 |
 | --- | --- |
-| basic | `agv_add_module(agile_vision.basic ../system/dynamic_library_loader.cpp)`；定义 `RATEL_{BASIC,GEOMETRY,SYSTEM}_EXPORTS` 与 `AGV_BASIC_EXPORT`；额外安装 geometry/system 头文件 |
+| basic | `agv_add_module(agile_vision.basic ../system/dynamic_library_loader.cpp)`；在 `if(WIN32)` 中定义 `AGV_{BASIC,GEOMETRY,SYSTEM}_EXPORT`；额外安装 geometry/system 头文件 |
 | core | 标准模块，PUBLIC 链接 basic，定义 `AGV_CORE_EXPORT` |
 | stdtool | 标准模块，PUBLIC 链接 basic + core，定义 `AGV_STDTOOL_EXPORT` |
 | package | 标准模块 + Protobuf 探测，PUBLIC 链接 basic + core，定义 `AGV_PACKAGE_EXPORT` |

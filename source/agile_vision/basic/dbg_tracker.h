@@ -34,7 +34,7 @@
 
 namespace agv {
 
-    class RATEL_BASIC_API DbgTracker 
+    class AGV_BASIC_API DbgTracker 
     {
     public:
         DbgTracker(const char* fn, const char* func, unsigned int line_no);
