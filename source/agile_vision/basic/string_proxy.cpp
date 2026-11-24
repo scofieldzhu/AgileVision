@@ -337,11 +337,13 @@ namespace agv {
         {
             return 0;
         }
-        unsigned int required_size = *(const unsigned int*)buffer;
+        unsigned int required_size = 0;
+        memcpy(&required_size, buffer, kUIntSize);
         if(required_size == 0){
             stdstr_.clear();
         }else{
-            if(size < required_size + kUIntSize) //data lost!
+            // 用 size_t 比对剩余长度，避免 unsigned int 加法回绕绕过校验
+            if(size - kUIntSize < static_cast<size_t>(required_size)) //data lost!
                 return 0;
             stdstr_.resize(required_size);
             memcpy((void*)stdstr_.data(), buffer + kUIntSize, required_size);

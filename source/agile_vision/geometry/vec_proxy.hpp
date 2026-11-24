@@ -118,9 +118,14 @@ namespace agv {
             list.clear();
             if constexpr(std::is_arithmetic_v<element_type>){
                 if(element_count){
+                    const size_t data_size = static_cast<size_t>(element_count) * sizeof(element_type);
+                    if(data_size > left_size)
+                    {
+                        return 0;
+                    }
                     list.resize(element_count);
-                    memcpy((void*)list.data(), byte_cursor, element_count * sizeof(element_type));
-                    left_size -= element_count * sizeof(element_type);
+                    memcpy((void*)list.data(), byte_cursor, data_size);
+                    left_size -= data_size;
                 }
             }else{            
                 for(unsigned int i = 0; i < element_count; ++i){
@@ -141,7 +146,7 @@ namespace agv {
                             finish_size = e.loadBytes(byte_cursor, left_size);
                         }
                     }
-                    if(finish_size == 0)
+                    if(finish_size == 0 || finish_size > left_size)
                     {
                         return 0;
                     }

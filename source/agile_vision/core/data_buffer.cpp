@@ -127,10 +127,18 @@ namespace agv::core {
         {
             bytes_table_[i] = vvpp.data().at(i).data();
         }
+        cur_data += finish_bytes;
+        left_size -= finish_bytes;
 
+        if(left_size < agv::kUIntSize)
+        {
+            AGV_LOG_ERROR("Serialized data buffer lacks value size field!");
+            return 0;
+        }
         unsigned int value_size = 0;
         memcpy(&value_size, cur_data, agv::kUIntSize);
-        value_size_ = value_size;
+        // 声明值不得大于实际装载容量，避免后续按此值读写时越界
+        value_size_ = std::min<size_t>(value_size, getSize());
         cur_data += agv::kUIntSize;
         left_size -= agv::kUIntSize;
         return size - left_size;
@@ -381,8 +389,12 @@ namespace agv::core {
             bytes_table_.clear();
             return;
         }
-        auto safe_size = std::min<size_t>(strs.size(), value_size_);
-        std::transform(strs.begin(), strs.end(), bytes_table_.begin(), [](const auto& s){
+        const auto safe_size = std::min<size_t>(strs.size(), value_size_);
+        if(bytes_table_.size() < safe_size)
+        {
+            bytes_table_.resize(safe_size);
+        }
+        std::transform(strs.begin(), strs.begin() + safe_size, bytes_table_.begin(), [](const auto& s){
             AgvBytes bytes(s.size() + 1, 0);
             memcpy(bytes.data(), s.c_str(), s.size());
             bytes[s.size()] = '\0';

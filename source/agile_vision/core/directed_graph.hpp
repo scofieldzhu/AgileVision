@@ -105,7 +105,7 @@ namespace agv {
     template<class VDT, class ADT, class VKT>
     inline void DirectedGraph<VDT, ADT, VKT>::addVertex(const_vertex_key_reference key, const vertex_data_type& data)
     {
-        if(!existVertex(key))
+        if(existVertex(key))
         {
             return;
         }

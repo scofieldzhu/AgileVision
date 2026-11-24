@@ -94,39 +94,51 @@ namespace agv {
                 return 0;        
             }
             auto cur_data = byte_data;
-            auto number = *(const unsigned int*)(cur_data);
+            unsigned int number = 0;
+            memcpy(&number, cur_data, kUIntSize);
             cur_data += kUIntSize;
-            auto left_size = size - kUIntSize;
+            size_t left_size = size - kUIntSize;
 
-            unsigned int key_byte_size = 0;
-            memcpy(&key_byte_size, cur_data, kUIntSize);
-            cur_data += kUIntSize;
-            left_size = size - kUIntSize;
-
-            key_vec_proxy_type keys;
-            auto finish_bytes = keys.loadBytes(cur_data, key_byte_size);
-            if(finish_bytes == 0)
+            if(left_size < kUIntSize)
             {
                 return 0;
             }
-            assert(finish_bytes == key_byte_size);
+            unsigned int key_byte_size = 0;
+            memcpy(&key_byte_size, cur_data, kUIntSize);
+            cur_data += kUIntSize;
+            left_size -= kUIntSize;
+
+            if(key_byte_size > left_size)
+            {
+                return 0;
+            }
+            key_vec_proxy_type keys;
+            const auto finish_bytes = keys.loadBytes(cur_data, key_byte_size);
+            if(finish_bytes == 0 || finish_bytes > left_size)
+            {
+                return 0;
+            }
             left_size -= finish_bytes;
             cur_data += finish_bytes;
 
             value_vec_proxy_type values;
-            finish_bytes = values.loadBytes(cur_data, left_size);
-            if(finish_bytes == 0)
+            auto values_bytes = values.loadBytes(cur_data, left_size);
+            if(values_bytes == 0 || values_bytes > left_size)
             {
                 return 0;
             }
-            left_size -= finish_bytes;
-            cur_data += finish_bytes;
+            left_size -= values_bytes;
+            cur_data += values_bytes;
 
-            //restore key/value pairs' data
-            map.clear();
-            for(unsigned int i = 0 ; i< number; ++i)
+            // 条目数不得超过实际解析出的键/值数量，避免 at() 抛越界异常
+            if(number > keys.data().size() || number > values.data().size())
             {
-                map.insert({keys.data().at(i), values.data().at(i)});
+                return 0;
+            }
+            map.clear();
+            for(unsigned int i = 0; i < number; ++i)
+            {
+                map.insert({keys.data()[i], values.data()[i]});
             }
             return size - left_size;
         }

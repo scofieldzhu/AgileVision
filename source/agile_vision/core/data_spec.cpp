@@ -44,7 +44,15 @@ namespace agv::core {
     size_t DataSpec::loadBytes(ConsAgvBytePtr buffer, size_t size)
     {
         Arry3u arry_d;
-        return arry_d.loadBytes(buffer, size);
+        const auto finish_bytes = arry_d.loadBytes(buffer, size);
+        if(finish_bytes == 0)
+        {
+            return 0;
+        }
+        major_type = static_cast<DataType>(arry_d[0]);
+        subtype = arry_d[1];
+        arry_size = arry_d[2];
+        return finish_bytes;
     }
 
     bool DataSpec::compatibleWith(const DataSpec &ds) const

@@ -57,7 +57,6 @@ namespace agv::core {
 
     private:
         friend struct RunThreadTask;
-        agv::ThreadPool thread_pool_;
         struct Work
         {
             ProcessPtr process = nullptr;
@@ -68,12 +67,10 @@ namespace agv::core {
         using WorkSPtr = std::shared_ptr<Work>;
         using WorkTableType = std::map<wkid_t, WorkSPtr>;
         WorkTableType running_work_table_;
-        std::mutex running_work_table_mutex_;
+        mutable std::mutex running_work_table_mutex_;
         agv::IdSeed<wkid_t> work_id_seed_{0};
-        std::condition_variable rem_work_cv_;
-        std::mutex rem_work_mutex_;
-        wkid_t rem_work_id_ = kNullId;
-        bool exit_rem_task_ = false;
+        // 线程池最后声明：析构时先 stop/join，确保在途任务结束前工作表与锁仍有效
+        agv::ThreadPool thread_pool_;
     };
 
 }
