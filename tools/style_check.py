@@ -14,6 +14,7 @@ import sys
 
 EXT = ('.h', '.hpp', '.cpp')
 MAX_COL = 160
+PLATFORM_HEADERS = {'cross_platform.h', 'win_header.h', 'export_macro.h'}
 
 
 # ---------------------------------------------------------------------------
@@ -238,6 +239,53 @@ def check_file(path: str):
         # §8.4 初始化列表逗号行首
         if re.match(r'^\s*,\s*\S', line):
             issues.append((n, 'COMMA_FIRST', '初始化列表逗号应置于上一项行尾（§8.4）'))
+
+        # §8.7 二元操作符断行：行尾留操作符（排除预处理续行）
+        if (not stripped.startswith('#') and
+                re.search(r'(\&\&|\|\||==|!=|<=|>=|<<|>>|\+=|-=|\*=|/=|[\+\*/%])\s*$', line)):
+            issues.append((n, 'OP_EOL', '二元操作符不得留在行尾（§8.7）'))
+
+        # §8.7 三元断行：'?' 独占行尾，或 '?/:' 独占续行
+        # 排除构造初始化列表 ': member_(' 形态（§8.4 逗号后置场景）
+        if re.search(r'\?\s*$', line):
+            issues.append((n, 'TERNARY_BREAK', '三元 ? 不得断行（§8.7）'))
+        if re.match(r'^\s*\?', line):
+            issues.append((n, 'TERNARY_BREAK', '三元 ? 不得独占续行（§8.7）'))
+        if (re.match(r'^\s*:\s', line) and
+                not re.match(r'^\s*:\s*\w+\s*[(\{]', line) and
+                idx > 0 and re.search(r'\?\s*$', lines[idx - 1])):
+            issues.append((n, 'TERNARY_BREAK', '三元 : 不得独占续行（§8.7）'))
+
+        # §1/§12 日志消息中文
+        ml = re.search(r'AGV_LOG_\w+\s*\(\s*"([^"]*)"', line)
+        if ml and re.search(r'[\u4e00-\u9fff]', ml.group(1)):
+            issues.append((n, 'LOG_CHINESE', '日志消息必须使用英文（§12）'))
+
+        # §1/§10.2 业务代码散落原生平台宏（平台头豁免）
+        if os.path.basename(path) not in PLATFORM_HEADERS and re.search(
+                r'\b(_WIN32|_WIN64|_MSC_VER|__GNUC__|__linux__|__APPLE__)\b', line):
+            issues.append((n, 'PLATFORM_MACRO', '平台宏应复用平台头（§10.2）'))
+
+        # §6.2 typedef
+        if re.search(r'\btypedef\b', line):
+            issues.append((n, 'TYPEDEF', '类型别名应使用 using（§6.2）'))
+
+        # §7 enum class 成员 k 前缀
+        me = re.search(r'enum\s+class\s+\w+\s*\{([^}]*)\}', line)
+        if me:
+            bad_members = [m.strip().split('=')[0].strip() for m in me.group(1).split(',')
+                           if m.strip() and not m.strip().startswith('k')]
+            if bad_members:
+                issues.append((n, 'ENUM_MEMBER', 'enum class 成员应加 k 前缀（§7）'))
+
+        # §6.1 常量 k 前缀
+        mc = re.search(r'\bconstexpr\s+(?:auto|int|size_t|std::size_t|unsigned|long|float|double)\s+(\w+)', line)
+        if mc and not mc.group(1).startswith('k'):
+            issues.append((n, 'CONSTEXPR_NAME', '编译期常量应以 k 开头（§6.1）'))
+
+        # §8.1 else 独占一行
+        if re.match(r'^\s*else\s*$', line):
+            issues.append((n, 'ELSE_SEPARATE', '} 与 else 应写在同一行（§8.2）'))
     return issues
 
 

@@ -64,12 +64,12 @@ namespace agv::stdtool {
         auto process_iid_list_pin = getPropPin(PK_P_ProcessIIDList);
         auto trigger_string_list_pin = getPropPin(PK_P_TriggerStringList);
         auto trigger_mode_list_pin = getPropPin(PK_P_TriggerModeList);
-        if(process_iid_list_pin->dataBuffer().valueSize() != trigger_string_list_pin->dataBuffer().valueSize() && 
-           trigger_string_list_pin->dataBuffer().valueSize() != trigger_mode_list_pin->dataBuffer().valueSize()){
-            AGV_LOG_ERROR("The sizes of process iid list, trigger string list and trigger mode list are not equal with each other:[{},{},{}]!", 
-                process_iid_list_pin->dataBuffer().valueSize(), 
-                trigger_string_list_pin->dataBuffer().valueSize(),
-                trigger_mode_list_pin->dataBuffer().valueSize());
+        const size_t process_iid_size = process_iid_list_pin->dataBuffer().valueSize();
+        const size_t trigger_string_size = trigger_string_list_pin->dataBuffer().valueSize();
+        const size_t trigger_mode_size = trigger_mode_list_pin->dataBuffer().valueSize();
+        if(process_iid_size != trigger_string_size && trigger_string_size != trigger_mode_size){
+            AGV_LOG_ERROR("The sizes of process iid list, trigger string list and trigger mode list are not equal:[{},{},{}]!",
+                process_iid_size, trigger_string_size, trigger_mode_size);
             return false;
         }
         AgvString cur_trigger_string = referenced_string_pin->dataBuffer().getStringValue();

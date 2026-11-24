@@ -89,7 +89,7 @@ void Test_Solution()
     GetModuleFileName(NULL, exe_path, MAX_PATH);
     sExecDir = path(exe_path).parent_path();
     InitToolFactory();
-    Solution* sln = new Solution(3);
-    InitProcedure(sln);
-    sln->run();
+    Solution sln(3);
+    InitProcedure(&sln);
+    sln.run();
 }

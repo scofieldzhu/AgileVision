@@ -25,6 +25,14 @@ python tools/style_check.py [源码根目录，默认 source/agile_vision]
 | `NO_BRACE` / `BRACE_NEXT_LINE` | §8.2 | 控制流缺大括号 / 大括号换行 |
 | `MULTI_STMT` | §8.2 | 一行多语句 |
 | `COMMA_FIRST` | §8.4 | 初始化列表逗号写在行首 |
+| `OP_EOL` | §8.7 | 二元操作符留在行尾（表达式应改写为具名中间量，不靠断行） |
+| `TERNARY_BREAK` | §8.7 | 三元 `?`/`:` 断行（排除构造初始化列表的 `: member_(`） |
+| `LOG_CHINESE` | §1/§12 | 日志消息含中文（必须为英文） |
+| `PLATFORM_MACRO` | §1/§10.2 | 业务代码散落 `_WIN32` 等原生平台宏（平台头豁免） |
+| `TYPEDEF` | §6.2 | 使用 `typedef`（应用 `using`） |
+| `ENUM_MEMBER` | §7 | `enum class` 成员缺少 `k` 前缀 |
+| `CONSTEXPR_NAME` | §6.1 | 编译期常量未以 `k` 开头 |
+| `ELSE_SEPARATE` | §8.2 | `else` 独占一行（应与 `}` 同行） |
 
 ### 关键机制
 
@@ -64,3 +72,5 @@ python tools/style_fix_braces.py [源码根目录，默认 source/agile_vision]
 项目曾对 `source/` 下 98 个 `.h/.hpp/.cpp` 执行全量整改：66 文件 68 个 namespace 块统一缩进、10 文件 41 处控制流补大括号、13 文件 67 处日志调用改为 `LOG_*`、头文件 `using namespace` 清理、`#pragma once` 改 guard 等。整改后检查器零违规，且 configure/build/install 全通过。整改前源码备份在 `C:/Users/cheng/WorkBuddy/spaces/2026_11_21_16-38-59/style_backup_20261121`。
 
 注：以上为当时整改结果；日志门面现已统一为 `basic/log_service.h` 的 `AGV_LOG_*`（见 §12 与 `03-modules/basic.md`）。
+
+2026-11-24 追加：按 CODING_STANDARD.md 全量复核，检查器新增 §6.1/§6.2/§7/§8.7/§10.2/§12 共 8 条机械规则（见上表），覆盖此前仅靠人工审查的条项。同步修正 `string_process_tool.cpp` 中 `&&` 行尾断行（提具名中间量改写）、`test_solution.cpp` 中 `Solution` 裸 `new` 改为栈对象（消除泄漏）。`DefaultCreator<T*>` 工厂中的 `new` 配合 `shared_ptr` 自定义删除器（§9 允许），`DirectedGraph` 的 `ArcNode` 属双向链表内部节点管理，二者均保留。自检零违规，Debug/Release 构建通过。
