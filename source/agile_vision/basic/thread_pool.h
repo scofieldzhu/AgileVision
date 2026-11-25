@@ -29,6 +29,7 @@
 #ifndef __agile_vision_basic_thread_pool_h__
 #define __agile_vision_basic_thread_pool_h__
 
+#include <atomic>
 #include <condition_variable>
 #include <functional>
 #include <thread>
@@ -51,7 +52,7 @@ namespace agv {
         std::vector<std::thread> workers_;
         std::condition_variable cv_;
         std::mutex mutex_;
-        bool stop_ = false;
+        std::atomic<bool> stop_{false};
     };
 
 }

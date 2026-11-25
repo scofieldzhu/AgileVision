@@ -29,11 +29,11 @@
 
 ## 10.3 接入新的序列化后端
 
-当前 `SerializePolicy` 的 `SERIALIZER_PB` 分支为空。接入 Protobuf 需：
+通过 `-DAGV_SERIALIZER_BACKEND=protobuf` 选择 Protobuf 后端；当前该后端尚未实现，配置时会告警并回退到 proxy。接入 Protobuf 需：
 
 1. 在 `package/CMakeLists.txt` 增加 `protobuf_generate()`，把 7 个 `.proto` 纳入目标并链接 protobuf 运行时；将 `AGV_REQUIRE_PROTOBUF` 设为 ON 或按需强制。
 2. 实现领域对象 ↔ pb 消息的双向转换层（Solution/Procedure/Process/Tool/Pin/DataBuffer）。
-3. 在 `serialize_policy.h` 的 `SERIALIZER_PB` 分支定义所需别名，并让各类的序列化函数体在新宏分支下提供实现。
+3. 在 `serialize_policy.h` 的 `AGV_SERIALIZER_PB` 分支定义所需别名，并让各类的序列化函数体在新宏分支下提供实现；同时移除 CMake 中的回退告警。
 4. 注意 Tool 实例由 `ToolFactory` 按 clsid 创建，反序列化时先建实例再回填属性；Pin 连接关系用 `pbProduceInfo`/`pbInputPin`/`pbOutputPin` 的字段恢复。
 
 ## 10.4 扩展数据流连接

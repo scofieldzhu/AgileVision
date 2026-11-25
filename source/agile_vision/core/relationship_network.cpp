@@ -73,6 +73,11 @@ namespace agv::core {
         dg_.addArc(linkage.producer->iid(), linkage.consumer->iid(), ad);
     }
 
+    void RelationshipNetwork::breakRelationship()
+    {
+        dg_.clear();
+    }
+
     bool RelationshipNetwork::getToolRelationships(ConstToolPtr t, ToolLinkageList* produce_linkages, ToolLinkageList* consume_linkages) const
     {
         if(t == nullptr || !dg_.existVertex(t->iid()))

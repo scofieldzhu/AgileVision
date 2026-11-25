@@ -6,7 +6,8 @@ else()
     find_package(Protobuf QUIET)
 endif()
 
-agv_add_module(agile_vision.package)
+# package 当前为占位模块（无导出符号、无 import lib），不纳入包导出。
+agv_add_module(agile_vision.package NO_EXPORT)
 
 target_link_libraries(agile_vision.package PUBLIC
     agile_vision.basic

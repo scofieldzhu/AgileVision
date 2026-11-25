@@ -43,6 +43,8 @@ namespace agv::core {
         void setAlias(const AgvString& s){ alias_ = s; }
         void setDeprecated(bool s){ deprecated_ = s; }
         bool deprecated()const{ return deprecated_; }
+        Tool* ownerTool()const{ return owner_; }
+        void setOwnerTool(Tool* t){ owner_ = t; }
         virtual PinType getPinType()const = 0;
         explicit ToolPin(const DataSpec& ds);
         virtual ~ToolPin();
@@ -51,6 +53,7 @@ namespace agv::core {
         DataSpec ds_;
         AgvString alias_{"null"};
         bool deprecated_ = false;
+        Tool* owner_ = nullptr; // 非拥有，指向所属 Tool
     };
 
 }

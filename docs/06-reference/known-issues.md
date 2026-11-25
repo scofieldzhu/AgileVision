@@ -9,7 +9,7 @@
 | `bytes_writer` / `compressor` / `package` | `package/` 下三对 .h/.cpp | 仅 MIT 许可证头，无类定义 |
 | `AsyncProcess` / `BreakTool` / `ConditionProcessTool` / `LoopProcessTool` / `SyncProcedureTool` | `stdtool/` 下五对 .h/.cpp | 仅许可证头，无类定义 |
 | `GlobalVariable::serializeToBytes/loadBytes` | `core/global_variable.cpp` | 空实现，全局变量不能持久化 |
-| `SERIALIZER_PB` 分支 | `core/serialize_policy.h` | 空，Protobuf 后端未接入 |
+| `AGV_SERIALIZER_PB` 后端 | `core/serialize_policy.h` | 预留未实现；由 CMake `AGV_SERIALIZER_BACKEND=protobuf` 选择，配置时告警并回退 |
 | `protobuf_generate()` | `package/CMakeLists.txt` | 未接入，7 个 .proto 仅作契约 |
 
 ## 11.2 序列化缺口
@@ -17,28 +17,23 @@
 | 项 | 说明 |
 | --- | --- |
 | Pin 连接未持久化 | `ToolPin` 序列化被注释；`InputPin`/`OutputPin` 无独立序列化；`Tool::loadBytes` 只恢复 name 与 PropPin |
-| `Line::loadBytes` / `Circle::loadBytes` 未回填 | 用值模式（Ref=false）的临时 `ProxyCombine` 反序列化，结果留在临时对象，成员未更新 |
-| `Circle::serializeToBytes` 参数存疑 | `ProxyCombine<point_type, float_proxy, true> pc(center_, radius_)` 中 `radius_` 为 float，而引用模式构造签名要求 `ElementProxy<float>&` |
 | 协议平台相关 | 原生内存 memcpy（无字节序转换、无版本号、无类型标签），跨字节序/ABI 需额外处理；与规范 §11“不直接序列化结构体内存”存在张力（ArrayX/ElementProxy/ImageData 实际用 memcpy） |
 
 ## 11.3 疑似逻辑缺陷（待核实）
 
 | 项 | 说明 |
 | --- | --- |
-| `Tool::setPinConnection` 消费者登记 | `tool.cpp` 中写 `pi.pin->addConsumeInfo({pi.pin})`，按对称语义应为 `{consume_pin}`；当前 OutputPin 记录的可能是自己而非下游 Pin |
 | `DirectedGraph::existArc` 依赖 `VKT::empty()` | 更换 key 类型时需保证有 `empty()` 成员（默认 string 满足） |
 | `ArrayX::operator[]` 仅查上界 | 条件为 `idx >= kN`，`int` 负索引未被拦截 |
-| `OutputPin` 声明未实现 | `removeConsumeTool(ToolPtr)`、`clear()` 在头中声明，cpp 中未见实现 |
 
 ## 11.4 遗留与待收敛
 
 | 项 | 说明 |
 | --- | --- |
-| 图网络未联动 | `Tool::setPinConnection` 的启用版本直接在 Pin 层建引用，基于 `RelationshipNetwork` 的旧校验代码被注释；框架正从“图驱动”向“Pin 直接引用驱动”迁移 |
+| 图网络未联动 | `Tool::setPinConnection` 直接在 Pin 层建引用，基于 `RelationshipNetwork` 的旧校验代码被注释；框架已从“图驱动”迁移到“Pin 直接引用驱动”，图模块保留为预留调度设施 |
 | `_AUTO_FUNC_TRACK_` 宏 | 调试跟踪宏仍在使用，按规范逐步收敛（注释/命名/日志） |
-| 非 Windows 导出宏缺口 | 所有 `AGV_*_API` 只在 `#ifdef PLATFORM_WIN` 分支定义；非 Windows 编译非模板声明会因宏未定义失败，需构建脚本补空定义 |
 | 授权头 Ratel 字样 | 部分文件头的 MIT 授权注释仍含 Ratel 字样（历史文本，与外部依赖无关） |
-| `Tool::clone()` 基类实现 | 返回 `nullptr`，依赖派生类 override；未 override 的工具调用 clone 会得到空指针 |
+| `Tool::clone()` 基类实现 | 默认返回 `nullptr`，由需要的派生类重写；基类无法通用复制派生行为与引脚连接 |
 | 全角文档路径 | 内嵌源码授权条款需对外分发前确认（Ratel 源码副本） |
 
 ## 11.5 已修复的问题（记录备查）
@@ -51,9 +46,12 @@
 - 导出宏命名已统一为 `AGV_` 前缀：`RATEL_BASIC_API`/`RATEL_GEOMETRY_API`/`RATEL_SYSTEM_API` 及底层 `RATEL_WIN_DLL_*`、`RATEL_EXTERN_C_*`、`RATEL_*_EXPORTS` 全部改为对应 `AGV_` 宏，`RATEL_BASIC_API` 与既有 `AGV_BASIC_API` 合并。
 - 内存与并发（高危）：`DataBuffer::setStringValue` 的 `safe_size` 现真正用于截断写入并按需扩容；`syncRunProcess` 空指针解引用已修正；`Engine` 工作表全部访问改为加锁并消除 `exist()`/`operator[]` 竞态，回调在锁外执行且 promise 先于回调满足；线程池成员改为最后声明，保证析构时先 join 在途任务，并捕获任务异常避免 `std::terminate` 与等待方挂起；`ProcessManager::removeProcess(iterator)` 在失效前复位 manager。
 - 反序列化边界：`DataSpec::loadBytes` 现回填三元组；`DataBuffer::loadBytes` 补齐游标推进、尾部长度字段校验并将 `value_size` 限制为容器实际容量；`VecProxy`/`DictProxy`/`StringProxy` 增加长度上界、游标推进与无符号回绕防护；`DirectedGraph::addVertex` 条件反转已修正。
+- 第 2 组：`Tool::setPinConnection` 现正确登记消费者引脚（`{consume_pin}`）且连接成功返回 `true`；`ToolPin` 增加 `owner_` 反查，补齐 `OutputPin::clear`/`removeConsumeTool` 与 `RelationshipNetwork::breakRelationship` 实现；`Line`/`Circle` 改用静态 `SerializeToBytes`/`LoadBytes` 并回填成员，几何模板可正常实例化；`ProxyCombine::LoadBytes` 返回值补齐第二段字节；`ToolFactory` 删除器捕获 loader 的 `shared_ptr`，DLL 生命周期不短于其创建的 Tool。
+- 第 3 组：六个 `*_export.h` 补齐非 Windows 空定义；线程池 `stop_` 改原子、任务加异常边界、析构安全 join；序列化宏统一为 `AGV_SERIALIZER_PROXY`/`AGV_SERIALIZER_PB` 并接入 CMake 选项 `AGV_SERIALIZER_BACKEND`；`solution.cpp` 的占位 iid `"xxx"` 改为空串；`CMakeUserPresets.json` 移出版本控制、提供无硬编码模板；接入 CTest 与非交互冒烟测试 `agv_smoke_test`；`test` 目标改名 `agv_demo` 以避开 CTest 保留字。
+- 第 4 组：CMake 新增 `install(EXPORT AgileVisionTargets)` 与 `AgileVisionConfig(.Version).cmake`，消费者可 `find_package(AgileVision CONFIG)` 链接 `AgileVision::*`；占位模块 package 以 `NO_EXPORT` 排除导出（无 import lib）。
 
 ## 11.6 演进优先级建议
 
-1. **高**：核实并修复 `setPinConnection` 消费者登记与返回值语义、补 `OutputPin` 与 `RelationshipNetwork::breakRelationship` 缺失实现、修复 `Line`/`Circle` 反序列化回填与几何模板实例化编译问题、`ToolFactory` 卸载 DLL 后删除器悬垂。
-2. **中**：接入 Protobuf 后端并补全 package 模块；实现 Pin 连接持久化；处理非 Windows 导出宏；为协议补充魔数/版本号/端序转换与全局长度上限。
-3. **低**：补齐 stdtool 占位工具、为几何类型与并发路径写单元测试、收敛图网络与 Pin 直连双轨实现。
+1. **高**：接入 Protobuf 后端并补全 package 模块；为协议补充魔数/版本号/端序转换与全局长度上限。
+2. **中**：实现 Pin 连接持久化（当前仅 PropPin 可序列化）；补齐 stdtool 占位工具。
+3. **低**：收敛 `_AUTO_FUNC_TRACK_` 调试宏；为几何类型与并发路径补充更多单元测试；对外分发前确认内嵌源码授权条款。

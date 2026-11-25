@@ -41,7 +41,8 @@ namespace agv {
     {
         static Procedure* Create()
         {
-            return new Procedure("xxx");
+            // iid 为反序列化占位值，随后由 Procedure::loadBytes 覆盖。
+            return new Procedure("");
         }
     };
 
@@ -60,22 +61,19 @@ namespace agv::core {
 
     AgvBytes Solution::serializeToBytes() const
     {
-    #ifdef SERIALIZER_RATEL
+    #ifdef AGV_SERIALIZER_PROXY
         using namespace agv;
         std::vector<ProcedurePtr> ptr_list;
         auto transform_view = procedure_list_ | std::views::transform([](auto& p){ return p.get();});
         std::ranges::copy(transform_view, std::back_inserter(ptr_list));
         VecProxy<Procedure*, true> pp(ptr_list);
-        return pp.serializeToBytes();    
-    #endif 
-
-    #ifdef SERIALIZER_PB 
+        return pp.serializeToBytes();
     #endif
     }
 
     size_t Solution::loadBytes(ConsAgvBytePtr buffer, size_t size)
     {
-    #ifdef SERIALIZER_RATEL
+    #ifdef AGV_SERIALIZER_PROXY
         using namespace agv;
         VecProxy<Procedure*> pp;
         auto finish_bytes = pp.loadBytes(buffer, size);
@@ -90,9 +88,6 @@ namespace agv::core {
             procedure_list_.push_back(std::move(e));
         }
         return finish_bytes;
-    #endif
-
-    #ifdef SERIALIZER_PB 
     #endif
     }
 

@@ -44,16 +44,26 @@ namespace agv {
 
         ByteVec serializeToBytes()const
         {
-            ProxyCombine<point_type, float_proxy, true> pc(center_, radius_);
-            // pc.proxyA().mutableElement() = center_;
-            // pc.proxyB().mutableElement() = radius_;
-            return pc.serializeToBytes();
+            float_proxy fp(radius_);
+            return ProxyCombine<point_type, float_proxy>::SerializeToBytes(center_, fp);
         }
 
         size_t loadBytes(ConsBytePtr buffer, size_t size)
         {
-            ProxyCombine<point_type, float_proxy> pc;
-            return pc.loadBytes(buffer, size);
+            if(buffer == nullptr)
+            {
+                return 0;
+            }
+            point_type center;
+            float_proxy fp(0.0f);
+            auto consumed = ProxyCombine<point_type, float_proxy>::LoadBytes(center, fp, buffer, size);
+            if(consumed == 0)
+            {
+                return 0;
+            }
+            center_ = center;
+            radius_ = fp.element();
+            return consumed;
         }
 
         void setCenter(value_type x, value_type y){ center_ = point_type{x, y}; }

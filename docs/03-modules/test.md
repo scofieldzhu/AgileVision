@@ -39,4 +39,4 @@
 
 程序依赖外部 `.agvt` 工具插件文件与 `ImageCalib.bmp` 图像，需放置在可执行文件目录才能完整运行。当前测试不依赖 OpenCV（注释中保留 `cv::waitKey`），保留为后续视觉测试入口。
 
-`CMakeLists.txt` 使用 `add_executable(test)`（非 `agv_add_module`），安装到 `<prefix>/bin/`。
+`CMakeLists.txt` 使用 `add_executable(agv_demo)`（非 `agv_add_module`），安装到 `<prefix>/bin/`。

@@ -74,7 +74,21 @@ namespace agv::core {
             if(kv.second.cls_iid == clsid){
                 const auto& di = kv.second;
                 ToolPtr new_instance = (di.create_tool_func)(iid.c_str());
-                ToolSPtr new_tool(new_instance, di.destroy_tool_func);
+                if(new_instance == nullptr){
+                    AGV_LOG_ERROR("Create tool instance of clsid:{} failed!", clsid);
+                    return nullptr;
+                }
+                // 删除器捕获 loader 的 shared_ptr，使 DLL 生命周期不短于由其创建的 Tool：
+                // 即使工厂先 unload 或析构，DLL 也会保留到最后一个 Tool 销毁后才真正卸载，
+                // 避免调用已卸载代码页中的 destroy 函数。
+                auto loader = di.loader;
+                auto destroy = di.destroy_tool_func;
+                ToolSPtr new_tool(new_instance, [loader, destroy](ToolPtr p){
+                    if(p != nullptr && destroy != nullptr)
+                    {
+                        destroy(p);
+                    }
+                });
                 return new_tool;
             }
         }

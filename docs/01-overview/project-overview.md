@@ -43,7 +43,7 @@ AgileVision 是一个基于 C++20 的通用机器视觉流程框架，目标是�
 | `agile_vision.core` | SHARED | `agv::core` | `AGV_CORE_API` | 依赖 basic |
 | `agile_vision.stdtool` | SHARED | `agv::stdtool` | `AGV_STDTOOL_API` | 依赖 basic + core |
 | `agile_vision.package` | SHARED | `agv` | `AGV_PACKAGE_API` | 依赖 basic + core；实现占位 |
-| `test` | EXECUTABLE | 全局（using `agv`、`agv::core`） | — | 由 `AGV_BUILD_TESTS` 控制 |
+| `agv_demo` | EXECUTABLE | 全局（using `agv`、`agv::core`） | — | 由 `AGV_BUILD_TESTS` 控制 |
 
 ## 1.5 快速上手
 

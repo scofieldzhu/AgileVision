@@ -40,7 +40,7 @@ endif()
 
 ## 演进方向
 
-将 Protobuf 作为第二序列化后端接入 `SerializePolicy` 的 `SERIALIZER_PB` 分支，需完成：
+将 Protobuf 作为第二序列化后端接入 `SerializePolicy` 的 `AGV_SERIALIZER_PB` 分支（由 CMake 选项 `AGV_SERIALIZER_BACKEND=protobuf` 启用），需完成：
 
 1. CMake 接入 `protobuf_generate()` 并链接 protobuf 运行时。
 2. 实现领域对象 ↔ pb 消息的双向转换层（注意 `Tool` 实例仍需由 `ToolFactory` 按 clsid 创建）。

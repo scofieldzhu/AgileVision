@@ -36,7 +36,7 @@ using namespace agv;
 namespace agv::core {
     namespace
     {
-    #ifdef SERIALIZER_RATEL
+    #ifdef AGV_SERIALIZER_PROXY
         using StrPcType = ProxyCombine<StringProxy, StringProxy, true>;
     #endif
     }
@@ -57,7 +57,7 @@ namespace agv::core {
 
     AgvBytes Process::serializeToBytes() const
     {
-    #ifdef SERIALIZER_RATEL    
+    #ifdef AGV_SERIALIZER_PROXY    
         StringProxy sp(iid_);
         StringProxy sp1(alias_);   
         StrPcType spc(sp, sp1);
@@ -72,7 +72,7 @@ namespace agv::core {
 
     size_t Process::loadBytes(ConsAgvBytePtr buffer, size_t size)
     {
-    #ifdef SERIALIZER_RATEL  
+    #ifdef AGV_SERIALIZER_PROXY  
         StringProxy sp;
         StringProxy sp1;    
         StrPcType spc(sp, sp1);

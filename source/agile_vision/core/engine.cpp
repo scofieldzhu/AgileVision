@@ -119,8 +119,12 @@ namespace agv::core {
         std::lock_guard lk(running_work_table_mutex_);
         // 检查与插入在同一临界区内完成，避免重复提交与 id 生成竞态
         const bool already_running = std::any_of(
-            running_work_table_.begin(), running_work_table_.end(),
-            [p](const auto& pair){ return pair.second->process == p; });
+            running_work_table_.begin(), 
+            running_work_table_.end(),
+            [p](const auto& pair){ 
+                return pair.second->process == p;
+            }
+        );
         if(already_running){
             AGV_LOG_ERROR("Process already running!");
             return kNullId;

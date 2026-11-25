@@ -28,13 +28,15 @@
 #ifndef __agile_vision_core_serialize_policy_h__
 #define __agile_vision_core_serialize_policy_h__
 
-#define SERIALIZER_RATEL
+// 序列化后端由构建脚本通过 AGV_SERIALIZER_PROXY / AGV_SERIALIZER_PB 选择；
+// 未显式指定时默认使用内嵌的几何代理方案（无外部依赖）。
+#if !defined(AGV_SERIALIZER_PROXY) && !defined(AGV_SERIALIZER_PB)
+    #define AGV_SERIALIZER_PROXY
+#endif
 
-#ifdef SERIALIZER_RATEL
+#ifdef AGV_SERIALIZER_PROXY
     #include "agile_vision/geometry/geometry.h"
     using SerializeDict = agv::DictProxy<std::string, std::string>;
-#elif defined(SERIALIZER_PB)
-#else 
 #endif
 
 #endif

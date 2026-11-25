@@ -38,7 +38,7 @@ namespace agv::core {
 
     namespace 
     {
-    #ifdef SERIALIZER_RATEL
+    #ifdef AGV_SERIALIZER_PROXY
         using ByteVecPx = VecProxy<agile_vision_byte>;
         using PinDictProxy = DictProxy<std::string, ByteVecPx>;
         using StrProCb = ProxyCombine<StringProxy, StringProxy, true>;
@@ -101,7 +101,7 @@ namespace agv::core {
 
     AgvBytes Tool::serializeToBytes() const
     {
-    #ifdef SERIALIZER_RATEL
+    #ifdef AGV_SERIALIZER_PROXY
         StringProxy sp1(iid_);
         StringProxy sp2(name_);
         StrProCb pc1(sp1, sp2); 
@@ -122,7 +122,7 @@ namespace agv::core {
 
     size_t Tool::loadBytes(ConsAgvBytePtr buffer, size_t size)
     {
-    #ifdef SERIALIZER_RATEL    
+    #ifdef AGV_SERIALIZER_PROXY    
         StringProxy sp1;
         StringProxy sp2;
         StrProCb pc1(sp1, sp2); 
@@ -164,11 +164,14 @@ namespace agv::core {
             old_info.pin->removeConsumePin(consume_pin);
         }
         consume_pin->unbind();
-        if(pi.isNull())//disconnect pin relationship.        
+        if(pi.isNull())//disconnect pin relationship.
+        {
             return true;
+        }
         consume_pin->bindProduceInfo(pi);
-        pi.pin->addConsumeInfo({pi.pin});
-        return false;
+        // 在生产者的输出引脚上登记消费者引脚，而非生产者自身
+        pi.pin->addConsumeInfo({consume_pin});
+        return true;
     }
 
     bool Tool::run()
@@ -293,6 +296,7 @@ namespace agv::core {
     void Tool::addPin(const PinKey& key, ToolPinSPtr pin)
     {
         if(tool_pin_dict_.find(key) == tool_pin_dict_.end()){
+            pin->setOwnerTool(this);
             tool_pin_dict_[key] = pin;
         }
     }
@@ -307,6 +311,7 @@ namespace agv::core {
 
     Tool* Tool::clone()const
     {
+        // 默认不支持克隆：基类无法通用复制派生行为与引脚连接，由需要的派生类重写。
         return nullptr;
     }
 

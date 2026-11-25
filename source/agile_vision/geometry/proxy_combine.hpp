@@ -78,6 +78,7 @@ namespace agv {
             {
                 return 0;
             }
+            left_size -= finish_bytes;
             return size - left_size;
         }
 

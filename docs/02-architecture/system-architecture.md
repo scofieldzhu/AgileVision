@@ -81,7 +81,7 @@ Solution（方案）
 
 | 目标路径 | 内容 |
 | --- | --- |
-| `<prefix>/bin/` | 各模块 DLL / `test.exe`（Debug 为 `*_d`），vcpkg 自动拷贝 spdlog/fmt 运行时 |
+| `<prefix>/bin/` | 各模块 DLL / `agv_demo.exe`（Debug 为 `agv_demo_d.exe`），vcpkg 自动拷贝 spdlog/fmt 运行时 |
 | `<prefix>/lib/` | 各模块导入库 `.lib` |
 | `<prefix>/include/agile_vision/{basic,core,geometry,system,stdtool,package,test}/` | 对应模块头文件 |
 

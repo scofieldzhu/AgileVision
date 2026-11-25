@@ -27,6 +27,7 @@
  */
 
 #include "output_pin.h"
+#include "agile_vision/basic/log_service.h"
 
 namespace agv::core {
 
@@ -51,6 +52,22 @@ namespace agv::core {
             auto it = std::remove_if(consume_info_list_.begin(), consume_info_list_.end(), [&consume_pin](const auto& it){ return consume_pin == it.pin; });
             consume_info_list_.erase(it, consume_info_list_.end());
         }
+    }
+
+    void OutputPin::removeConsumeTool(ToolPtr t)
+    {
+        if(t == nullptr){
+            return;
+        }
+        auto it = std::remove_if(consume_info_list_.begin(), consume_info_list_.end(), [t](const auto& info){
+            return info.pin != nullptr && info.pin->ownerTool() == t;
+        });
+        consume_info_list_.erase(it, consume_info_list_.end());
+    }
+
+    void OutputPin::clear()
+    {
+        consume_info_list_.clear();
     }
 
     PinType OutputPin::getPinType() const

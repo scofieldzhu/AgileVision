@@ -27,6 +27,7 @@
  */
 
 #include "thread_pool.h"
+#include "agile_vision/basic/log_service.h"
 
 namespace agv {
 
@@ -35,42 +36,59 @@ namespace agv {
         for(auto i = 0; i < number; ++i){
             workers_.emplace_back([this]
             {
-                while(!this->stop_)
+                while(!this->stop_.load(std::memory_order_acquire))
                 {
-                task_func active_task;
-                {
-                    std::unique_lock lk(mutex_);
-                    cv_.wait(lk, [this]{ 
-                        return this->stop_ || !this->pending_tasks_.empty();
-                    });
-                    if(this->stop_)
+                    task_func active_task;
                     {
-                        break;
+                        std::unique_lock lk(mutex_);
+                        cv_.wait(lk, [this]{
+                            return this->stop_.load(std::memory_order_acquire) || !this->pending_tasks_.empty();
+                        });
+                        if(this->stop_.load(std::memory_order_acquire))
+                        {
+                            break;
+                        }
+                        active_task = std::move(this->pending_tasks_.front());
+                        this->pending_tasks_.pop();
                     }
-                    active_task = std::move(this->pending_tasks_.front());
-                    this->pending_tasks_.pop();
+                    // 隔离任务异常，避免工作线程 terminate 导致整个进程退出。
+                    try
+                    {
+                        active_task();
+                    }
+                    catch(const std::exception& e)
+                    {
+                        AGV_LOG_ERROR("ThreadPool task threw exception: {}", e.what());
+                    }
+                    catch(...)
+                    {
+                        AGV_LOG_ERROR("ThreadPool task threw unknown exception!");
+                    }
                 }
-                active_task();
-                };
             });
         }
     }
 
     ThreadPool::~ThreadPool()
     {
-        {
-            std::lock_guard<std::mutex> lk(mutex_);
-            stop_ = true;
-        }
+        stop_.store(true, std::memory_order_release);
         cv_.notify_all();
         for(std::thread& w : workers_)
         {
-            w.join();
+            if(w.joinable())
+            {
+                w.join();
+            }
         }
     }
 
     void ThreadPool::enqueue(task_func&& t)
     {
+        if(stop_.load(std::memory_order_acquire))
+        {
+            AGV_LOG_WARN("Enqueue rejected: thread pool is stopping!");
+            return;
+        }
         {
             std::lock_guard<std::mutex> lk(mutex_);
             pending_tasks_.emplace(std::move(t));

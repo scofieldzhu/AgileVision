@@ -2,12 +2,12 @@
 
 ## 6.1 后端选择
 
-`core/serialize_policy.h` 通过编译期宏选择序列化后端：
+后端由 CMake 选项 `AGV_SERIALIZER_BACKEND`（`proxy` / `protobuf`）通过 `agv_build_config` 定义对应宏，`core/serialize_policy.h` 据此选择：
 
-- `SERIALIZER_RATEL`（当前生效）：引入 `agile_vision/geometry/geometry.h`，定义 `using SerializeDict = agv::DictProxy<string, string>`。
-- `SERIALIZER_PB`（预留）：分支为空，尚未实现。
+- `AGV_SERIALIZER_PROXY`（默认）：引入 `agile_vision/geometry/geometry.h`，定义 `using SerializeDict = agv::DictProxy<string, string>`；无外部依赖。
+- `AGV_SERIALIZER_PB`（预留未实现）：选择后 CMake 会告警并回退，当前无实际序列化实现。
 
-所有 core 类的序列化函数体都包在 `#ifdef SERIALIZER_RATEL` 中。注意：这里的 `RATEL` 只是历史宏名，源码依赖已完全内嵌到本仓库，与外部 Ratel 库无关。
+`serialize_policy.h` 在两者都未定义时默认回退到 `AGV_SERIALIZER_PROXY`。所有 core 类的序列化函数体都包在 `#ifdef AGV_SERIALIZER_PROXY` 中。旧宏名 `SERIALIZER_RATEL` 已统一改名，与外部 Ratel 库无关。
 
 ## 6.2 统一签名约定
 

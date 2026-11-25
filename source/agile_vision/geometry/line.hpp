@@ -40,16 +40,16 @@ namespace agv {
     public:
         ByteVec serializeToBytes()const
         {
-            ProxyCombine<PointType, PointType> pc;
-            pc.proxyA().mutableElement() = p1_;
-            pc.proxyB().mutableElement() = p2_;
-            return pc.serializeToBytes();
+            return ProxyCombine<PointType, PointType>::SerializeToBytes(p1_, p2_);
         }
 
         size_t loadBytes(ConsBytePtr buffer, size_t size)
         {
-            ProxyCombine<PointType, PointType> pc;
-            return pc.loadBytes(buffer, size);
+            if(buffer == nullptr)
+            {
+                return 0;
+            }
+            return ProxyCombine<PointType, PointType>::LoadBytes(p1_, p2_, buffer, size);
         }
 
         void setP1(const PointType& pt){ p1_ = pt; }

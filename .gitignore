@@ -34,3 +34,6 @@
 third_party
 build
 install
+
+# 用户本地 CMake 预设（含机器专属路径），参考模板为 CMakeUserPresets.example.json
+CMakeUserPresets.json

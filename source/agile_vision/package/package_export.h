@@ -36,6 +36,8 @@
     #else
         #define AGV_PACKAGE_API AGV_WIN_DLL_IMPORT
     #endif
+#else
+    #define AGV_PACKAGE_API
 #endif
 
 #endif
