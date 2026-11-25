@@ -71,11 +71,11 @@ namespace agv {
 
         reference operator[](int idx)
         {
-            if(idx >= kN)
+            if(idx < 0 || static_cast<size_t>(idx) >= kN)
             {
                 throw std::out_of_range(std::format("Invalid index value:{}, array size:{}!", idx, kN));
             }
-            return this->arry_[idx];
+            return this->arry_[static_cast<size_t>(idx)];
         }
 
         const_reference operator[](int idx)const

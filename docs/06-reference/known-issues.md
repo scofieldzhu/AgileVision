@@ -8,7 +8,6 @@
 | --- | --- | --- |
 | `bytes_writer` / `compressor` / `package` | `package/` 下三对 .h/.cpp | 仅 MIT 许可证头，无类定义 |
 | `AsyncProcess` / `BreakTool` / `ConditionProcessTool` / `LoopProcessTool` / `SyncProcedureTool` | `stdtool/` 下五对 .h/.cpp | 仅许可证头，无类定义 |
-| `GlobalVariable::serializeToBytes/loadBytes` | `core/global_variable.cpp` | 空实现，全局变量不能持久化 |
 | `AGV_SERIALIZER_PB` 后端 | `core/serialize_policy.h` | 预留未实现；由 CMake `AGV_SERIALIZER_BACKEND=protobuf` 选择，配置时告警并回退 |
 | `protobuf_generate()` | `package/CMakeLists.txt` | 未接入，7 个 .proto 仅作契约 |
 
@@ -24,7 +23,6 @@
 | 项 | 说明 |
 | --- | --- |
 | `DirectedGraph::existArc` 依赖 `VKT::empty()` | 更换 key 类型时需保证有 `empty()` 成员（默认 string 满足） |
-| `ArrayX::operator[]` 仅查上界 | 条件为 `idx >= kN`，`int` 负索引未被拦截 |
 
 ## 11.4 遗留与待收敛
 
@@ -49,9 +47,10 @@
 - 第 2 组：`Tool::setPinConnection` 现正确登记消费者引脚（`{consume_pin}`）且连接成功返回 `true`；`ToolPin` 增加 `owner_` 反查，补齐 `OutputPin::clear`/`removeConsumeTool` 与 `RelationshipNetwork::breakRelationship` 实现；`Line`/`Circle` 改用静态 `SerializeToBytes`/`LoadBytes` 并回填成员，几何模板可正常实例化；`ProxyCombine::LoadBytes` 返回值补齐第二段字节；`ToolFactory` 删除器捕获 loader 的 `shared_ptr`，DLL 生命周期不短于其创建的 Tool。
 - 第 3 组：六个 `*_export.h` 补齐非 Windows 空定义；线程池 `stop_` 改原子、任务加异常边界、析构安全 join；序列化宏统一为 `AGV_SERIALIZER_PROXY`/`AGV_SERIALIZER_PB` 并接入 CMake 选项 `AGV_SERIALIZER_BACKEND`；`solution.cpp` 的占位 iid `"xxx"` 改为空串；`CMakeUserPresets.json` 移出版本控制、提供无硬编码模板；接入 CTest 与非交互冒烟测试 `agv_smoke_test`；`test` 目标改名 `agv_demo` 以避开 CTest 保留字。
 - 第 4 组：CMake 新增 `install(EXPORT AgileVisionTargets)` 与 `AgileVisionConfig(.Version).cmake`，消费者可 `find_package(AgileVision CONFIG)` 链接 `AgileVision::*`；占位模块 package 以 `NO_EXPORT` 排除导出（无 import lib）。
+- 第 5 组：`GlobalVariable::serializeToBytes/loadBytes` 补全四种类型的二进制持久化（类型头 + 定长标量/字符串长度前缀），`loadBytes` 校验类型枚举、逐字段边界与畸形输入并返回消费字节数；四个 `getXxxValue` 改用 `std::any_cast<T>(&value_)` 指针式检测，类型状态不符时安全返回 `nullopt` 而非抛 `bad_any_cast`；`ArrayX::operator[]` 补齐负索引下界检查。冒烟测试新增 4 类用例覆盖往返、畸形输入与负索引。
 
 ## 11.6 演进优先级建议
 
 1. **高**：接入 Protobuf 后端并补全 package 模块；为协议补充魔数/版本号/端序转换与全局长度上限。
 2. **中**：实现 Pin 连接持久化（当前仅 PropPin 可序列化）；补齐 stdtool 占位工具。
-3. **低**：收敛 `_AUTO_FUNC_TRACK_` 调试宏；为几何类型与并发路径补充更多单元测试；对外分发前确认内嵌源码授权条款。
+3. **低**：收敛 `_AUTO_FUNC_TRACK_` 调试宏；`DirectedGraph::existArc` 对 key 类型 `empty()` 的依赖改为模板约束；为几何类型与并发路径补充更多单元测试；对外分发前确认内嵌源码授权条款。
