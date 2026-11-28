@@ -50,15 +50,13 @@ namespace agv {
 
         size_t loadBytes(ConsBytePtr buffer, size_t size)
         {
-            if(buffer == nullptr)
-            {
+            if(buffer == nullptr){
                 return 0;
             }
             point_type center;
             float_proxy fp(0.0f);
             auto consumed = ProxyCombine<point_type, float_proxy>::LoadBytes(center, fp, buffer, size);
-            if(consumed == 0)
-            {
+            if(consumed == 0){
                 return 0;
             }
             center_ = center;

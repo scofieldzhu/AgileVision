@@ -31,6 +31,7 @@
 #include <codecvt>
 #include <sstream>
 #include "agile_vision/basic/log_service.h"
+#include "agile_vision/basic/portable_stream.h"
 #ifdef PLATFORM_WIN
 #include "win_header.h"
 #include <objbase.h>
@@ -44,8 +45,7 @@ namespace
     template <size_t CP>
     std::wstring multiBytesToUnicode(const std::string& multi_bytes)
     {
-        if(multi_bytes.empty())
-        {
+        if(multi_bytes.empty()){
             return std::wstring();
         }
         int capacity = ::MultiByteToWideChar(CP, 0, multi_bytes.data(), (int)multi_bytes.size(), NULL, 0);
@@ -57,8 +57,7 @@ namespace
     template <size_t CP>
     std::string unicodeToMultiBytes(const std::wstring& unicode_str)
     {
-        if(unicode_str.empty())
-        {
+        if(unicode_str.empty()){
             return std::string();
         }
         int capacity = ::WideCharToMultiByte(CP, 0, unicode_str.c_str(), (int)unicode_str.size(), NULL, 0, NULL, NULL);
@@ -271,8 +270,7 @@ namespace agv {
     {
     #ifdef PLATFORM_WIN
         std::wstring ustr = multiBytesToUnicode<CP_ACP>(source);
-        if(!ustr.empty())
-        {
+        if(!ustr.empty()){
             stdstr_ = unicodeToMultiBytes<CP_UTF8>(ustr);
         }
     #else
@@ -320,35 +318,39 @@ namespace agv {
 
     ByteVec StringProxy::serializeToBytes()const
     {
-        const auto total_byte_size = stdstr_.size() + kUIntSize;
-        ByteVec bv(total_byte_size, 0);
-        unsigned int required_size = (unsigned int)stdstr_.size();
-        memcpy(bv.data(), &required_size, kUIntSize);   
-        if(!stdstr_.empty())
-        {
-            memcpy(bv.data() + kUIntSize, stdstr_.data(), required_size);
-        }
-        return bv;
+        ByteVec payload;
+        detail::writeU32(payload, static_cast<uint32_t>(stdstr_.size()));
+        detail::appendBytes(payload, stdstr_.data(), stdstr_.size());
+        ByteVec framed;
+        detail::writeFramedBytes(framed, detail::kStringProxyMagic, payload);
+        return framed;
     }
 
     size_t StringProxy::loadBytes(ConsBytePtr buffer, size_t size)
     {
-        if(buffer == nullptr || size < kUIntSize)
-        {
+        ConsBytePtr payload = nullptr;
+        size_t payload_size = 0;
+        if(!detail::readFramedBytes(buffer, size, detail::kStringProxyMagic, payload, payload_size)){
             return 0;
         }
-        unsigned int required_size = 0;
-        memcpy(&required_size, buffer, kUIntSize);
+        ConsBytePtr cur = payload;
+        size_t left = payload_size;
+        uint32_t required_size = 0;
+        if(!detail::readU32(cur, left, required_size) || required_size > left){
+            return 0;
+        }
         if(required_size == 0){
             stdstr_.clear();
-        }else{
-            // 用 size_t 比对剩余长度，避免 unsigned int 加法回绕绕过校验
-            if(size - kUIntSize < static_cast<size_t>(required_size)) //data lost!
-                return 0;
-            stdstr_.resize(required_size);
-            memcpy((void*)stdstr_.data(), buffer + kUIntSize, required_size);
+        }else
+        {
+            stdstr_.assign(cur, cur + required_size);
+            cur += required_size;
+            left -= required_size;
         }
-        return stdstr_.size() + kUIntSize;
+        if(left != 0){
+            return 0;
+        }
+        return detail::kPortableHeaderSize + payload_size;
     }
 
 }

@@ -45,8 +45,7 @@ namespace agv {
 
         size_t loadBytes(ConsBytePtr buffer, size_t size)
         {
-            if(buffer == nullptr)
-            {
+            if(buffer == nullptr){
                 return 0;
             }
             return ProxyCombine<PointType, PointType>::LoadBytes(p1_, p2_, buffer, size);

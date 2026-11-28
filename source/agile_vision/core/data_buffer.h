@@ -29,16 +29,45 @@
 #ifndef __agile_vision_core_data_buffer_h__
 #define __agile_vision_core_data_buffer_h__
 
+#include <atomic>
+#include <cstdint>
+#include <optional>
+#include <shared_mutex>
+#include <string>
 #include "agile_vision/core/data_spec.h"
 
 namespace agv::core {
+
+    class DataBuffer;
+
+    /// @brief 数据缓冲的只读值快照。构造时拷贝源缓冲，之后与源解耦，
+    /// 可安全跨阶段持有；所有取值接口返回值而非裸指针，避免悬垂。
+    class AGV_CORE_API DataBufferSnapshot
+    {
+    public:
+        uint64_t version()const{ return version_; }
+        size_t valueSize()const{ return value_size_; }
+        const DataSpec& dataSpec()const{ return ds_; }
+        std::optional<int> getIntValue(size_t idx = 0)const;
+        std::optional<float> getFloatValue(size_t idx = 0)const;
+        std::optional<ImageData> getImageValue(size_t idx = 0)const;
+        std::optional<std::string> getStringValue(size_t idx = 0)const;
+        std::optional<AgvBytes> getBytesValue(size_t idx = 0)const;
+        explicit DataBufferSnapshot(const DataBuffer& src);
+    private:
+        DataSpec ds_;
+        AgvBytes fundamental_bytes_;
+        AgvMultiBytes bytes_table_;
+        size_t value_size_ = 0;
+        uint64_t version_ = 0;
+    };
 
     class AGV_CORE_API DataBuffer
     {
     public:
         AgvBytes serializeToBytes()const;
         size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
-        auto dataSpec()const{ return ds_; }
+        DataSpec dataSpec()const;
         size_t valueSize()const;
         bool isFixedSize()const{ return ds_.isStaticArray(); }
         bool isDynamicSize()const{ return !isFixedSize(); }
@@ -66,17 +95,25 @@ namespace agv::core {
         std::optional<AgvBytes> getBytesValue(size_t idx = 0)const;
         const AgvMultiBytes& getAllBytesValues()const;
         void updateModifyTime(agile_vision_time_t t);
-        agile_vision_time_t lastModifyTime()const{ return last_modify_time_; }
+        agile_vision_time_t lastModifyTime()const;
+        /// @brief 当前数据版本；每次成功写入递增，可用于判断上游是否已更新。
+        uint64_t version()const{ return version_.load(std::memory_order_relaxed); }
+        /// @brief 在锁内取一份值语义快照；适合跨阶段持有。
+        DataBufferSnapshot snapshot()const;
         explicit DataBuffer(const DataSpec& data_spec);
         ~DataBuffer();
 
     private:
+        friend class DataBufferSnapshot;
+        // 内部辅助，调用方须已持有 io_mutex_。
         size_t getSize()const;
         DataSpec ds_;
         AgvBytes fundamental_bytes_;
         AgvMultiBytes bytes_table_;
         size_t value_size_ = 0;
         agile_vision_time_t last_modify_time_ = 0;
+        std::atomic_uint64_t version_{0};
+        mutable std::shared_mutex io_mutex_;
     };
 
 }

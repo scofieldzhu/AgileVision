@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <type_traits>
 #include "agile_vision/basic/string_proxy.h"
+#include "agile_vision/basic/portable_stream.h"
 #include "agile_vision/geometry/is_serializable.hpp"
 #include "agile_vision/geometry/default_creator.hpp"
 
@@ -64,39 +65,36 @@ namespace agv {
 
         static ByteVec SerializeToBytes(list_const_reference list)
         {
+            ByteVec payload;
+            detail::writeU32(payload, static_cast<uint32_t>(list.size()));
             if constexpr(std::is_arithmetic_v<element_type>){
-                size_t calc_size = sizeof(element_type) * list.size() + kUIntSize;
-                ByteVec bv(calc_size, 0);
-                unsigned int element_count = (unsigned int)list.size();
-                memcpy(bv.data(), &element_count, kUIntSize);
-                if(element_count)
-                {
-                    memcpy(bv.data() + kUIntSize, (void*)list.data(), calc_size - kUIntSize);
+                for(const auto& element : list){
+                    detail::writeScalar(payload, element);
                 }
-                return bv;
-            }else{
-                ByteVec bv(kUIntSize, 0);
-                unsigned int element_count = (unsigned int)list.size();
-                memcpy(bv.data(), &element_count, kUIntSize);
+            }else
+            {
                 for(const auto& v : list){
-                    ByteVec mbv;
                     if constexpr(std::is_same_v<element_type, std::string>){
                         if constexpr(kIsPointer){
-                            mbv = StringProxy(*v).serializeToBytes();
-                        }else{
-                            mbv = StringProxy(v).serializeToBytes();
-                        }                    
-                    }else{
+                            detail::appendBytes(payload, StringProxy(*v).serializeToBytes());
+                        }else
+                        {
+                            detail::appendBytes(payload, StringProxy(v).serializeToBytes());
+                        }
+                    }else
+                    {
                         if constexpr(kIsPointer){
-                            mbv = v->serializeToBytes();
-                        }else{
-                            mbv = v.serializeToBytes();
+                            detail::appendBytes(payload, v->serializeToBytes());
+                        }else
+                        {
+                            detail::appendBytes(payload, v.serializeToBytes());
                         }
                     }
-                    std::copy(mbv.begin(), mbv.end(), std::back_inserter(bv));
                 }
-                return bv;
             }
+            ByteVec framed;
+            detail::writeFramedBytes(framed, detail::kVecProxyMagic, payload);
+            return framed;
         }
 
         ByteVec serializeToBytes()const
@@ -106,60 +104,68 @@ namespace agv {
 
         static size_t LoadBytes(list_reference list, ConsBytePtr byte_data, size_t size)
         {
-            if(byte_data == nullptr || size < kUIntSize)
-            {
+            ConsBytePtr payload = nullptr;
+            size_t payload_size = 0;
+            if(!detail::readFramedBytes(byte_data, size, detail::kVecProxyMagic, payload, payload_size)){
                 return 0;
             }
-            auto byte_cursor = byte_data;
-            unsigned int element_count = 0;
-            memcpy(&element_count, byte_cursor, kUIntSize);
-            byte_cursor += kUIntSize;
-            size_t left_size = size - kUIntSize;
+            ConsBytePtr cur = payload;
+            size_t left = payload_size;
+            uint32_t element_count = 0;
+            if(!detail::readU32(cur, left, element_count)){
+                return 0;
+            }
             list.clear();
             if constexpr(std::is_arithmetic_v<element_type>){
-                if(element_count){
-                    const size_t data_size = static_cast<size_t>(element_count) * sizeof(element_type);
-                    if(data_size > left_size)
-                    {
+                if(element_count > left / sizeof(element_type)){
+                    return 0;
+                }
+                list.resize(element_count);
+                for(size_t i = 0; i < element_count; ++i){
+                    if(!detail::readScalar(cur, left, list[i])){
                         return 0;
                     }
-                    list.resize(element_count);
-                    memcpy((void*)list.data(), byte_cursor, data_size);
-                    left_size -= data_size;
                 }
-            }else{            
-                for(unsigned int i = 0; i < element_count; ++i){
+            }else
+            {
+                for(uint32_t i = 0; i < element_count; ++i){
                     E e = default_creator::Create();
                     size_t finish_size = 0;
                     if constexpr(std::is_same_v<element_type, std::string>){
                         StringProxy strp;
-                        finish_size = strp.loadBytes(byte_cursor, left_size);
+                        finish_size = strp.loadBytes(cur, left);
                         if constexpr(kIsPointer){
                             *e = strp.stdStr();
-                        }else{
+                        }else
+                        {
                             e = strp.stdStr();
-                        }                    
-                    }else{
+                        }
+                    }else
+                    {
                         if constexpr(kIsPointer){
-                            finish_size = e->loadBytes(byte_cursor, left_size);
-                        }else{
-                            finish_size = e.loadBytes(byte_cursor, left_size);
+                            finish_size = e->loadBytes(cur, left);
+                        }else
+                        {
+                            finish_size = e.loadBytes(cur, left);
                         }
                     }
-                    if(finish_size == 0 || finish_size > left_size)
-                    {
+                    if(finish_size == 0 || finish_size > left){
                         return 0;
                     }
-                    byte_cursor += finish_size;
-                    left_size -= finish_size;
+                    cur += finish_size;
+                    left -= finish_size;
                     if constexpr(kIsPointer){
                         list.push_back(e);
-                    }else{
+                    }else
+                    {
                         list.push_back(std::move(e));
                     }
                 }
             }
-            return size - left_size;
+            if(left != 0){
+                return 0;
+            }
+            return detail::kPortableHeaderSize + payload_size;
         }
 
         size_t loadBytes(ConsBytePtr byte_data, size_t size)

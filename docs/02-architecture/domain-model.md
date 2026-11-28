@@ -125,10 +125,11 @@ Solution  ──unique_ptr──> Engine
 
 `ToolFactory`（`core/tool_factory.h/.cpp`）通过 `DynamicLibraryLoader` 加载工具 DLL：
 
-1. `loadToolFile(path)`：`load()` 后解析 `GetToolClsID`、`CreateToolInstance`、`DestroyToolInstance` 三个符号，齐备则以类 ID 登记到 `loader_dict_`。
+1. `loadToolFile(path)`：`load()` 后解析 `GetToolClsID`、`CreateToolInstance`、`DestroyToolInstance` 三个基础符号，齐备后再做 ABI 协商：可选 `GetToolABIVersion` 缺失时按 v1 兼容，声明版本超出宿主支持范围则拒绝加载；v2 还要求 `GetToolMeta` 并校验 clsid/版本一致性与 Pin 数量上限，元数据立即拷贝为值语义结构。
 2. `createTool(clsid, iid)`：按 clsid 找到 DllInfo，调用创建函数生成 `Tool*`，用 `shared_ptr<Tool>(instance, destroy_func)` 包装——**将 DLL 的销毁函数作为删除器**，保证跨模块正确释放。
-3. `unloadAll()`（析构时自动调用）：卸载所有 DLL 并清空字典。
+3. `getToolMeta(clsid, out)`：查询优先级为显式注册（`registerMetadata`）> DLL v2 元数据 > 创建临时实例反射（`Tool::pinMetadata()`）；`getAllToolMetas()` 按 clsid 去重枚举，供 UI 自动生成配置界面。
+4. `unloadAll()`（析构时自动调用）：卸载所有 DLL 并清空字典。
 
 ## 3.11 持久化的边界
 
-当前持久化覆盖 `Solution → Procedure → Process → Tool → PropPin → DataBuffer → DataSpec` 链路。`Tool::loadBytes` 只恢复名称与 PropPin 数据；工具实例仍需由 DLL 工厂按 clsid 创建。**Pin 连接关系与 Input/Output Pin 不参与持久化**，全局变量序列化为空实现。详见 [序列化体系](serialization.md)。
+当前持久化覆盖 `Solution → Procedure → Process → Tool → Pin → DataBuffer → DataSpec` 全链：工具帧记录 clsid、全部 Pin 规格与输入引脚绑定表，加载时经 `ToolFactory` 按 clsid 重建实例并统一重连（见 [序列化体系](serialization.md)）。工具帧尾部另有可选子过程段，递归嵌入 `Process` 帧，任意层级的 `Tool → ProcessManager → Process` 树均可往返；深度上限 16 层、节点上限 256。全局变量序列化仍为空实现。

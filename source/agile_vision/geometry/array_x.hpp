@@ -35,6 +35,7 @@
 #include <stdexcept>
 #include <initializer_list>
 #include "agile_vision/basic/basic_typedef.h"
+#include "agile_vision/basic/portable_stream.h"
 
 namespace agv {
 
@@ -50,29 +51,47 @@ namespace agv {
         using const_pointer = const value_type*;    
         static constexpr size_t kN = S;    
         using array_type = value_type[kN];
+        // 原生值数组的字节数，用于内存布局说明；序列化帧另含魔数头。
         static constexpr size_t kByteSize = sizeof(value_type) * kN;
 
         ByteVec serializeToBytes()const
         {
-            ByteVec bv(kByteSize, 0);
-            memcpy(bv.data(), (void*)&this->arry_, kByteSize);
-            return bv;
+            ByteVec payload;
+            for(size_t i = 0; i < kN; ++i){
+                detail::writeScalar(payload, arry_[i]);
+            }
+            ByteVec framed;
+            detail::writeFramedBytes(framed, detail::kArrayXMagic, payload);
+            return framed;
         }
 
         size_t loadBytes(ConsBytePtr buffer, size_t size)
         {
-            if(buffer == nullptr || size < kByteSize)
-            {
+            ConsBytePtr payload = nullptr;
+            size_t payload_size = 0;
+            if(!detail::readFramedBytes(buffer, size, detail::kArrayXMagic, payload, payload_size)){
                 return 0;
             }
-            memcpy((void*)&this->arry_, buffer, kByteSize);
-            return kByteSize;
+            ConsBytePtr cur = payload;
+            size_t left = payload_size;
+            value_type loaded[kN] = {value_type(0)};
+            for(size_t i = 0; i < kN; ++i){
+                if(!detail::readScalar(cur, left, loaded[i])){
+                    return 0;
+                }
+            }
+            if(left != 0){
+                return 0;
+            }
+            for(size_t i = 0; i < kN; ++i){
+                arry_[i] = loaded[i];
+            }
+            return detail::kPortableHeaderSize + payload_size;
         }
 
         reference operator[](int idx)
         {
-            if(idx < 0 || static_cast<size_t>(idx) >= kN)
-            {
+            if(idx < 0 || static_cast<size_t>(idx) >= kN){
                 throw std::out_of_range(std::format("Invalid index value:{}, array size:{}!", idx, kN));
             }
             return this->arry_[static_cast<size_t>(idx)];

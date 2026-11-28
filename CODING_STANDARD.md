@@ -174,9 +174,36 @@ enum class DataType { kUnknown, kInt, kFloat, kString, kBytes, kImage };
 
 - **一行只写一条语句**：禁止在同一行用分号拼接多条语句；单条语句体也不得与 `if` 条件写在同一行。
   - 反例：`int a = 1; int b = 2;`、`if(ok) return;`
+
+- **关键词(if/while/for/else /else if等)语句用{}包裹的**：左括号必须与这些关键词同一行，不要单独换行。
+```cpp
+//正例：
+if(ok){
+	return true;
+}else if(false){
+	return true;
+}else{
+	return true;
+}
+//反例：
+if(ok)
+{
+	return true;
+}
+else if(false)
+{
+	return true;
+}
+else
+{
+	return true;
+}
+```
 - **控制流必须加大括号**：`if` / `while` / `for` 的语句体必须用 `{}` 包裹，即使只有一条语句也不得省略大括号。
+
   - 反例：`if(ok) return true;`
   - 正例：`if(ok) { return true; }`
+
 - **大括号与后接的else if必须写在同一行，不要分成两行来写**
 
 ### 8.3 类声明结构
@@ -525,7 +552,10 @@ bool SampleConfig::validate()const
 - [ ] 头文件无 `using namespace`；.cpp 包含顺序正确（自身头文件优先）
 - [ ] 命名空间（含匿名）体内每行缩进 4 个空格字符，内部层级继续 +4；**全库不出现真实 `\t`**（§5 / §8.1，由项目约定的检查脚本执行）
 - [ ] 命名符合 §6 风格（成员尾下划线、`k` 前缀常量、`SPtr/Ptr` 别名），注意空格问题
-- [ ] 一行一条语句；`if`/`while`/`for` 语句体必加 `{}`（§8.2）
+- [ ] 一行一条语句：禁止用分号在同一行拼接多条语句；单条语句体不得与 `if` 等条件写在同一行（§8.2）
+- [ ] 控制流（`if`/`while`/`for`/`else`/`else if` 等）的左大括号必须与关键词写在同一行，不得单独换行（§8.2）
+- [ ] `if`/`while`/`for` 的语句体必须用 `{}` 包裹，即使只有一条语句（§8.2）
+- [ ] `}` 与后接的 `else`/`else if` 必须写在同一行，不得分成两行（§8.2）
 - [ ] `switch` 的 `case` 标签相对 `switch` 缩进四个空格（§8.1）
 - [ ] 类声明访问域唯一；构造/析构函数置于所在访问域末尾（§8.3）
 - [ ] 构造初始化列表逗号后置，不放行首（§8.4）

@@ -50,6 +50,7 @@ namespace agv::core {
         void appendProcess(ProcessSPtr p);
         void removeProcess(const std::string& iid);
         void removeProcess(iterator pos);
+        void clear();
         auto size()const{ return process_list_.size(); }
         void setActiveProcessIid(const std::string& iid);
         const auto& activeProcessIid()const{ return active_process_iid_; }

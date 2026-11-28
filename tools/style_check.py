@@ -161,15 +161,100 @@ def namespace_violation_lines(lines):
 
 
 # ---------------------------------------------------------------------------
+# §8.2 控制流语句块判定（检查器与批量改写器共用）
+# ---------------------------------------------------------------------------
+def clean_code_lines(lines):
+    """逐行剥离注释与字面量内容，返回等长的可匹配代码文本。"""
+    state = {'block': False, 'str': False}
+    return [strip_literals(raw, state) for raw in lines]
+
+
+def control_headers(lines):
+    """定位所有控制流语句头结束的位置。
+
+    返回 {行索引: (关键词, 右括号位置)}，覆盖跨行条件；'else' 的右括号位置取关键词末尾。
+    判定逻辑供 style_fix_braces.py 复用。
+    """
+    clean = clean_code_lines(lines)
+    headers = {}
+    pending = None
+    for idx, code in enumerate(clean):
+        if pending is None:
+            m = re.match(r'\s*else\s+if\b', code)
+            if m:
+                kind = 'else if'
+                start = m.end()
+            else:
+                m = re.match(r'\s*(if|for|while|switch)\b', code)
+                if m:
+                    kind = m.group(1)
+                    start = m.end()
+                else:
+                    m = re.match(r'\s*else\b', code)
+                    if m:
+                        headers[idx] = ('else', m.end() - 1)
+                    continue
+            pos = code.find('(', start)
+            if pos < 0:
+                continue
+            depth = 0
+            closed = None
+            for p in range(pos, len(code)):
+                if code[p] == '(':
+                    depth += 1
+                elif code[p] == ')':
+                    depth -= 1
+                    if depth == 0:
+                        closed = p
+                        break
+            if closed is None:
+                pending = (kind, depth, idx)
+            else:
+                headers[idx] = (kind, closed)
+        else:
+            kind, depth, _ = pending
+            for p, ch in enumerate(code):
+                if ch == '(':
+                    depth += 1
+                elif ch == ')':
+                    depth -= 1
+                    if depth == 0:
+                        headers[idx] = (kind, p)
+                        pending = None
+                        break
+    return headers, clean
+
+
+def next_content_line(lines, idx):
+    """返回 idx 之后第一条非空行的索引，没有则返回 None。"""
+    for j in range(idx + 1, len(lines)):
+        if lines[j].strip():
+            return j
+    return None
+
+
+def statement_count(code):
+    """统计一行内分号分隔的语句数（忽略括号内的 for 头与 lambda 捕获）。"""
+    depth = 0
+    count = 0
+    for ch in code:
+        if ch == '(':
+            depth += 1
+        elif ch == ')':
+            depth = max(0, depth - 1)
+        elif ch == ';' and depth == 0:
+            count += 1
+    return count
+
+
+# ---------------------------------------------------------------------------
 # 检查规则（规则 ID 保持稳定，供改写器复用）
 # ---------------------------------------------------------------------------
-def check_file(path: str):
-    """返回 [(line_no, rule, detail)]。line_no 为 1-based。"""
+def check_lines(lines, path=''):
+    """返回 [(line_no, rule, detail)]。line_no 为 1-based。供检查器与改写器共用。"""
     issues = []
-    with open(path, 'r', encoding='utf-8', errors='surrogateescape') as fh:
-        lines = fh.readlines()
-
     ns_violations = namespace_violation_lines(lines)
+    headers, clean_lines = control_headers(lines)
     is_header = path.endswith(('.h', '.hpp'))
 
     in_block_comment = False
@@ -215,26 +300,33 @@ def check_file(path: str):
                 issues.append((n, 'SPACE_KW', f'{kw} 后不应有空格（§8.1）'))
                 break
 
-        # §8.2 控制流缺大括号
-        m = re.search(r'\b(if|for|while)\s*\(.*\)\s*(return|break|continue|throw)\b', line)
-        if m:
-            issues.append((n, 'NO_BRACE', f'{m.group(1)} 语句体缺少 {{}}（§8.2）'))
+        # §8.2 控制流语句块四条子规则（判定逻辑见 control_headers）
+        if idx in headers:
+            kind, close_pos = headers[idx]
+            rest = clean_lines[idx][close_pos + 1:].strip()
+            if not rest:
+                nxt = next_content_line(clean_lines, idx)
+                if nxt is not None and clean_lines[nxt].strip() == '{':
+                    issues.append((n, 'BRACE_SAME_LINE', f'{kind} 的左大括号应写在关键词同一行（§8.2）'))
+                elif nxt is None or not clean_lines[nxt].strip().startswith('{'):
+                    issues.append((n, 'BRACE_NEXT_LINE', f'{kind} 语句体应加大括号（§8.2）'))
+            elif not rest.startswith('{'):
+                issues.append((n, 'INLINE_NO_BRACE', f'{kind} 语句体未用 {{}} 包裹（§8.2）'))
 
-        # §8.2 跨行单语句体无大括号：if/for/while 行以 ')' 结尾，下一非空行非 '{'
-        # （else/else if 由前置 if 的大括号保证，这里只处理控制头本身）
-        if re.match(r'\s*(if|for|while)\s*\(.*\)\s*$', line):
-            for j in range(idx + 1, min(idx + 4, len(lines))):
-                nxt = lines[j].strip()
-                if not nxt or nxt.startswith('//'):
-                    continue
-                if not nxt.startswith('{'):
-                    issues.append((n, 'BRACE_NEXT_LINE', '控制流语句体应加大括号（§8.2）'))
-                break
+        # §8.2 } 与 else / else if 必须同一行
+        if re.match(r'^\s*else\s+if\b', line):
+            prev = None
+            for j in range(idx - 1, -1, -1):
+                if clean_lines[j].strip():
+                    prev = clean_lines[j].strip()
+                    break
+            if prev == '}':
+                issues.append((n, 'ELSE_IF_SEPARATE', '} 与 else if 应写在同一行（§8.2）'))
+        # else 独占一行由下方 ELSE_SEPARATE 规则处理
 
-        # §8.2 一行多语句
-        if re.search(r';\s*(?:int|auto|const|std::|[A-Za-z_]\w*\s*=)', line) and not stripped.startswith('#'):
-            if not re.match(r'\s*(?:for|if|while)\s*\(', stripped):
-                issues.append((n, 'MULTI_STMT', '一行多条语句（§8.2）'))
+        # §8.2 一行多条语句：忽略括号内的 for 头与分号拼接的 lambda 捕获
+        if not stripped.startswith('#') and statement_count(clean_lines[idx]) > 1:
+            issues.append((n, 'MULTI_STMT', '一行多条语句（§8.2）'))
 
         # §8.4 初始化列表逗号行首
         if re.match(r'^\s*,\s*\S', line):
@@ -287,6 +379,13 @@ def check_file(path: str):
         if re.match(r'^\s*else\s*$', line):
             issues.append((n, 'ELSE_SEPARATE', '} 与 else 应写在同一行（§8.2）'))
     return issues
+
+
+def check_file(path: str):
+    """从文件读取内容后委托 check_lines，保证检查与改写使用同一判定。"""
+    with open(path, 'r', encoding='utf-8', errors='surrogateescape') as fh:
+        lines = fh.readlines()
+    return check_lines(lines, path)
 
 
 def main():

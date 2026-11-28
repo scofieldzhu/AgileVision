@@ -57,8 +57,7 @@ namespace agv::core {
     {
         for(auto& p : process_list_){
             auto dst_p = p->findMutableChildProcess(iid, recursive);
-            if(dst_p)
-            {
+            if(dst_p){
                 return dst_p;
             }
         }
@@ -85,9 +84,21 @@ namespace agv::core {
     void ProcessManager::removeProcess(iterator pos)
     {
         if(pos != process_list_.end()){
-            process_list_.erase(pos);
+            // 必须在迭代器失效前复位 manager，否则解引用已删除元素。
             (*pos)->setManager(nullptr);
+            process_list_.erase(pos);
         }
+    }
+
+    void ProcessManager::clear()
+    {
+        for(auto& p : process_list_){
+            if(p != nullptr){
+                p->setManager(nullptr);
+            }
+        }
+        process_list_.clear();
+        active_process_iid_.clear();
     }
 
     void ProcessManager::setActiveProcessIid(const std::string& iid)
@@ -102,8 +113,7 @@ namespace agv::core {
 
     ProcessPtr ProcessManager::getActiveProcess()
     {
-        if(active_process_iid_.empty())
-        {
+        if(active_process_iid_.empty()){
             return nullptr;
         }
         auto it = std::find_if(process_list_.begin(), process_list_.end(), [this](auto item){ 

@@ -36,7 +36,9 @@
 - `GetToolClsID` — 取工具类 ID
 - `CreateToolInstance` — 创建工具实例
 - `DestroyToolInstance` — 销毁工具实例（作为 shared_ptr 删除器）
+- `GetToolABIVersion`（可选）— 声明 ABI 版本；缺失视为 v1，当前宿主支持 v1/v2，未来版本拒绝加载
+- `GetToolMeta`（v2 必需）— 返回 `AgvToolMetaC`（clsid + Pin 清单），宿主立即拷贝为值语义结构
 
-详见 [领域模型](../02-architecture/domain-model.md) 的工厂与插件生命周期章节。
+元数据查询接口：`ToolFactory::registerMetadata()` / `getToolMeta()` / `getAllToolMetas()` / `getToolAbiVersion()`，供 UI 发现工具与自动生成配置界面。详见 [领域模型](../02-architecture/domain-model.md) 的工厂与插件生命周期章节。
 
 > 已修复：`dynamic_library_loader.h` 的 Linux 分支 `dlsym(handle_, func_name.c_str())` 曾缺少右括号，现编译通过。

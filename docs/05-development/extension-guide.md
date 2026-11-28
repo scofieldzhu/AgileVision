@@ -10,10 +10,16 @@
    - `std::string getClsGuid() const override` — 返回唯一 GUID（用于 `ToolFactory::createTool` 的 clsid）。
    - `bool requestOutputData() override` — 实现算法，经 InputPin 读上游数据、写 OutputPin。
 4. **构造函数中定义 Pin**：调用 `addPin(key, std::make_shared<...Pin>(...))`；若需子过程，调用 `autoCreateProcesManager()`。属性用 `PropPin`，输入用 `InputPin`，输出用 `OutputPin`。
-5. **注册到 DLL**（插件形态）：在工具 DLL 中导出三个 C 符号供 `ToolFactory` 解析：
+5. **注册到 DLL**（插件形态）：在工具 DLL 中导出三个基础 C 符号供 `ToolFactory` 解析：
    - `GetToolClsID()` — 返回类 GUID 字符串
    - `CreateToolInstance(iid)` — `new XxxTool(iid)`
    - `DestroyToolInstance(tool*)` — `delete`
+
+   如需 UI 自动生成配置界面，再导出 v2 元数据符号（旧 DLL 不导出也能按 v1 正常加载）：
+   - `GetToolABIVersion()` — 返回 `agv::core::kToolAbiCurrent`（当前 2）
+   - `GetToolMeta()` — 返回静态 `AgvToolMetaC`，其中 `pins` 指向静态 `AgvPinMetaC` 数组。宿主会立即拷贝，因此缓冲可复用；字段取值见 `core/tool_metadata.h`，`pin_count` 上限 256。
+
+   进程内工具不导出 C 符号时，可用 `ToolFactory::registerCreator()` + `registerMetadata()` 接入，或直接由 `getToolMeta()` 反射实例。
 6. **接入构建**：源文件由 `stdtool/CMakeLists.txt` 的 GLOB 自动收集；工具 DLL 按 `.agvt` 命名放在 `test` 可执行文件目录供 `loadToolFile` 加载。
 
 要点：Tool 基类构造时自动添加 `Status` OutputPin，`run()` 会先做 Pin 兼容校验再调 `requestOutputData()`，无需在派生类重复这些逻辑。
@@ -43,7 +49,7 @@
 1. 连接入口是 `Tool::setPinConnection(consume_key, ProduceInfo)`，需保证 InputPin→OutputPin 引用与 OutputPin 侧 ConsumeInfo 双向一致。
 2. 类型校验在 `Tool::checkPinDataCompatible()`，依赖 `DataSpec::compatibleWith()` 的三字段全等规则。
 3. 若启用 `RelationshipNetwork` 图联动，需在连接建立/断开时同步 `makeRelationship/breakRelationship`，并用 `checkCycle()` 防止数据流成环。
-4. 注意当前图网络与 Pin 连接尚未联动（旧代码被注释），这是待完成项。
+4. 图网络与 Pin 连接已联动：`RelationshipNetwork::buildFrom()` 在流程执行前从 Pin 连接即时派生依赖图，图仅作只读校验/调度分析，Pin 直连仍是唯一运行时真相源，不要维护第二份连接状态。
 
 ## 10.5 代码规范与验证
 

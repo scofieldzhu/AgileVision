@@ -29,7 +29,7 @@
 #include "string_process_tool.h"
 #include "agile_vision/core/process.h"
 #include "agile_vision/core/process_manager.h"
-#include "agile_vision/core/engine.h"
+#include "agile_vision/core/process_runner.h"
 #include "agile_vision/basic/log_service.h"
 
 namespace agv::stdtool {
@@ -83,13 +83,15 @@ namespace agv::stdtool {
                     AGV_LOG_ERROR("No process object exists with iid:{}", process_iid);
                     return false;
                 }
-                auto proc_engine = joinedProcess()->runContext().engine;
-                if(trigger_mode){ //sync mode;
-                    proc_engine->syncRunProcess(process); 
-                }else{ //async mode
-                    auto proc_ctx = process->runContext();
-                    proc_ctx.work_id = proc_engine->commit(process, Engine::FinishCallback());
-                    if(proc_ctx.work_id == kNullId){
+                auto host = joinedProcess();
+                if(trigger_mode){ // sync mode
+                    if(!ProcessRunner::runSync(host, process)){
+                        AGV_LOG_ERROR("Sync run process:{} failed!", process->alias());
+                        return false;
+                    }
+                }else{ // async mode
+                    // work_id 由 ProcessRunner 写回子过程自身的上下文，不再写入副本。
+                    if(ProcessRunner::runAsync(host, process) == kNullId){
                         AGV_LOG_ERROR("Commit process:{} work failed!", process->alias());
                         return false;
                     }

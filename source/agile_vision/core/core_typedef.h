@@ -55,16 +55,13 @@ namespace agv {
 
     inline unsigned int getFundamentalTypeSize(DataType t)
     {
-        if(t == DataType::kInt)
-        {
+        if(t == DataType::kInt){
             return sizeof(int);
         }
-        if(t == DataType::kFloat)
-        {
+        if(t == DataType::kFloat){
             return sizeof(float);
         }
-        if(t == DataType::kImage)
-        {
+        if(t == DataType::kImage){
             return sizeof(ImageData);
         }
         return 0;

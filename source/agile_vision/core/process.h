@@ -29,11 +29,15 @@
 #ifndef __agile_vision_core_process_h__
 #define __agile_vision_core_process_h__
 
+#include <atomic>
 #include <mutex>
 #include "agile_vision/core/run_context.h"
+#include "agile_vision/core/serialization_frame.h"
 #include "agile_vision/basic/time_util.h"
 
 namespace agv::core {
+
+    class ToolFactory;
 
     class AGV_CORE_API Process
     {
@@ -47,7 +51,15 @@ namespace agv::core {
         const_iterator end()const{ return tools_.end(); }
         AgvBytes serializeToBytes()const;
         size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        /// @brief 从完整拓扑帧重建工具并重连 Pin；factory 为空时只能复用已存在的同 iid 工具。
+        size_t loadBytes(ConsAgvBytePtr buffer, size_t size, ToolFactory* factory);
+        /// @brief 递归加载入口：同时重建工具内的嵌套子过程树。
+        size_t loadBytes(ConsAgvBytePtr buffer, size_t size, ToolFactory* factory, detail::TopologyContext& ctx);
         bool run();
+        bool runInTopologicalOrder();
+        /// @brief 按依赖分层并行执行：同层工具并发，层间屏障等待全部完成。
+        /// 同层工具互不依赖，因此不会同时写同一 DataBuffer；跨阶段读取由屏障建立 happens-before。
+        bool runInParallelLayers();
         RunContext& runContext(){ return run_context_; }
         const RunContext& runContext()const{ return run_context_; }    
         void appendTool(ToolSPtr t);
@@ -72,16 +84,19 @@ namespace agv::core {
         explicit Process(const std::string& iid);
         ~Process();
 
-    private:        
+    private:
         friend class ProcessManager;
+        friend class Tool;
+        AgvBytes serializeToBytes(detail::TopologyContext& ctx)const;
         void setManager(ProcessManager* t);
+        bool runTools(const std::vector<ToolPtr>& ordered_tools);
         ProcessManager* manager_ = nullptr;
         std::string iid_;
         AgvString alias_{"null"};
         ToolList tools_;
         RunContext run_context_;
         agv::Timestamp timestamp_ = {0};
-        bool interrupt_ = false;
+        std::atomic_bool interrupt_ = false;
         std::mutex run_mutex_;
     };
 

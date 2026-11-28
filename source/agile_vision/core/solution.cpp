@@ -30,7 +30,9 @@
 #include <ranges>
 #include "procedure.h"
 #include "engine.h"
+#include "tool_factory.h"
 #include "serialize_policy.h"
+#include "serialization_frame.h"
 #include "agile_vision/basic/log_service.h"
 
 namespace agv {
@@ -61,45 +63,117 @@ namespace agv::core {
 
     AgvBytes Solution::serializeToBytes() const
     {
-    #ifdef AGV_SERIALIZER_PROXY
-        using namespace agv;
-        std::vector<ProcedurePtr> ptr_list;
-        auto transform_view = procedure_list_ | std::views::transform([](auto& p){ return p.get();});
-        std::ranges::copy(transform_view, std::back_inserter(ptr_list));
-        VecProxy<Procedure*, true> pp(ptr_list);
-        return pp.serializeToBytes();
-    #endif
+        AgvBytes payload;
+        detail::writeU32(payload, static_cast<uint32_t>(procedure_list_.size()));
+        for(const auto& procedure : procedure_list_){
+            const auto bytes = procedure->serializeToBytes();
+            detail::writeBytes(payload, bytes.data(), bytes.size());
+        }
+        AgvBytes out;
+        detail::writeFrameHeader(out, detail::kSolutionFrameMagic, static_cast<uint32_t>(payload.size()));
+        out.insert(out.end(), payload.begin(), payload.end());
+        return out;
     }
 
     size_t Solution::loadBytes(ConsAgvBytePtr buffer, size_t size)
     {
-    #ifdef AGV_SERIALIZER_PROXY
-        using namespace agv;
-        VecProxy<Procedure*> pp;
-        auto finish_bytes = pp.loadBytes(buffer, size);
-        if(finish_bytes == 0)
-        {
+        return loadBytes(buffer, size, nullptr);
+    }
+
+    size_t Solution::loadBytes(ConsAgvBytePtr buffer, size_t size, ToolFactory* factory)
+    {
+        if(buffer == nullptr || size < 12){
             return 0;
         }
-        const auto& pd_list = pp.data();
-        removeAll();
-        for(unsigned int i = 0; i < pd_list.size(); ++i){
-            ProcedureUPtr e(pd_list[i]);
-            procedure_list_.push_back(std::move(e));
+        auto cur = buffer;
+        size_t left = size;
+        uint32_t payload_size = 0;
+        if(!detail::readFrameHeader(cur, left, detail::kSolutionFrameMagic, payload_size)){
+            return 0;
         }
-        return finish_bytes;
-    #endif
+        uint32_t procedure_count = 0;
+        if(!detail::readU32(cur, left, procedure_count)){
+            return 0;
+        }
+        std::vector<ProcedureUPtr> restored;
+        restored.reserve(procedure_count);
+        for(uint32_t i = 0; i < procedure_count; ++i){
+            const char* data = nullptr;
+            size_t data_size = 0;
+            if(!detail::readBytes(cur, left, data, data_size)){
+                return 0;
+            }
+            auto procedure = std::make_unique<Procedure>("");
+            if(procedure->loadBytes(data, data_size, factory) == 0){
+                return 0;
+            }
+            restored.push_back(std::move(procedure));
+        }
+        removeAll();
+        procedure_list_ = std::move(restored);
+        return size - left;
     }
 
     void Solution::run()
     {
+        run(true);
+    }
+
+    void Solution::run(bool async_run)
+    {
         for(auto& p : procedure_list_){
             if(p->activeRun()){
-                p->runContext().async_run = true;
+                p->runContext().async_run = async_run;
                 p->runContext().engine = engine_.get();
                 p->run();
             }
         }
+    }
+
+    bool Solution::waitAll(std::chrono::milliseconds timeout)
+    {
+        using Clock = std::chrono::steady_clock;
+        const auto deadline = Clock::now() + timeout;
+        bool all_done = true;
+        for(auto& p : procedure_list_){
+            if(!p->activeRun()){
+                continue;
+            }
+            const auto wid = p->runContext().work_id;
+            if(wid == kNullId){
+                continue;
+            }
+            const auto remain = std::chrono::duration_cast<std::chrono::milliseconds>(deadline - Clock::now());
+            const auto status = engine_->wait(wid, remain < std::chrono::milliseconds(0) ? std::chrono::milliseconds(0) : remain);
+            if(status != Engine::WaitResult::kOk){
+                AGV_LOG_WARN("Wait work:{} of procedure:{} failed with status:{}", wid, p->iid(), static_cast<int>(status));
+                all_done = false;
+            }
+        }
+        return all_done;
+    }
+
+    void Solution::cancelAll(bool wait_infinite)
+    {
+        for(auto& p : procedure_list_){
+            if(!p->activeRun()){
+                continue;
+            }
+            const auto wid = p->runContext().work_id;
+            if(wid == kNullId){
+                continue;
+            }
+            engine_->cancel(wid, wait_infinite);
+        }
+    }
+
+    bool Solution::getWorkResult(const std::string& iid, WorkResult* out) const
+    {
+        const auto proc = findProcedure(iid);
+        if(proc == nullptr || out == nullptr){
+            return false;
+        }
+        return engine_->getResult(proc->runContext().work_id, out);
     }
 
     Procedure *Solution::createProcedure(const std::string &iid)

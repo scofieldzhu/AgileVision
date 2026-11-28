@@ -32,8 +32,7 @@ namespace agv {
     TimeTracker::TimeTracker(bool auto_start)
         :auto_start_(auto_start)
     {
-        if(auto_start)
-        {
+        if(auto_start){
             restart();
         }
     }

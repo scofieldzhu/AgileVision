@@ -33,11 +33,15 @@
 
 namespace agv::core {
 
+    class ToolFactory;
+
     class AGV_CORE_API Procedure
     {
     public:
         AgvBytes serializeToBytes()const;
         size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        /// @brief 从拓扑帧重建流程及其根过程工具。
+        size_t loadBytes(ConsAgvBytePtr buffer, size_t size, ToolFactory* factory);
         ProcessPtr mutableRoot(){ return root_.get(); }
         ConstProcessPtr root()const{ return root_.get(); }
         void setAlias(const AgvString& str);
@@ -48,6 +52,7 @@ namespace agv::core {
         const auto& runContext()const{ return run_context_; }
         void setActiveRun(bool s);
         bool activeRun()const{ return active_run_; }
+        bool checkDataflowCycle()const;
         explicit Procedure(const std::string& iid);
         ~Procedure();
 

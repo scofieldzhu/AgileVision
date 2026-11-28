@@ -31,6 +31,7 @@
 
 #include <type_traits>
 #include "agile_vision/basic/string_proxy.h"
+#include "agile_vision/basic/portable_stream.h"
 
 namespace agv {
 
@@ -47,19 +48,28 @@ namespace agv {
 
         ByteVec serializeToBytes()const
         {
-            ByteVec bv(sizeof(value_type), 0);
-            memcpy(bv.data(), std::addressof(element_), sizeof(value_type));
-            return bv;
+            ByteVec payload;
+            detail::writeScalar(payload, element_);
+            ByteVec framed;
+            detail::writeFramedBytes(framed, detail::kElementProxyMagic, payload);
+            return framed;
         }
 
         size_t loadBytes(ConsBytePtr buffer, size_t size)
         {
-            if(buffer == nullptr || size < sizeof(value_type))
-            {
+            ConsBytePtr payload = nullptr;
+            size_t payload_size = 0;
+            if(!detail::readFramedBytes(buffer, size, detail::kElementProxyMagic, payload, payload_size)){
                 return 0;
             }
-            memcpy(std::addressof(element_), buffer, sizeof(value_type));
-            return sizeof(value_type);
+            ConsBytePtr cur = payload;
+            size_t left = payload_size;
+            value_type loaded = value_type(0);
+            if(!detail::readScalar(cur, left, loaded) || left != 0){
+                return 0;
+            }
+            element_ = loaded;
+            return detail::kPortableHeaderSize + payload_size;
         }
 
         reference mutableElement()

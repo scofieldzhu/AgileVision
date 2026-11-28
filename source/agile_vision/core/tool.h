@@ -29,21 +29,50 @@
 #ifndef __agile_vision_core_tool_h__
 #define __agile_vision_core_tool_h__
 
+#include <cstdint>
+#include <list>
 #include <map>
+#include <string>
+#include <vector>
 #include "agile_vision/core/input_pin.h"
 #include "agile_vision/core/output_pin.h"
+#include "agile_vision/core/tool_metadata.h"
 #include "agile_vision/core/prop_pin.h"
 #include "agile_vision/core/process_manager.h"
+#include "agile_vision/core/tool_linkage.h"
+#include "agile_vision/core/serialization_frame.h"
 
 namespace agv::core {
+
+    class ToolFactory;
+
+    /// @brief 反序列化后待由 Process 统一重连的输入引脚绑定描述。
+    struct PinBinding
+    {
+        std::string consume_pin_key;
+        std::string producer_iid;
+        std::string produce_pin_key;
+        uint32_t data_location = 0;
+    };
 
     class AGV_CORE_API Tool 
     {
     public:
         static constexpr PinKey kStatusPinKey = "Status";
         virtual AgvBytes serializeToBytes()const;
+        /// @brief 递归序列化入口：附带子过程树，ctx 用于深度/节点防护。
+        AgvBytes serializeTree(detail::TopologyContext& ctx)const;
         virtual size_t loadBytes(ConsAgvBytePtr buffer, size_t size);
+        /// @brief 加载完整拓扑帧；绑定关系输出到 bindings，由所属 Process 统一重连。
+        size_t loadTopologyBytes(ConsAgvBytePtr buffer, size_t size, std::vector<PinBinding>* bindings);
+        /// @brief 递归加载入口：解析 Pin 与子过程段，子过程在此重建到本 Tool 的 ProcessManager。
+        size_t loadTopologyBytes(ConsAgvBytePtr buffer, size_t size, std::vector<PinBinding>* bindings, ToolFactory* factory, detail::TopologyContext& ctx);
+        /// @brief 反序列化时按需补齐派生类构造阶段未创建的引脚。
+        bool restorePin(const PinKey& key, PinType type, const DataSpec& spec);
         bool setPinConnection(const PinKey& consume_key, const ProduceInfo& pi);
+        ToolLinkageList collectPinLinkages()const;
+        /// @brief 反射本工具全部 Pin 规格，供 UI 自动生成配置界面。
+        std::vector<PinMetadata> pinMetadata()const;
         bool run();
         const OutputPin* getOutputPin(const PinKey& key)const;
         const InputPin* getInputPin(const PinKey& key)const;
@@ -83,6 +112,8 @@ namespace agv::core {
         std::string iid_;
         AgvString name_ = "unnamed";
         ToolPinDict tool_pin_dict_;
+        // 反序列化补建引脚时持有 key 字符串，保证字典中的 string_view 长期有效。
+        std::list<std::string> owned_pin_keys_;
         ProcessPtr joined_process_ = nullptr;
     };
 

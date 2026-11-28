@@ -45,8 +45,7 @@ namespace agv::core {
     {
         Arry3u arry_d;
         const auto finish_bytes = arry_d.loadBytes(buffer, size);
-        if(finish_bytes == 0)
-        {
+        if(finish_bytes == 0){
             return 0;
         }
         major_type = static_cast<DataType>(arry_d[0]);

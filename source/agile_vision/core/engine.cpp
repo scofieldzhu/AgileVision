@@ -54,36 +54,60 @@ namespace agv::core {
             {
                 std::lock_guard lk(this_engine->running_work_table_mutex_);
                 auto it = this_engine->running_work_table_.find(wk_id);
-                if(it == this_engine->running_work_table_.end())
-                {
+                if(it == this_engine->running_work_table_.end()){
                     return;
                 }
                 work = it->second;
             }
+            using Clock = std::chrono::steady_clock;
+            const auto started = Clock::now();
+            WorkResult result;
+            result.work_id = wk_id;
             // 任务异常不得逸出线程池工作线程，否则触发 terminate 且 promise 永不满足
             try
             {
                 work->process->runContext().engine = this_engine;
-                work->process->run(); //sync running...
-                // 先满足 promise 再执行回调，避免回调内调用 wait() 时等待自身而死锁
-                work->prm.set_value(wk_id);
-                if(work->callback)
-                {
-                    work->callback(wk_id);
-                }
+                result.success = work->process->run();
+            }
+            catch(const std::exception& e)
+            {
+                result.error = e.what();
+                AGV_LOG_ERROR("Async process run failed, work id:{}, error:{}", wk_id, result.error);
             }
             catch(...)
             {
-                AGV_LOG_ERROR("Async process run failed, work id:{}!", wk_id);
-                try
-                {
-                    work->prm.set_value(wk_id);
-                }
-                catch(const std::future_error&)
-                {
+                result.error = "unknown exception";
+                AGV_LOG_ERROR("Async process run failed with unknown exception, work id:{}", wk_id);
+            }
+            result.cancelled = work->cancelled.load();
+            result.elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - started);
+            // 先满足 promise 再执行回调，避免回调内调用 wait() 时等待自身而死锁
+            try
+            {
+                work->prm.set_value(result);
+            }
+            catch(const std::future_error&)
+            {
+            }
+            // 回调异常同样不得中断结果登记与工作表清理
+            try
+            {
+                if(work->result_callback){
+                    work->result_callback(result);
+                }else if(work->finish_callback){
+                    work->finish_callback(wk_id);
                 }
             }
+            catch(const std::exception& e)
+            {
+                AGV_LOG_ERROR("Async work callback failed, work id:{}, error:{}", wk_id, e.what());
+            }
+            catch(...)
+            {
+                AGV_LOG_ERROR("Async work callback failed with unknown exception, work id:{}", wk_id);
+            }
             std::lock_guard lk(this_engine->running_work_table_mutex_);
+            this_engine->recordResult(wk_id, result);
             this_engine->running_work_table_.erase(wk_id);
         }
         Engine* this_engine = nullptr;
@@ -107,14 +131,23 @@ namespace agv::core {
     }
 
     wkid_t Engine::commit(ProcessPtr p, FinishCallback cb)
-    {    
+    {
+        // 旧签名适配为结果回调，保持既有调用方无需改动。
+        if(!cb){
+            return commit(p, ResultCallback());
+        }
+        return commit(p, [cb](const WorkResult& result){ cb(result.work_id); });
+    }
+
+    wkid_t Engine::commit(ProcessPtr p, ResultCallback cb)
+    {
         if(p == nullptr){
             AGV_LOG_ERROR("Null process pointer!");
             return kNullId;
         }
         auto work = std::make_shared<Work>();
         work->process = p;
-        work->callback = cb;
+        work->result_callback = cb;
         work->fut = work->prm.get_future();
         std::lock_guard lk(running_work_table_mutex_);
         // 检查与插入在同一临界区内完成，避免重复提交与 id 生成竞态
@@ -151,9 +184,9 @@ namespace agv::core {
             }
             work = it->second;
         }
+        work->cancelled.store(true);
         work->process->setInterrupt(true);
-        if(wait_infinite)
-        {
+        if(wait_infinite){
             work->fut.wait();
         }
     }
@@ -165,21 +198,41 @@ namespace agv::core {
             std::lock_guard lk(running_work_table_mutex_);
             auto it = running_work_table_.find(w);
             if(it == running_work_table_.end()){
-                AGV_LOG_ERROR("Aleady done:{}", w);
-                return WaitResult::kOk;
+                // 结果表只在完成后登记且不会因查询而消费，可据此区分“已完成”与“从未提交”。
+                return completed_results_.find(w) != completed_results_.end() ? WaitResult::kOk : WaitResult::kNotFound;
             }
             work = it->second;
         }
         auto fut_status = work->fut.wait_for(timeout);
-        if(fut_status == std::future_status::ready)
-        {
+        if(fut_status == std::future_status::ready){
             return WaitResult::kOk;
         }
-        if(fut_status == std::future_status::timeout)
-        {
+        if(fut_status == std::future_status::timeout){
             return WaitResult::kTimeout;
         }
         return WaitResult::kUnk;
+    }
+
+    bool Engine::getResult(wkid_t w, WorkResult* out) const
+    {
+        if(out == nullptr){
+            return false;
+        }
+        std::lock_guard lk(running_work_table_mutex_);
+        auto it = completed_results_.find(w);
+        if(it == completed_results_.end()){
+            return false;
+        }
+        *out = it->second;
+        return true;
+    }
+
+    void Engine::recordResult(wkid_t w, const WorkResult& result)
+    {
+        completed_results_[w] = result;
+        while(completed_results_.size() > kMaxCompletedResults){
+            completed_results_.erase(completed_results_.begin());
+        }
     }
 
     bool Engine::exist(wkid_t w) const
@@ -200,8 +253,7 @@ namespace agv::core {
         }
         p->runContext().work_id = kNullId;
         p->runContext().async_run = false;
-        p->run();
-        return true;
+        return p->run();
     }
 
 }

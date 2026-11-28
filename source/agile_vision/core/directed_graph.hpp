@@ -105,8 +105,7 @@ namespace agv {
     template<class VDT, class ADT, class VKT>
     inline void DirectedGraph<VDT, ADT, VKT>::addVertex(const_vertex_key_reference key, const vertex_data_type& data)
     {
-        if(existVertex(key))
-        {
+        if(existVertex(key)){
             return;
         }
         VertexNode vnode;
@@ -117,8 +116,7 @@ namespace agv {
     template <class VDT, class ADT, class VKT>
     inline void DirectedGraph<VDT, ADT, VKT>::getVertexData(const_vertex_key_reference key, vertex_data_type& out_data) const
     {
-        if(!existVertex(key))
-        {
+        if(!existVertex(key)){
             return;
         }
         out_data = vertex_node_map_.at(key).data;
@@ -127,8 +125,7 @@ namespace agv {
     template<class VDT, class ADT, class VKT>
     inline void DirectedGraph<VDT, ADT, VKT>::removeVertex(const_vertex_key_reference key)
     {
-        if(!existVertex(key))
-        {
+        if(!existVertex(key)){
             return;
         }
         auto& host_vertex = vertex_node_map_[key];
@@ -149,8 +146,7 @@ namespace agv {
         const arc_data_type& data
     )
     {
-        if(existArc(source_vertex, target_vertex))
-        {
+        if(existArc(source_vertex, target_vertex)){
             return;
         }
         ArcNode* anode = new ArcNode;
@@ -166,8 +162,7 @@ namespace agv {
     template<class VDT, class ADT, class VKT>
     inline void DirectedGraph<VDT, ADT, VKT>::removeArc(const_vertex_key_reference source_vertex, const_vertex_key_reference target_vertex)
     {
-        if(!existArc(source_vertex, target_vertex))
-        {
+        if(!existArc(source_vertex, target_vertex)){
             return;
         }
         ArcNode* target_arc_node = locateArcNode(source_vertex, target_vertex);
@@ -190,8 +185,7 @@ namespace agv {
     template<class VDT, class ADT, class VKT>
     inline void DirectedGraph<VDT, ADT, VKT>::getVertexArcs(const_vertex_key_reference vertex_key, ArcInfoList& out_arcs, ArcInfoList& in_arcs) const
     {
-        if(!existVertex(vertex_key))
-        {
+        if(!existVertex(vertex_key)){
             return;
         }
         const auto& vertex_node = vertex_node_map_.at(vertex_key);
@@ -239,8 +233,7 @@ namespace agv {
     {
         auto cur_arc = vertex_node_map_.at(source_vertex).head_out_arc;
         while(cur_arc){
-            if(cur_arc->target_vertex == target_vertex)
-            {
+            if(cur_arc->target_vertex == target_vertex){
                 return cur_arc;
             }
             cur_arc = cur_arc->next_out_arc;
@@ -255,8 +248,7 @@ namespace agv {
         auto cur_arc = node.head_out_arc;
         while(cur_arc){
             if(cur_arc->target_vertex == target_vertex){
-                if(cur_arc == node.head_out_arc)
-                {
+                if(cur_arc == node.head_out_arc){
                     node.head_out_arc = cur_arc->next_out_arc;
                 } else
                 {
@@ -273,12 +265,10 @@ namespace agv {
     template<class VDT, class ADT, class VKT>
     inline void DirectedGraph<VDT, ADT, VKT>::removeAllOutArcNodes(VertexNode& host)
     {
-        while(host.head_out_arc)
-        {
+        while(host.head_out_arc){
             removeArc(host.head_out_arc->source_vertex, host.head_out_arc->target_vertex);
         }
-        while(host.head_in_arc)
-        {
+        while(host.head_in_arc){
             removeArc(host.head_in_arc->source_vertex, host.head_in_arc->target_vertex);
         }
     }
@@ -290,8 +280,7 @@ namespace agv {
         auto cur_arc = node.head_in_arc;
         while(cur_arc){
             if(cur_arc->source_vertex == source_vertex){
-                if(cur_arc == node.head_in_arc)
-                {
+                if(cur_arc == node.head_in_arc){
                     node.head_in_arc = cur_arc->next_in_arc;
                 } else
                 {
@@ -309,8 +298,7 @@ namespace agv {
     inline void DirectedGraph<VDT, ADT, VKT>::getConnectedComponents(vertex_key_list2_type& components)const
     {
         visit_map visited;
-        for(const auto& kv : vertex_node_map_)
-        {
+        for(const auto& kv : vertex_node_map_){
             visited[kv.first] = false;
         }
         for(const auto& kv : vertex_node_map_){
@@ -346,8 +334,7 @@ namespace agv {
         }
         for(const auto& kv : vertex_node_map_) {
             const auto& source_vertex = kv.first;
-            if(!visited[source_vertex] && checkCycleImpl(source_vertex, visited, visit_stack))
-            {
+            if(!visited[source_vertex] && checkCycleImpl(source_vertex, visited, visit_stack)){
                 return true;
             }
         }

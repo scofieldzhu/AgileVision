@@ -29,6 +29,7 @@
 #ifndef __agile_vision_core_relationship_network_h__
 #define __agile_vision_core_relationship_network_h__
 
+#include <vector>
 #include "agile_vision/core/directed_graph.hpp"
 #include "agile_vision/core/tool_linkage.h"
 
@@ -38,6 +39,11 @@ namespace agv::core {
     {
     public:
         bool checkCycle()const;
+        void buildFrom(ConstProcessPtr root);
+        void buildFrom(ConstProcessPtr root, bool recursive);
+        bool topologicalSort(std::vector<ConstToolPtr>& out_order)const;
+        /// @brief 按依赖关系分层：同层工具互不依赖，可并行执行；层间需屏障同步。
+        bool topologicalLevels(std::vector<std::vector<ToolPtr>>& out_levels)const;
         void addTool(ConstToolPtr t);
         bool existTool(ConstToolPtr t)const;
         void makeRelationship(const ToolLinkage& linkage);
@@ -57,6 +63,7 @@ namespace agv::core {
         };
         using DGType = agv::DirectedGraph<VertexData, ArcData, std::string>;
         DGType dg_;
+        std::vector<ConstToolPtr> vertex_tools_;
     };
 
 }

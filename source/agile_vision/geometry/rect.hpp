@@ -29,6 +29,7 @@
 #define __agile_vision_geometry_rect_h__
 
 #include "agile_vision/geometry/array_x.hpp"
+#include "agile_vision/basic/portable_stream.h"
 
 namespace agv {
 
@@ -39,40 +40,51 @@ namespace agv {
         using value_type = std::enable_if_t<std::is_same_v<T, int> || std::is_same_v<T, float>, T>;
         using point_type = ArrayX<value_type, 2>;
         using size_type = ArrayX<value_type, 2>;
+        // 原生字段占位字节数（不含帧头），仅用于说明内存布局，不参与解析。
         static constexpr size_t kByteSize = point_type::kByteSize + size_type::kByteSize + kFloatSize;
 
         ByteVec serializeToBytes()const
         {
-            ByteVec bv(kByteSize, 0);
-            auto lt_bv = lt_.serializeToBytes();
-            auto cur_data = bv.data();
-            memcpy(cur_data, lt_bv.data(), lt_bv.size());
-            cur_data += lt_bv.size();
-            auto s_bv = size_.serializeToBytes();
-            memcpy(cur_data, s_bv.data(), s_bv.size());
-            cur_data += s_bv.size();
-            memcpy(cur_data, (void*)&angle_, kFloatSize);
-            return bv;
+            ByteVec payload;
+            detail::appendBytes(payload, lt_.serializeToBytes());
+            detail::appendBytes(payload, size_.serializeToBytes());
+            detail::writeScalar(payload, angle_);
+            ByteVec framed;
+            detail::writeFramedBytes(framed, detail::kRectMagic, payload);
+            return framed;
         }
 
         size_t loadBytes(ConsBytePtr buffer, size_t size)
         {
-            if(buffer == nullptr || size < kByteSize)
-            {
+            ConsBytePtr payload = nullptr;
+            size_t payload_size = 0;
+            if(!detail::readFramedBytes(buffer, size, detail::kRectMagic, payload, payload_size)){
                 return 0;
             }
-            auto left_size = size;
-            auto cur_buffer = buffer;
-            auto finish_bytes = lt_.loadBytes(cur_buffer, left_size);
-            left_size -= finish_bytes;
-            cur_buffer += finish_bytes;
-            finish_bytes = size_.loadBytes(cur_buffer, left_size);
-            left_size -= finish_bytes;
-            cur_buffer += finish_bytes;
-            memcpy((void*)&angle_, cur_buffer, kFloatSize);
-            left_size -= kFloatSize;
-            cur_buffer += kFloatSize;
-            return size - left_size;
+            ConsBytePtr cur = payload;
+            size_t left = payload_size;
+            point_type lt{value_type(0), value_type(0)};
+            size_type sz{value_type(0), value_type(0)};
+            auto used = lt.loadBytes(cur, left);
+            if(used == 0 || used > left){
+                return 0;
+            }
+            cur += used;
+            left -= used;
+            used = sz.loadBytes(cur, left);
+            if(used == 0 || used > left){
+                return 0;
+            }
+            cur += used;
+            left -= used;
+            float angle = 0.0f;
+            if(!detail::readScalar(cur, left, angle) || left != 0){
+                return 0;
+            }
+            lt_ = lt;
+            size_ = sz;
+            angle_ = angle;
+            return detail::kPortableHeaderSize + payload_size;
         }
 
         void setLeftTop(const point_type& pt){ lt_ = pt; }

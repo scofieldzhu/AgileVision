@@ -60,22 +60,19 @@ namespace agv {
 
         static size_t LoadBytes(ProxyA& pa, ProxyB& pb, ConsBytePtr byte_data, size_t size)
         {
-            if(byte_data == nullptr)
-            {
+            if(byte_data == nullptr){
                 return 0;
             }
             auto cur_data = byte_data;
             auto left_size = size;
             auto finish_bytes = pa.loadBytes(cur_data, left_size);
-            if(finish_bytes == 0)
-            {
+            if(finish_bytes == 0){
                 return 0;
             }
             cur_data += finish_bytes;
             left_size -= finish_bytes;
             finish_bytes = pb.loadBytes(cur_data, left_size);
-            if(finish_bytes == 0)
-            {
+            if(finish_bytes == 0){
                 return 0;
             }
             left_size -= finish_bytes;

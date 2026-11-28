@@ -32,6 +32,7 @@
 #include <map>
 #include <cassert>
 #include "agile_vision/basic/string_proxy.h"
+#include "agile_vision/basic/portable_stream.h"
 #include "agile_vision/geometry/vec_proxy.hpp"
 
 namespace agv {
@@ -65,21 +66,13 @@ namespace agv {
                 keys.mutableData().push_back(kv.first);
                 values.mutableData().push_back(kv.second);
             }
-            ByteVec bv_k = keys.serializeToBytes();
-            ByteVec bv_v = values.serializeToBytes();
-            size_t total_size = bv_k.size() + bv_v.size() + kUIntSize * 2;
-            ByteVec bv(total_size);
-            unsigned int number = (unsigned int)map.size();
-            auto cur_data = bv.data();
-            memcpy(cur_data, &number, kUIntSize);
-            cur_data += kUIntSize;
-            unsigned int key_byte_size = (unsigned int)bv_k.size();
-            memcpy(cur_data, &key_byte_size, kUIntSize);
-            cur_data += kUIntSize;
-            memcpy(cur_data, bv_k.data(), bv_k.size());
-            cur_data += bv_k.size();
-            memcpy(cur_data, bv_v.data(), bv_v.size());
-            return bv;
+            ByteVec payload;
+            detail::writeU32(payload, static_cast<uint32_t>(map.size()));
+            detail::appendBytes(payload, keys.serializeToBytes());
+            detail::appendBytes(payload, values.serializeToBytes());
+            ByteVec framed;
+            detail::writeFramedBytes(framed, detail::kDictProxyMagic, payload);
+            return framed;
         }
 
         ByteVec serializeToBytes()const
@@ -89,58 +82,45 @@ namespace agv {
 
         static size_t LoadBytes(map_reference map, ConsBytePtr byte_data, size_t size)
         {
-            if(byte_data == nullptr || size < 2 * kUIntSize)
-            {
-                return 0;        
-            }
-            auto cur_data = byte_data;
-            unsigned int number = 0;
-            memcpy(&number, cur_data, kUIntSize);
-            cur_data += kUIntSize;
-            size_t left_size = size - kUIntSize;
-
-            if(left_size < kUIntSize)
-            {
+            ConsBytePtr payload = nullptr;
+            size_t payload_size = 0;
+            if(!detail::readFramedBytes(byte_data, size, detail::kDictProxyMagic, payload, payload_size)){
                 return 0;
             }
-            unsigned int key_byte_size = 0;
-            memcpy(&key_byte_size, cur_data, kUIntSize);
-            cur_data += kUIntSize;
-            left_size -= kUIntSize;
-
-            if(key_byte_size > left_size)
-            {
+            ConsBytePtr cur = payload;
+            size_t left = payload_size;
+            uint32_t number = 0;
+            if(!detail::readU32(cur, left, number)){
                 return 0;
             }
             key_vec_proxy_type keys;
-            const auto finish_bytes = keys.loadBytes(cur_data, key_byte_size);
-            if(finish_bytes == 0 || finish_bytes > left_size)
-            {
+            const auto finish_bytes = keys.loadBytes(cur, left);
+            if(finish_bytes == 0 || finish_bytes > left){
                 return 0;
             }
-            left_size -= finish_bytes;
-            cur_data += finish_bytes;
+            left -= finish_bytes;
+            cur += finish_bytes;
 
             value_vec_proxy_type values;
-            auto values_bytes = values.loadBytes(cur_data, left_size);
-            if(values_bytes == 0 || values_bytes > left_size)
-            {
+            const auto values_bytes = values.loadBytes(cur, left);
+            if(values_bytes == 0 || values_bytes > left){
                 return 0;
             }
-            left_size -= values_bytes;
-            cur_data += values_bytes;
+            left -= values_bytes;
+            cur += values_bytes;
 
-            // 条目数不得超过实际解析出的键/值数量，避免 at() 抛越界异常
-            if(number > keys.data().size() || number > values.data().size())
-            {
+            if(left != 0){
+                return 0;
+            }
+            // 条目数不得超过实际解析出的键/值数量，避免越界访问。
+            if(number > keys.data().size() || number > values.data().size()){
                 return 0;
             }
             map.clear();
-            for(unsigned int i = 0; i < number; ++i)
-            {
+            for(uint32_t i = 0; i < number; ++i){
                 map.insert({keys.data()[i], values.data()[i]});
             }
-            return size - left_size;
+            return detail::kPortableHeaderSize + payload_size;
         }
 
         size_t loadBytes(ConsBytePtr byte_data, size_t size)

@@ -36,16 +36,14 @@ namespace agv {
         for(auto i = 0; i < number; ++i){
             workers_.emplace_back([this]
             {
-                while(!this->stop_.load(std::memory_order_acquire))
-                {
+                while(!this->stop_.load(std::memory_order_acquire)){
                     task_func active_task;
                     {
                         std::unique_lock lk(mutex_);
                         cv_.wait(lk, [this]{
                             return this->stop_.load(std::memory_order_acquire) || !this->pending_tasks_.empty();
                         });
-                        if(this->stop_.load(std::memory_order_acquire))
-                        {
+                        if(this->stop_.load(std::memory_order_acquire)){
                             break;
                         }
                         active_task = std::move(this->pending_tasks_.front());
@@ -73,10 +71,8 @@ namespace agv {
     {
         stop_.store(true, std::memory_order_release);
         cv_.notify_all();
-        for(std::thread& w : workers_)
-        {
-            if(w.joinable())
-            {
+        for(std::thread& w : workers_){
+            if(w.joinable()){
                 w.join();
             }
         }
@@ -84,8 +80,7 @@ namespace agv {
 
     void ThreadPool::enqueue(task_func&& t)
     {
-        if(stop_.load(std::memory_order_acquire))
-        {
+        if(stop_.load(std::memory_order_acquire)){
             AGV_LOG_WARN("Enqueue rejected: thread pool is stopping!");
             return;
         }

@@ -2,15 +2,15 @@
 
 框架核心层，命名空间 `agv::core`（公共类型在 `agv` 根），编译为 `agile_vision.core` SHARED 库，PUBLIC 依赖 basic。
 
-## 文件清单（35 个）
+## 文件清单（40 个）
 
 | 分类 | 文件 |
 | --- | --- |
-| 基础定义 | `core_typedef.h`、`core_export.h`、`serialize_policy.h`、`run_context.h`、`consume_info.h`、`produce_info.h`、`tool_linkage.h` |
+| 基础定义 | `core_typedef.h`、`core_export.h`、`serialize_policy.h`、`serialization_frame.h`、`run_context.h`、`consume_info.h`、`produce_info.h`、`tool_linkage.h` |
 | 数据层 | `data_spec.h/.cpp`、`data_buffer.h/.cpp`、`global_variable.h/.cpp` |
 | Pin 层 | `tool_pin.h/.cpp`、`input_pin.h/.cpp`、`output_pin.h/.cpp`、`prop_pin.h/.cpp` |
-| 工具层 | `tool.h/.cpp`、`tool_factory.h/.cpp` |
-| 流程层 | `process.h/.cpp`、`procedure.h/.cpp`、`solution.h/.cpp`、`process_manager.h/.cpp` |
+| 工具层 | `tool.h/.cpp`、`tool_factory.h/.cpp`、`tool_metadata.h/.cpp` |
+| 流程层 | `process.h/.cpp`、`procedure.h/.cpp`、`solution.h/.cpp`、`process_manager.h/.cpp`、`process_runner.h/.cpp` |
 | 调度层 | `engine.h/.cpp`、`relationship_network.h/.cpp`、`directed_graph.hpp` |
 
 ## 核心类职责速查
@@ -22,10 +22,12 @@
 | `Process` | 持有 Tool 列表，`run()` 按序执行并支持中断 | 同上 |
 | `Engine` | 线程池调度，commit/syncRun/wait/cancel/exist | [执行引擎](../02-architecture/execution-and-scheduling.md) |
 | `Tool` | 抽象工具基类，Status Pin 状态机，Pin 兼容校验 | [领域模型](../02-architecture/domain-model.md) |
-| `ToolFactory` | 动态加载工具 DLL 并创建/销毁实例 | 同上 |
-| `ProcessManager` | Tool 的子过程容器，实现递归树 | 同上 |
+| `ToolFactory` | 动态加载工具 DLL 或注册进程内构造器，供反序列化重建工具；ABI 协商与元数据发现 | [序列化体系](../02-architecture/serialization.md) |
+| `ToolMetadata` / `PinMetadata` | 值语义元数据（UI 配置界面数据源），由 C ABI `AgvToolMetaC` 立即拷贝得到 | [扩展指南](../05-development/extension-guide.md) |
+| `ProcessManager` | Tool 的子过程容器，实现递归树；支持递归拓扑帧的重建 | 同上 |
+| `ProcessRunner` | 子过程统一执行入口：同步/异步提交、等待、按 iid 查找 | [执行引擎](../02-architecture/execution-and-scheduling.md) |
 | `ToolPin` 及派生 | 数据输入/输出/属性端口 | [数据流与引脚](../02-architecture/dataflow-and-pins.md) |
-| `DataSpec`/`DataBuffer` | 数据规格与存储 | 同上 |
+| `DataSpec`/`DataBuffer`/`DataBufferSnapshot` | 数据规格、带版本与读写锁的存储、值语义快照 | 同上 |
 | `GlobalVariable` | `std::any` 全局变量（DT_BOOLEAN/INT/FLOAT/STRING） | — |
 | `RelationshipNetwork` | 工具依赖有向图，支持判环 | [数据流与引脚](../02-architecture/dataflow-and-pins.md) |
 | `RunContext` | 运行时上下文下传 | [执行引擎](../02-architecture/execution-and-scheduling.md) |

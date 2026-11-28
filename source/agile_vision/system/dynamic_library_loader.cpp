@@ -39,8 +39,7 @@ namespace agv {
         {
         #ifdef PLATFORM_WIN
             DWORD err_id = ::GetLastError();
-            if(err_id == 0)
-            {
+            if(err_id == 0){
                 return "no error!";
             }
             LPSTR msg_buffer = nullptr;
@@ -55,8 +54,7 @@ namespace agv {
             LocalFree(msg_buffer);        
         #elif PLATFORM_LINUX
             std::string err_msg;
-            if(const char* msg = dlerror())
-            {
+            if(const char* msg = dlerror()){
                 err_msg = msg;
             }
         #else
@@ -85,8 +83,7 @@ namespace agv {
         #else
             THROW_EXCEPTION_OF_METHOD_NOT_IMPL()
         #endif
-        if(handle_ == nullptr && err_detail)
-        {
+        if(handle_ == nullptr && err_detail){
             *err_detail = getLastErrorMsg();
         }
         return handle_ != nullptr;
@@ -99,8 +96,7 @@ namespace agv {
 
     bool DynamicLibraryLoader::unload(std::string *err_detail)
     {
-        if(!isLoaded())
-        {
+        if(!isLoaded()){
             return true;
         }
         #ifdef PLATFORM_WIN
@@ -122,8 +118,7 @@ namespace agv {
             THROW_EXCEPTION_OF_METHOD_NOT_IMPL()
         }
         #endif
-        if(err_detail)
-        {
+        if(err_detail){
             *err_detail = getLastErrorMsg();
         }
         return false;

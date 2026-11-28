@@ -29,7 +29,7 @@
 #include "wait_process_tool.h"
 #include "agile_vision/core/process.h"
 #include "agile_vision/core/procedure.h"
-#include "agile_vision/core/engine.h"
+#include "agile_vision/core/process_runner.h"
 #include "agile_vision/basic/log_service.h"
 
 namespace agv::stdtool {
@@ -65,19 +65,15 @@ namespace agv::stdtool {
             AGV_LOG_ERROR("Process iid list contain self!");
             return false;
         }
-        auto cur_engine = joined_process->runContext().engine;
+        float timeout = getPropPin(PK_P_MaxWaitTimeSeconds)->mutableDataBuffer().getFloatValue().value();
+        const auto timeout_ms = std::chrono::milliseconds(static_cast<int>(timeout * 1000));
         for(const auto& iid_str : iid_str_list){
-            auto cur_process = joined_process->getMutableRootProcess()->findMutableChildProcess(iid_str, true);
+            auto cur_process = ProcessRunner::findChild(joined_process, iid_str);
             if(cur_process == nullptr){
                 AGV_LOG_ERROR("Invalid process iid:{}", iid_str);
                 return false;
             }
-            wkid_t wid = cur_engine->get(cur_process);
-            if(wid == kNullId){ //perhaps it's done!
-                continue;
-            }
-            float timeout = getPropPin(PK_P_MaxWaitTimeSeconds)->mutableDataBuffer().getFloatValue().value();
-            auto wait_result = cur_engine->wait(wid, std::chrono::milliseconds((int)(timeout * 1000)));
+            auto wait_result = ProcessRunner::wait(joined_process, cur_process, timeout_ms);
             if(wait_result != Engine::WaitResult::kOk){
                 AGV_LOG_ERROR("Wait process[{}] time out!", iid_str);
                 return false;

@@ -28,18 +28,15 @@
 
 #include "procedure.h"
 #include "engine.h"
+#include "tool_factory.h"
+#include "relationship_network.h"
+#include "serialization_frame.h"
 #include "agile_vision/geometry/geometry.h"
 #include "agile_vision/basic/log_service.h"
 
 using namespace agv;
 
 namespace agv::core {
-
-    namespace{
-        using StrPxEP = StringProxy;
-        using CombineA = ProxyCombine<StringProxy, StringProxy, false>;
-        using CombineB = ProxyCombine<CombineA, Process, true>;
-    }
 
     Procedure::Procedure(const std::string &iid)
         : iid_(iid),
@@ -53,25 +50,58 @@ namespace agv::core {
 
     AgvBytes Procedure::serializeToBytes() const
     {
-        CombineA ca;
-        ca.proxyA() = iid_;
-        ca.proxyB() = alias_;
-        CombineB cb(ca, *root_);
-        return cb.serializeToBytes();
+        AgvBytes payload;
+        detail::writeString(payload, iid_);
+        detail::writeString(payload, alias_);
+        detail::writeU8(payload, active_run_ ? 1 : 0);
+        const auto process_bytes = root_->serializeToBytes();
+        detail::writeBytes(payload, process_bytes.data(), process_bytes.size());
+        AgvBytes out;
+        detail::writeFrameHeader(out, detail::kProcedureFrameMagic, static_cast<uint32_t>(payload.size()));
+        out.insert(out.end(), payload.begin(), payload.end());
+        return out;
     }
 
     size_t Procedure::loadBytes(ConsAgvBytePtr buffer, size_t size)
     {
-        CombineA ca;
-        CombineB cb(ca, *root_);
-        auto finish_bytes = cb.loadBytes(buffer, size);
-        if(finish_bytes == 0)
-        {
+        return loadBytes(buffer, size, nullptr);
+    }
+
+    size_t Procedure::loadBytes(ConsAgvBytePtr buffer, size_t size, ToolFactory* factory)
+    {
+        if(buffer == nullptr || size < 12){
             return 0;
         }
-        iid_ = ca.proxyA().stdStr();
-        alias_ = ca.proxyB().stdStr();
-        return finish_bytes;
+        auto cur = buffer;
+        size_t left = size;
+        uint32_t payload_size = 0;
+        if(!detail::readFrameHeader(cur, left, detail::kProcedureFrameMagic, payload_size)){
+            return 0;
+        }
+        std::string loaded_iid;
+        std::string loaded_alias;
+        uint8_t active = 0;
+        const char* process_data = nullptr;
+        size_t process_size = 0;
+        if(!detail::readString(cur, left, loaded_iid)){
+            return 0;
+        }
+        if(!detail::readString(cur, left, loaded_alias)){
+            return 0;
+        }
+        if(!detail::readU8(cur, left, active)){
+            return 0;
+        }
+        if(!detail::readBytes(cur, left, process_data, process_size)){
+            return 0;
+        }
+        if(root_->loadBytes(process_data, process_size, factory) == 0){
+            return 0;
+        }
+        iid_ = loaded_iid;
+        alias_ = loaded_alias;
+        active_run_ = active != 0;
+        return size - left;
     }
 
     void Procedure::setAlias(const AgvString &str)
@@ -79,16 +109,33 @@ namespace agv::core {
         alias_ = str;
     }
 
+    bool Procedure::checkDataflowCycle() const
+    {
+        RelationshipNetwork network;
+        network.buildFrom(root_.get());
+        return network.checkCycle();
+    }
+
     void Procedure::run()
     {
+        if(checkDataflowCycle()){
+            AGV_LOG_ERROR("Dataflow cycle detected in procedure:{}, refuse to run!", alias_);
+            return;
+        }
         if(run_context_.engine ==  nullptr){
             AGV_LOG_ERROR("No engine object attached!");
             return;
         }
         auto cur_engine = run_context_.engine;
-        if(run_context_.async_run){ 
-            auto finish_func = [this](wkid_t w){
-                AGV_LOG_TRACE("Procedure:{} root run done!", this->alias_);
+        if(run_context_.async_run){
+            // 按值捕获别名，避免 Procedure 先于异步回调析构时 this 悬垂。
+            const std::string proc_alias = alias_;
+            auto finish_func = [proc_alias](const WorkResult& result){
+                if(result.success){
+                    AGV_LOG_TRACE("Procedure:{} root run done, work:{}!", proc_alias, result.work_id);
+                }else{
+                    AGV_LOG_ERROR("Procedure:{} root run failed, work:{}, error:{}!", proc_alias, result.work_id, result.error);
+                }
             };
             run_context_.work_id = cur_engine->commit(root_.get(), finish_func);
             if(run_context_.work_id == kNullId){
